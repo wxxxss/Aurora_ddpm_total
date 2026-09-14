@@ -10,6 +10,30 @@ mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
+def test_hro2_velocity_resolves_to_flow_speed():
+    available = {
+        "Epoch", "BX_GSE", "BY_GSM", "BZ_GSM", "Pressure",
+        "flow_speed", "Vx", "Vy", "Vz",
+    }
+    mapping, velocity_mode = mod.resolve_source_mapping(available)
+    assert mapping["Bx"] == "BX_GSE"
+    assert mapping["By"] == "BY_GSM"
+    assert mapping["Bz"] == "BZ_GSM"
+    assert mapping["P"] == "Pressure"
+    assert mapping["V"] == "flow_speed"
+    assert velocity_mode == "direct_flow_speed"
+
+
+def test_velocity_falls_back_to_vector_magnitude():
+    available = {
+        "Epoch", "BX_GSE", "BY_GSM", "BZ_GSM", "Pressure",
+        "Vx", "Vy", "Vz",
+    }
+    mapping, velocity_mode = mod.resolve_source_mapping(available)
+    assert mapping["V"] == ("Vx", "Vy", "Vz")
+    assert velocity_mode == "vector_magnitude"
+
+
 def test_clean_preserves_rows_and_outputs_model_schema():
     times = pd.date_range("2005-01-01", periods=5, freq="5min")
     df = pd.DataFrame({
@@ -48,6 +72,8 @@ def test_structured_array_field_names_match_final_model_loader():
 
 
 if __name__ == "__main__":
+    test_hro2_velocity_resolves_to_flow_speed()
+    test_velocity_falls_back_to_vector_magnitude()
     test_clean_preserves_rows_and_outputs_model_schema()
     test_structured_array_field_names_match_final_model_loader()
     print("tests passed")

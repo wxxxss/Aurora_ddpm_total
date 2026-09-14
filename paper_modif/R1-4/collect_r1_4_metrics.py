@@ -31,7 +31,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
-
+import torch_npu
 # -----------------------------------------------------------------------------
 # Make repository-root imports work when this file is executed by path.
 # paper_modif/R1-4/collect_r1_4_metrics.py -> repo root is parents[2].
@@ -41,18 +41,13 @@ REPO_ROOT = SCRIPT_PATH.parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-# Register Ascend NPU device support when torch_npu is installed.
-try:
-    import torch_npu  # type: ignore  # noqa: F401
-except Exception:
-    torch_npu = None
 
 from models.unet import UNet
 from models.ddpm import DDPM
 
 
 DEFAULT_LEGACY_CHECKPOINT = Path(
-    "/home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv4_unetv1/aurora_diff_best.pth"
+    "/home/docker/code/Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth"
 )
 
 
@@ -79,8 +74,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--device",
         type=str,
-        default="auto",
-        help="Runtime benchmark device: auto, npu:0, cuda:0, cpu, etc. Default: auto.",
+        default="npu:0",
+        help="Runtime benchmark device: auto, npu:0, cuda:0, cpu, etc. Default: npu:0.",
     )
     parser.add_argument("--warmup", type=int, default=1, help="Number of warm-up reconstructions.")
     parser.add_argument("--repeats", type=int, default=5, help="Number of timed reconstructions.")

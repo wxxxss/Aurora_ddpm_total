@@ -21,7 +21,7 @@ ckpt/
 *.parquet
 *.npy
 *.npz
-
+*.json
 *.txt
 
 # Editors and OS

@@ -7,7 +7,7 @@ import warnings
 import torch
 import torch.nn as nn
 import torch_npu
-from models.unet_v3 import UNet
+from models.unet import UNet
 from models.ddpm import DDPM
 from datetime import datetime, timedelta
 from utils.normlize import normalize, denormalize
@@ -18,14 +18,14 @@ warnings.filterwarnings('ignore')
 
 # ==================== 1. 参数设置 ====================
 mask_size = (20, 20)  # 掩码大小 (高度, 宽度)
-results_dir = "/home/docker/code/Aurora_DDPM/reasult/eval_res/new_res/eval_results"
+results_dir = "/home/docker/code/Aurora_DDPM_total/res"
 os.makedirs(results_dir, exist_ok=True)
 num_steps = 300
 repaint_steps = 10
 jump_len = 10
 n_samples = 1
 device = "npu:0"
-model_save_path = "/home/docker/code/Aurora_DDPM/ckpt/diffusion_ckpt_unet/ckpt_v2_unetv3/aurora_diff_best.pth"
+model_save_path = "/home/docker/code/Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth"
 
 # ==================== 2. 加载模型 ====================
 print("加载扩散模型...")
@@ -36,7 +36,7 @@ ddpm.load_state_dict(checkpoint['model_state_dict'], strict=False)
 ddpm.eval()
 ddpm.to(device)
 
-model_save_path_nocond = "/home/docker/code/Aurora_DDPM/ckpt/diffusion_ckpt_simplenet/ckpt_v8/aurora_diff_best.pth"
+model_save_path_nocond = "/home/docker/code/Aurora_DDPM_total/ckpt/uncond/aurora_diff_best.pth"
 unet_nocond = UNet_nocond(1, 1)
 ddpm_nocond = DDPM_nocond(unet_nocond, num_train_steps=1000, schedule='cosine')
 checkpoint = torch.load(model_save_path_nocond, map_location=device)

@@ -4,8 +4,12 @@
 Final model conditioning schema:
     [Bx, By, Bz, V, P]
 
-CDF source variables:
-    Epoch, BX_GSE, BY_GSM, BZ_GSM, V, Pressure
+Primary HRO2 CDF source variables:
+    Epoch, BX_GSE, BY_GSM, BZ_GSM, flow_speed, Pressure
+
+For compatibility with other OMNI CDF variants, velocity is resolved in this
+order:
+    flow_speed -> V -> sqrt(Vx**2 + Vy**2 + Vz**2)
 
 The output preserves the native time axis and uses the historical processing
 choice of linear interpolation for invalid/fill values so its row indexing
@@ -33,14 +37,13 @@ DEFAULT_OUTPUT = Path(
 )
 DEFAULT_AUDIT = Path(__file__).resolve().with_name("omni_2005_5min_audit.json")
 
-SOURCE_FIELDS = {
+MODEL_FIELDS = ("Bx", "By", "Bz", "V", "P")
+STATIC_SOURCE_FIELDS = {
     "Bx": "BX_GSE",
     "By": "BY_GSM",
     "Bz": "BZ_GSM",
-    "V": "V",
     "P": "Pressure",
 }
-MODEL_FIELDS = ("Bx", "By", "Bz", "V", "P")
 VALID_RANGES = {
     "Bx": (-50.0, 50.0),
     "By": (-50.0, 50.0),
@@ -82,6 +85,49 @@ def _max_consecutive_true(mask: np.ndarray) -> int:
     return int(best)
 
 
+def resolve_source_mapping(available: set[str]) -> Tuple[Dict[str, Any], str]:
+    """Resolve CDF variables to the five conditioning variables used by the model.
+
+    The OMNI HRO2 5-min product uses ``flow_speed`` for scalar solar-wind speed.
+    Some older OMNI files expose ``V`` instead. If neither scalar field exists,
+    the speed is computed from Vx, Vy, and Vz.
+    """
+    missing_static = [name for name in ("Epoch", *STATIC_SOURCE_FIELDS.values()) if name not in available]
+    if missing_static:
+        raise KeyError(
+            f"CDF is missing required variables {sorted(missing_static)}. "
+            f"Available variables include: {sorted(available)[:80]}"
+        )
+
+    mapping: Dict[str, Any] = dict(STATIC_SOURCE_FIELDS)
+    if "flow_speed" in available:
+        mapping["V"] = "flow_speed"
+        velocity_mode = "direct_flow_speed"
+    elif "V" in available:
+        mapping["V"] = "V"
+        velocity_mode = "direct_V"
+    elif all(name in available for name in ("Vx", "Vy", "Vz")):
+        mapping["V"] = ("Vx", "Vy", "Vz")
+        velocity_mode = "vector_magnitude"
+    else:
+        raise KeyError(
+            "CDF has no usable solar-wind speed variable. Expected 'flow_speed', 'V', "
+            "or all of ['Vx', 'Vy', 'Vz']. "
+            f"Available variables include: {sorted(available)[:80]}"
+        )
+
+    # Keep the final model order explicit for auditability.
+    ordered = {field: mapping[field] for field in MODEL_FIELDS}
+    return ordered, velocity_mode
+
+
+def _read_cdf_1d(cdf: Any, name: str) -> np.ndarray:
+    values = np.asarray(cdf.varget(name)).squeeze()
+    if values.ndim != 1:
+        values = values.reshape(-1)
+    return values.astype(np.float64)
+
+
 def extract_raw_dataframe(cdf_path: Path, year: int = 2005) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     try:
         import cdflib
@@ -93,30 +139,33 @@ def extract_raw_dataframe(cdf_path: Path, year: int = 2005) -> Tuple[pd.DataFram
 
     cdf = cdflib.CDF(str(cdf_path))
     try:
-        available = set(cdf.cdf_info().rVariables) | set(cdf.cdf_info().zVariables)
-        required = {"Epoch", *SOURCE_FIELDS.values()}
-        missing = sorted(required - available)
-        if missing:
-            raise KeyError(
-                f"CDF is missing required variables {missing}. "
-                f"Available variables include: {sorted(available)[:80]}"
-            )
+        info = cdf.cdf_info()
+        available = set(info.rVariables) | set(info.zVariables)
+        mapping, velocity_mode = resolve_source_mapping(available)
 
         epoch_raw = cdf.varget("Epoch")
         utc = pd.to_datetime(cdflib.cdfepoch.to_datetime(epoch_raw))
         data: Dict[str, Any] = {"utc": utc}
-        for out_name, cdf_name in SOURCE_FIELDS.items():
-            values = np.asarray(cdf.varget(cdf_name)).squeeze()
-            if values.ndim != 1:
-                values = values.reshape(-1)
-            data[out_name] = values.astype(np.float64)
+
+        for out_name in ("Bx", "By", "Bz", "P"):
+            data[out_name] = _read_cdf_1d(cdf, mapping[out_name])
+
+        velocity_source = mapping["V"]
+        if isinstance(velocity_source, tuple):
+            vx = _read_cdf_1d(cdf, velocity_source[0])
+            vy = _read_cdf_1d(cdf, velocity_source[1])
+            vz = _read_cdf_1d(cdf, velocity_source[2])
+            data["V"] = np.sqrt(vx * vx + vy * vy + vz * vz)
+        else:
+            data["V"] = _read_cdf_1d(cdf, velocity_source)
     finally:
         try:
             cdf.close()
         except Exception:
             pass
 
-    df = pd.DataFrame(data)
+    # Reorder columns to the final model schema immediately.
+    df = pd.DataFrame(data)[["utc", *MODEL_FIELDS]]
     lengths = {name: len(df[name]) for name in df.columns}
     if len(set(lengths.values())) != 1:
         raise ValueError(f"CDF variable lengths are inconsistent: {lengths}")
@@ -127,9 +176,14 @@ def extract_raw_dataframe(cdf_path: Path, year: int = 2005) -> Tuple[pd.DataFram
     if duplicate_count:
         df = df.drop_duplicates(subset="utc", keep="first").reset_index(drop=True)
 
+    serializable_mapping = {
+        key: (list(value) if isinstance(value, tuple) else value)
+        for key, value in mapping.items()
+    }
     source_audit = {
         "cdf_path": str(cdf_path),
-        "source_to_model_mapping": {v: k for k, v in SOURCE_FIELDS.items()},
+        "model_to_source_mapping": serializable_mapping,
+        "velocity_source_mode": velocity_mode,
         "rows_after_year_filter": int(len(df)),
         "duplicate_timestamps_removed": duplicate_count,
     }
@@ -259,7 +313,6 @@ def main() -> None:
     print(f"Output NPY: {args.output}")
     print(f"Audit JSON: {args.audit}")
     print("Final-model fields: [Bx, By, Bz, V, P]")
-    print("Source mapping: BX_GSE, BY_GSM, BZ_GSM, V, Pressure")
 
     raw_df, source_info = extract_raw_dataframe(args.input, year=args.year)
     clean_df, cleaning_info = clean_model_input_dataframe(raw_df)
@@ -290,8 +343,15 @@ def main() -> None:
         json.dump(audit, f, indent=2, ensure_ascii=False)
 
     print("\nCDF -> final model mapping")
-    for out_name, cdf_name in SOURCE_FIELDS.items():
-        print(f"  {cdf_name:12s} -> {out_name}")
+    print(f"  Epoch        -> utc")
+    for out_name in MODEL_FIELDS:
+        source = source_info["model_to_source_mapping"][out_name]
+        if isinstance(source, list):
+            source_text = f"sqrt({source[0]}^2 + {source[1]}^2 + {source[2]}^2)"
+        else:
+            source_text = str(source)
+        print(f"  {source_text:28s} -> {out_name}")
+    print(f"  velocity mode: {source_info['velocity_source_mode']}")
 
     print("\nCleaning summary")
     for field in MODEL_FIELDS:

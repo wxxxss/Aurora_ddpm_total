@@ -20,8 +20,8 @@ LOWER_IS_BETTER = {"rmse", "mae"}
 def create_paper_mask(image_shape, mlat_range=(60.0, 80.0)) -> np.ndarray:
     """Return the controlled mask used in the manuscript OVATION evaluation.
 
-    The 80x96 grid spans 50--90 deg MLAT and 0--24 h MLT.  Pixels in the
-    requested MLAT band are hidden over 18--24 and 0--6 MLT.  The DDPM code
+    The 80x96 grid spans 50--90 deg MLAT and 0--24 h MLT. Pixels in the
+    requested MLAT band are hidden over 18--24 and 0--6 MLT. The DDPM code
     uses 1 for observed/preserved pixels and 0 for the artificially missing
     region.
     """
@@ -44,6 +44,26 @@ def create_paper_mask(image_shape, mlat_range=(60.0, 80.0)) -> np.ndarray:
     mask[row_min:row_max, col_18:col_24] = 0.0
     mask[row_min:row_max, col_00:col_06] = 0.0
     return mask
+
+
+def make_derangement(n: int, seed: int = 2026) -> np.ndarray:
+    """Return a deterministic permutation with no fixed points.
+
+    A Sattolo shuffle creates one cycle, so every selected test case receives
+    a condition from a different timestamp. This avoids diluting permutation
+    importance with accidental unchanged samples.
+    """
+    n = int(n)
+    if n < 2:
+        raise ValueError("A derangement requires at least two samples")
+    rng = np.random.default_rng(seed)
+    perm = np.arange(n, dtype=int)
+    for i in range(n - 1, 0, -1):
+        j = int(rng.integers(0, i))
+        perm[i], perm[j] = perm[j], perm[i]
+    if np.any(perm == np.arange(n)):
+        raise RuntimeError("Internal error: Sattolo shuffle produced a fixed point")
+    return perm
 
 
 def apply_condition_variant(
@@ -123,7 +143,6 @@ def compute_masked_metrics(
     ss_res = float(np.sum((y - p) ** 2))
     ss_tot = float(np.sum((y - mu_y) ** 2))
     r2 = float(1.0 - ss_res / ss_tot) if ss_tot > 0 else float("nan")
-    # Keep compatibility with the manuscript's existing evaluation script.
     if np.isfinite(r2):
         r2 = max(r2, -1.0)
 
@@ -185,11 +204,7 @@ def bootstrap_mean_ci(
 
 
 def paired_wilcoxon_pvalue(values: np.ndarray) -> float:
-    """Two-sided paired Wilcoxon test of degradation against zero.
-
-    SciPy is already used elsewhere in the project.  If every paired difference
-    is zero, the scientifically appropriate result is p=1 rather than raising.
-    """
+    """Two-sided paired Wilcoxon test of degradation against zero."""
     x = np.asarray(values, dtype=np.float64)
     x = x[np.isfinite(x)]
     if x.size == 0:

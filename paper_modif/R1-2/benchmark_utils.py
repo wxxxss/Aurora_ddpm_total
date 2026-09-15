@@ -81,7 +81,7 @@ def compute_masked_metrics(truth: np.ndarray, pred: np.ndarray, mask: np.ndarray
 
 
 def interpolate_inpainting(corrupted: np.ndarray, mask: np.ndarray) -> np.ndarray:
-    """Linear interpolation baseline with nearest fallback outside the convex hull."""
+    """Linear interpolation baseline matching the manuscript implementation."""
     from scipy.interpolate import griddata
 
     corrupted = np.asarray(corrupted, dtype=np.float64)
@@ -94,10 +94,7 @@ def interpolate_inpainting(corrupted: np.ndarray, mask: np.ndarray) -> np.ndarra
         return corrupted.copy().astype(np.float32)
 
     values = corrupted[mask == 1]
-    interp = griddata(known, values, unknown, method="linear", fill_value=np.nan)
-    bad = ~np.isfinite(interp)
-    if np.any(bad):
-        interp[bad] = griddata(known, values, unknown[bad], method="nearest")
+    interp = griddata(known, values, unknown, method="linear", fill_value=0.0)
     out = corrupted.copy()
     out[mask == 0] = interp
     return out.astype(np.float32)

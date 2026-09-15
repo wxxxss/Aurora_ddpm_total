@@ -41,21 +41,32 @@ def test_select_evenly_spaced_valid_is_unique_and_distributed():
     assert idx[0] < 10 and idx[-1] > 110
 
 
-def test_activity_selection_contains_requested_groups():
+def test_activity_selection_contains_requested_groups_and_unique_3h_kp_bins():
     rows = []
     for year in [2001, 2005, 2009]:
-        for i in range(20):
+        # Four low-Kp 3-h bins followed by four high-Kp 3-h bins.
+        # Three hourly rows share each nominal Kp interval.
+        for i in range(24):
             rows.append({
                 "utc": pd.Timestamp(year=year, month=1, day=1) + pd.Timedelta(hours=i),
                 "year": year, "Bx": 1, "By": 1, "Bz": -1, "V": 400, "P": 2,
-                "Kp": 2.0 if i < 10 else 5.0,
+                "Kp": 2.0 if i < 12 else 5.0,
             })
     frame = pd.DataFrame(rows)
     parts = [frame[frame.year == y].copy() for y in [2001, 2005, 2009]]
     out = select_activity_samples(parts, n_per_group=12, seed=1)
+
     assert (out.activity_group == "Kp<=3").sum() == 12
     assert (out.activity_group == "Kp>=4").sum() == 12
     assert set(out.year) == {2001, 2005, 2009}
+
+    # With 12 samples per activity group and three years, selection should be
+    # stratified 4/year/group and must not count multiple hours from the same
+    # nominal 3-h Kp interval as independent activity samples.
+    for (group, year), part in out.groupby(["activity_group", "year"]):
+        assert len(part) == 4, (group, year, len(part))
+        kp_bins = pd.to_datetime(part["utc"]).dt.floor("3h")
+        assert kp_bins.nunique() == len(part), (group, year, part[["utc", "Kp"]])
 
 
 def test_newell_and_weighted_coupling_are_finite():

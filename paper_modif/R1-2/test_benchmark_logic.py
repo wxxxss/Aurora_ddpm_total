@@ -60,3 +60,15 @@ def test_paired_comparison_uses_only_shared_sample_ids():
     out = paired_comparison(df, group_col="group", group_value="g", baseline="interpolation", bootstrap_n=500, seed=1)
     assert out["n"] == 2
     assert out["mean_improvement_rmse"] == pytest.approx((1.0 + 2.0) / 2.0)
+
+
+def test_interpolation_matches_manuscript_zero_fill_outside_convex_hull():
+    from benchmark_utils import interpolate_inpainting
+
+    image = np.arange(16, dtype=float).reshape(4, 4)
+    mask = np.ones((4, 4), dtype=float)
+    mask[:, 0] = 0.0
+    corrupted = image.copy()
+    corrupted[mask == 0] = 0.0
+    out = interpolate_inpainting(corrupted, mask)
+    assert np.all(out[:, 0] == 0.0)

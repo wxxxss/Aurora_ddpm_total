@@ -15,6 +15,7 @@ from condition_ablation_utils import (
     bootstrap_mean_ci,
     compute_masked_metrics,
     create_paper_mask,
+    make_derangement,
     metric_degradation,
 )
 
@@ -29,6 +30,14 @@ def test_create_paper_mask_matches_manuscript_missing_sector():
     assert np.all(mask[20:60, 72:96] == 0)
     assert np.all(mask[20:60, 0:24] == 0)
     assert np.all(mask[:20] == 1)
+
+
+def test_make_derangement_is_deterministic_and_has_no_fixed_points():
+    a = make_derangement(12, seed=2026)
+    b = make_derangement(12, seed=2026)
+    np.testing.assert_array_equal(a, b)
+    np.testing.assert_array_equal(np.sort(a), np.arange(12))
+    assert np.all(a != np.arange(12))
 
 
 def test_apply_condition_variant_changes_only_requested_component():

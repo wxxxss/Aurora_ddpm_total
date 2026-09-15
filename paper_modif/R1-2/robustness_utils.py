@@ -95,7 +95,47 @@ def select_evenly_spaced_valid(df: pd.DataFrame, n_samples: int, valid_mask: np.
     return np.asarray(sorted(chosen), dtype=int)
 
 
+def _kp_interval_representatives(cand: pd.DataFrame) -> pd.DataFrame:
+    """Return at most one hourly row from each nominal 3-h Kp interval.
+
+    OMNI hourly products repeat a 3-h Kp value across multiple hourly rows. Treating
+    those hours as independent activity samples would create pseudo-replication.
+    For each 3-h interval we keep the valid row closest to the interval midpoint.
+    """
+    if cand.empty:
+        return cand.copy()
+    work = cand.copy()
+    work["utc"] = pd.to_datetime(work["utc"])
+    work["kp_bin"] = work["utc"].dt.floor("3h")
+    work["_distance_to_mid_s"] = (
+        work["utc"] - (work["kp_bin"] + pd.Timedelta(hours=1))
+    ).abs().dt.total_seconds()
+    keep_idx = work.groupby(["year", "kp_bin"], sort=True)["_distance_to_mid_s"].idxmin()
+    return work.loc[keep_idx].drop(columns="_distance_to_mid_s").sort_values(["year", "utc"])
+
+
+def _pick_evenly_from_rows(rows: pd.DataFrame, n: int) -> list[int]:
+    if n <= 0 or rows.empty:
+        return []
+    if len(rows) <= n:
+        return rows.index.astype(int).tolist()
+    ordered = rows.sort_values("utc")
+    pos = select_evenly_spaced_valid(
+        ordered.reset_index(drop=False), n, np.ones(len(ordered), dtype=bool)
+    )
+    return ordered.iloc[pos].index.astype(int).tolist()
+
+
 def select_activity_samples(frames: Sequence[pd.DataFrame], n_per_group: int = 48, seed: int = 2026) -> pd.DataFrame:
+    """Select balanced Kp activity samples without repeated 3-h Kp intervals.
+
+    Samples are stratified as evenly as possible across the supplied years. Each
+    selected row comes from a distinct nominal 3-h Kp interval within its year and
+    activity group. The ``seed`` argument is retained for API compatibility and
+    reproducibility metadata; selection itself is deterministic and time-distributed.
+    """
+    del seed  # deterministic selection; retained in signature for compatibility
+
     pool = []
     for df in frames:
         if "year" not in df.columns:
@@ -104,30 +144,40 @@ def select_activity_samples(frames: Sequence[pd.DataFrame], n_per_group: int = 4
         cols = ["utc", "year", "Bx", "By", "Bz", "V", "P", "Kp"]
         pool.append(df.loc[mask, cols].copy())
     all_df = pd.concat(pool, ignore_index=True)
-    rng = np.random.default_rng(seed)
+
     outputs = []
     for label, cond in (("Kp<=3", all_df["Kp"] <= 3.0), ("Kp>=4", all_df["Kp"] >= 4.0)):
         cand = all_df.loc[cond].copy()
         if cand.empty:
             raise ValueError(f"No samples available for {label}")
-        years = sorted(cand["year"].unique())
+
+        reps = _kp_interval_representatives(cand)
+        years = sorted(reps["year"].unique())
         quota = {int(y): n_per_group // len(years) for y in years}
         for y in years[: n_per_group % len(years)]:
             quota[int(y)] += 1
-        picks = []
+
+        picks: list[int] = []
         for y in years:
-            yr = cand[cand["year"] == y]
-            k = min(quota[int(y)], len(yr))
-            if k:
-                picks.extend(rng.choice(yr.index.to_numpy(), size=k, replace=False).tolist())
+            yr = reps[reps["year"] == y]
+            picks.extend(_pick_evenly_from_rows(yr, min(quota[int(y)], len(yr))))
+
+        # If a year cannot provide its quota, fill the remainder from distinct
+        # intervals in the other years, still distributed through time.
         if len(picks) < n_per_group:
-            remaining = cand.drop(index=picks, errors="ignore")
-            k = min(n_per_group - len(picks), len(remaining))
-            if k:
-                picks.extend(rng.choice(remaining.index.to_numpy(), size=k, replace=False).tolist())
-        selected = cand.loc[picks].copy()
+            remaining = reps.drop(index=picks, errors="ignore")
+            picks.extend(_pick_evenly_from_rows(remaining, n_per_group - len(picks)))
+
+        if len(picks) < n_per_group:
+            raise ValueError(
+                f"Only {len(picks)} distinct 3-h Kp intervals available for {label}; "
+                f"{n_per_group} requested"
+            )
+
+        selected = reps.loc[picks[:n_per_group]].copy()
         selected["activity_group"] = label
-        outputs.append(selected)
+        outputs.append(selected.drop(columns="kp_bin", errors="ignore"))
+
     return pd.concat(outputs, ignore_index=True).sort_values(["activity_group", "utc"])
 
 

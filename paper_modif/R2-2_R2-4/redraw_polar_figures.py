@@ -18,10 +18,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.image import imread
 
-import cartopy.crs as ccrs
-from cartopy.feature.nightshade import Nightshade
-import aacgmv2
-
 SCRIPT_PATH = Path(__file__).resolve()
 REPO_ROOT = SCRIPT_PATH.parents[2]
 
@@ -150,6 +146,7 @@ AURORA_CMAP = make_aurora_cmap()
 
 
 def magnetic_grid_to_geographic(timestamp: datetime) -> Tuple[np.ndarray, np.ndarray]:
+    import aacgmv2
     _, mlat_grid = np.meshgrid(MLT_1D, MLAT_1D)
     mlon_row = np.asarray(aacgmv2.convert_mlt(MLT_1D, timestamp, m2a=True))
     mlon = np.tile(mlon_row[None, :], (len(MLAT_1D), 1))
@@ -158,6 +155,8 @@ def magnetic_grid_to_geographic(timestamp: datetime) -> Tuple[np.ndarray, np.nda
 
 
 def draw_background(ax, timestamp: datetime, background_path: Path) -> None:
+    import cartopy.crs as ccrs
+    from cartopy.feature.nightshade import Nightshade
     if background_path.exists():
         ax.imshow(imread(str(background_path)), origin="upper", transform=ccrs.PlateCarree(), extent=[-180, 180, -90, 90], zorder=0)
     else:
@@ -169,11 +168,13 @@ def draw_background(ax, timestamp: datetime, background_path: Path) -> None:
 
 
 def plot_flux_on_axis(ax, flux: np.ndarray, glat: np.ndarray, glon: np.ndarray, vmax: float):
+    import cartopy.crs as ccrs
     return ax.pcolormesh(glon, glat, np.ma.masked_invalid(flux), transform=ccrs.PlateCarree(),
                          shading="nearest", cmap=AURORA_CMAP, vmin=0.0, vmax=vmax, zorder=3, alpha=0.85)
 
 
 def plot_event(case: Dict[str, Any], output_path: Path, background_path: Path, vmax: float) -> None:
+    import cartopy.crs as ccrs
     timestamp = case["target_time"]
     glat, glon = magnetic_grid_to_geographic(timestamp)
     panels = [prepare_observation_for_plot(case["observation"]),

@@ -64,11 +64,11 @@ def test_bad_colormap_color_is_fully_transparent():
     assert cmap.get_bad()[3] == 0.0
 
 
-def test_panel_statistics_reports_display_floor_fraction():
+def test_panel_stats_reports_threshold_fraction():
     flux = np.asarray([0.0, 0.05, 0.1, 1.0, np.nan], dtype=np.float32)
-    stats = redraw.panel_statistics(flux, display_floor=0.1)
+    stats = redraw.panel_stats(flux, threshold=0.1)
     assert stats["n_finite"] == 4
-    assert stats["fraction_below_display_floor"] == pytest.approx(0.5)
+    assert stats["fraction_below_threshold"] == pytest.approx(0.5)
     assert stats["max"] == pytest.approx(1.0)
 
 

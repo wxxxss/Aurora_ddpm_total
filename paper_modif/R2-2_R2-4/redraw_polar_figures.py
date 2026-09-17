@@ -28,10 +28,7 @@ DEFAULT_OMNI_DATA = Path("/home/docker/data/private/AuroraData/omni_real_data/om
 DEFAULT_BACKGROUND = Path("/home/docker/data/private/AuroraData/background_img/natural-earth-1_large2048px.png")
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R2-2_R2-4/polar_redraw_results"
 
-EVENTS = {
-    "Figure4": datetime(1996, 4, 3, 2, 15, 0),
-    "Figure5": datetime(1996, 4, 1, 8, 40, 0),
-}
+EVENTS = {"Figure4": datetime(1996, 4, 3, 2, 15, 0), "Figure5": datetime(1996, 4, 1, 8, 40, 0)}
 MLAT_1D = np.linspace(50.0, 90.0, 80)
 MLT_1D = np.linspace(0.0, 24.0, 96, endpoint=False)
 ORTHO_LON = 110.0
@@ -59,8 +56,7 @@ def find_nearest_time_index(times: np.ndarray, target: datetime) -> Tuple[int, d
     delta_ns = np.abs(times_ns.astype("int64") - target64.astype("int64"))
     idx = int(np.argmin(delta_ns))
     matched = pd.Timestamp(times_ns[idx]).to_pydatetime()
-    delta_s = abs((matched - target).total_seconds())
-    return idx, matched, float(delta_s)
+    return idx, matched, float(abs((matched - target).total_seconds()))
 
 
 def extract_structured_image(data: np.ndarray, idx: int, field: str) -> np.ndarray:
@@ -100,7 +96,6 @@ def match_event(target: datetime, polar_data: np.ndarray, repaired_data: np.ndar
     for name, arr in (("polar_data", polar_data), ("repaired_data", repaired_data), ("omni_data", omni_data)):
         if arr.dtype.names is None or "utc" not in arr.dtype.names:
             raise KeyError(f"{name} must be a structured array containing a 'utc' field")
-
     p_idx, p_time, p_delta = find_nearest_time_index(polar_data["utc"], target)
     r_idx, r_time, r_delta = find_nearest_time_index(repaired_data["utc"], target)
     o_idx, o_time, o_delta = find_nearest_time_index(omni_data["utc"], target)
@@ -111,32 +106,19 @@ def match_event(target: datetime, polar_data: np.ndarray, repaired_data: np.ndar
         raise ValueError(f"OVATION array must have shape (N, 80, 96); got {ovation_data.shape}")
     if o_idx >= len(ovation_data):
         raise IndexError(f"Matched OMNI index {o_idx} exceeds OVATION length {len(ovation_data)}")
-
     observation = extract_structured_image(polar_data, p_idx, "aurora_image")
     reconstruction = extract_structured_image(repaired_data, r_idx, "image")
     ovation = np.asarray(ovation_data[o_idx], dtype=np.float32)
     validate_panel_shapes(observation, reconstruction, ovation)
-    return {
-        "target_time": target,
-        "observation": observation,
-        "reconstruction": reconstruction,
-        "ovation": ovation,
-        "polar_index": p_idx,
-        "repaired_index": r_idx,
-        "ovation_index": o_idx,
-        "polar_time": p_time,
-        "repaired_time": r_time,
-        "ovation_time": o_time,
-        "polar_delta_seconds": p_delta,
-        "repaired_delta_seconds": r_delta,
-        "ovation_delta_seconds": o_delta,
-    }
+    return {"target_time": target, "observation": observation, "reconstruction": reconstruction, "ovation": ovation,
+            "polar_index": p_idx, "repaired_index": r_idx, "ovation_index": o_idx,
+            "polar_time": p_time, "repaired_time": r_time, "ovation_time": o_time,
+            "polar_delta_seconds": p_delta, "repaired_delta_seconds": r_delta, "ovation_delta_seconds": o_delta}
 
 
 def make_aurora_cmap() -> LinearSegmentedColormap:
-    colors = [(0.0, 0.2, 0.0), (0.0, 0.5, 0.0), (0.0, 0.8, 0.0),
-              (0.5, 1.0, 0.0), (1.0, 1.0, 0.0), (1.0, 0.6, 0.0),
-              (1.0, 0.3, 0.0), (1.0, 0.0, 0.0)]
+    colors = [(0.0, 0.2, 0.0), (0.0, 0.5, 0.0), (0.0, 0.8, 0.0), (0.5, 1.0, 0.0),
+              (1.0, 1.0, 0.0), (1.0, 0.6, 0.0), (1.0, 0.3, 0.0), (1.0, 0.0, 0.0)]
     cmap = LinearSegmentedColormap.from_list("aurora", colors, N=256)
     cmap.set_bad(color="white", alpha=0.0)
     return cmap
@@ -169,19 +151,16 @@ def draw_background(ax, timestamp: datetime, background_path: Path) -> None:
 
 def plot_flux_on_axis(ax, flux: np.ndarray, glat: np.ndarray, glon: np.ndarray, vmax: float):
     import cartopy.crs as ccrs
-    return ax.pcolormesh(glon, glat, np.ma.masked_invalid(flux), transform=ccrs.PlateCarree(),
-                         shading="nearest", cmap=AURORA_CMAP, vmin=0.0, vmax=vmax, zorder=3, alpha=0.85)
+    return ax.pcolormesh(glon, glat, np.ma.masked_invalid(flux), transform=ccrs.PlateCarree(), shading="nearest",
+                         cmap=AURORA_CMAP, vmin=0.0, vmax=vmax, zorder=3, alpha=0.85)
 
 
 def plot_event(case: Dict[str, Any], output_path: Path, background_path: Path, vmax: float) -> None:
     import cartopy.crs as ccrs
     timestamp = case["target_time"]
     glat, glon = magnetic_grid_to_geographic(timestamp)
-    panels = [prepare_observation_for_plot(case["observation"]),
-              prepare_full_field_for_plot(case["reconstruction"]),
-              prepare_full_field_for_plot(case["ovation"])]
+    panels = [prepare_observation_for_plot(case["observation"]), prepare_full_field_for_plot(case["reconstruction"]), prepare_full_field_for_plot(case["ovation"])]
     titles = ["(a) Polar/UVI-derived energy flux", "(b) Reconstruction", "(c) OVATION Prime"]
-
     fig = plt.figure(figsize=(18.0, 7.0), dpi=150)
     fig.patch.set_facecolor("black")
     projection = ccrs.Orthographic(ORTHO_LON, 90.0)
@@ -191,7 +170,6 @@ def plot_event(case: Dict[str, Any], output_path: Path, background_path: Path, v
         draw_background(ax, timestamp, background_path)
         artist = plot_flux_on_axis(ax, panel, glat, glon, vmax=vmax)
         ax.set_title(title, color="white", fontsize=16, fontweight="bold", pad=12)
-
     cbar_ax = fig.add_axes([0.28, 0.075, 0.44, 0.026])
     cbar = fig.colorbar(artist, cax=cbar_ax, orientation="horizontal")
     cbar.ax.tick_params(labelsize=11, colors="white")
@@ -203,23 +181,17 @@ def plot_event(case: Dict[str, Any], output_path: Path, background_path: Path, v
 
 
 def load_inputs(args: argparse.Namespace):
-    for label, path in {"Polar/UVI": args.polar_data, "saved reconstruction": args.repaired_data,
-                        "OVATION": args.ovation_data, "OMNI": args.omni_data}.items():
+    for label, path in {"Polar/UVI": args.polar_data, "saved reconstruction": args.repaired_data, "OVATION": args.ovation_data, "OMNI": args.omni_data}.items():
         if not path.exists():
             raise FileNotFoundError(f"{label} file not found: {path}")
-    return (np.load(args.polar_data, allow_pickle=True), np.load(args.repaired_data, allow_pickle=True),
-            np.load(args.ovation_data, allow_pickle=False), np.load(args.omni_data, allow_pickle=True))
+    return np.load(args.polar_data, allow_pickle=True), np.load(args.repaired_data, allow_pickle=True), np.load(args.ovation_data, allow_pickle=False), np.load(args.omni_data, allow_pickle=True)
 
 
 def main() -> None:
     args = parse_args()
     polar_data, repaired_data, ovation_data, omni_data = load_inputs(args)
     args.output_root.mkdir(parents=True, exist_ok=True)
-    audit: Dict[str, Any] = {"polar_data": str(args.polar_data), "repaired_data": str(args.repaired_data),
-                             "ovation_data": str(args.ovation_data), "omni_data": str(args.omni_data),
-                             "vmax": args.vmax, "observation_support_threshold": OBS_SUPPORT_THRESHOLD,
-                             "events": {}}
-
+    audit: Dict[str, Any] = {"polar_data": str(args.polar_data), "repaired_data": str(args.repaired_data), "ovation_data": str(args.ovation_data), "omni_data": str(args.omni_data), "vmax": args.vmax, "observation_support_threshold": OBS_SUPPORT_THRESHOLD, "events": {}}
     print("=" * 88)
     print("POLAR/UVI FIGURE 4/5 REDRAW FROM SAVED RECONSTRUCTION")
     print("=" * 88)
@@ -227,17 +199,9 @@ def main() -> None:
         case = match_event(target, polar_data, repaired_data, omni_data, ovation_data, args.max_delta_seconds)
         out = args.output_root / f"{case_name}_Polar_UVI_manuscript.png"
         plot_event(case, out, args.background, args.vmax)
-        audit["events"][case_name] = {
-            "target_time": target.isoformat(), "polar_time": case["polar_time"].isoformat(),
-            "repaired_time": case["repaired_time"].isoformat(), "ovation_time": case["ovation_time"].isoformat(),
-            "polar_index": int(case["polar_index"]), "repaired_index": int(case["repaired_index"]),
-            "ovation_index": int(case["ovation_index"]), "polar_delta_seconds": float(case["polar_delta_seconds"]),
-            "repaired_delta_seconds": float(case["repaired_delta_seconds"]),
-            "ovation_delta_seconds": float(case["ovation_delta_seconds"]), "output": str(out),
-        }
+        audit["events"][case_name] = {"target_time": target.isoformat(), "polar_time": case["polar_time"].isoformat(), "repaired_time": case["repaired_time"].isoformat(), "ovation_time": case["ovation_time"].isoformat(), "polar_index": int(case["polar_index"]), "repaired_index": int(case["repaired_index"]), "ovation_index": int(case["ovation_index"]), "polar_delta_seconds": float(case["polar_delta_seconds"]), "repaired_delta_seconds": float(case["repaired_delta_seconds"]), "ovation_delta_seconds": float(case["ovation_delta_seconds"]), "output": str(out)}
         print(f"{case_name}: {target} -> {out}")
         print(f"  matched Polar={case['polar_time']} recon={case['repaired_time']} OVATION={case['ovation_time']}")
-
     audit_path = args.output_root / "polar_redraw_audit.json"
     with audit_path.open("w", encoding="utf-8") as f:
         json.dump(audit, f, indent=2)

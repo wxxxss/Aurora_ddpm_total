@@ -64,11 +64,11 @@ def test_bad_colormap_color_is_fully_transparent():
     assert cmap.get_bad()[3] == 0.0
 
 
-def test_panel_stats_reports_threshold_fraction():
+def test_panel_statistics_reports_display_floor_fraction():
     flux = np.asarray([0.0, 0.05, 0.1, 1.0, np.nan], dtype=np.float32)
-    stats = redraw.panel_stats(flux, threshold=0.1)
+    stats = redraw.panel_statistics(flux, display_floor=0.1)
     assert stats["n_finite"] == 4
-    assert stats["fraction_below_threshold"] == pytest.approx(0.5)
+    assert stats["fraction_below_display_floor"] == pytest.approx(0.5)
     assert stats["max"] == pytest.approx(1.0)
 
 
@@ -94,3 +94,16 @@ def test_match_event_builds_three_panels_from_saved_products():
     assert case["polar_time"] == target
     assert case["repaired_time"] == target
     assert case["ovation_time"] == target
+
+
+def test_remove_small_connected_components_hides_isolated_speckles():
+    flux = np.full((8, 8), np.nan, dtype=np.float32)
+    flux[1:5, 1:5] = 0.5
+    flux[6, 6] = 0.6
+    flux[6, 1:3] = 0.7
+
+    out = redraw.remove_small_connected_components(flux, min_component_size=4)
+
+    assert np.isfinite(out[1:5, 1:5]).all()
+    assert np.isnan(out[6, 6])
+    assert np.isnan(out[6, 1:3]).all()

@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-
 MODULE_PATH = Path(__file__).with_name("redraw_polar_figures.py")
 spec = importlib.util.spec_from_file_location("redraw_polar_figures", MODULE_PATH)
 redraw = importlib.util.module_from_spec(spec)
@@ -21,14 +20,8 @@ def make_structured(times, field_name, images):
 
 
 def test_find_nearest_time_index_returns_expected_row_and_delta():
-    times = np.asarray([
-        "1996-04-01T08:35:00",
-        "1996-04-01T08:40:00",
-        "1996-04-01T08:45:00",
-    ], dtype="datetime64[s]")
-    idx, matched, delta_s = redraw.find_nearest_time_index(
-        times, pd.Timestamp("1996-04-01T08:40:30").to_pydatetime()
-    )
+    times = np.asarray(["1996-04-01T08:35:00", "1996-04-01T08:40:00", "1996-04-01T08:45:00"], dtype="datetime64[s]")
+    idx, matched, delta_s = redraw.find_nearest_time_index(times, pd.Timestamp("1996-04-01T08:40:30").to_pydatetime())
     assert idx == 1
     assert matched == pd.Timestamp("1996-04-01T08:40:00").to_pydatetime()
     assert delta_s == pytest.approx(30.0)
@@ -63,21 +56,12 @@ def test_validate_panel_shapes_rejects_mismatch():
 
 def test_match_event_builds_three_panels_from_saved_products():
     target = pd.Timestamp("1996-04-01T08:40:00").to_pydatetime()
-    polar_images = [np.full((80, 96), 3.0, dtype=np.float32)]
-    repaired_images = [np.full((80, 96), 4.0, dtype=np.float32)]
-    polar = make_structured([target], "aurora_image", polar_images)
-    repaired = make_structured([target], "image", repaired_images)
+    polar = make_structured([target], "aurora_image", [np.full((80, 96), 3.0, dtype=np.float32)])
+    repaired = make_structured([target], "image", [np.full((80, 96), 4.0, dtype=np.float32)])
     omni = np.empty(1, dtype=[("utc", "datetime64[s]")])
     omni["utc"] = np.asarray([target], dtype="datetime64[s]")
     ovation = np.full((1, 80, 96), 5.0, dtype=np.float32)
-    case = redraw.match_event(
-        target=target,
-        polar_data=polar,
-        repaired_data=repaired,
-        omni_data=omni,
-        ovation_data=ovation,
-        max_delta_seconds=1.0,
-    )
+    case = redraw.match_event(target, polar, repaired, omni, ovation, max_delta_seconds=1.0)
     np.testing.assert_allclose(case["observation"], 3.0)
     np.testing.assert_allclose(case["reconstruction"], 4.0)
     np.testing.assert_allclose(case["ovation"], 5.0)

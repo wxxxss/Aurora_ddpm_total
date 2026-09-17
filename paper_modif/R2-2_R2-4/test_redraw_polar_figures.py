@@ -46,6 +46,32 @@ def test_observation_plot_array_masks_same_missing_pixels_as_legacy_repair():
     assert np.isnan(plotted[0, 5])
 
 
+def test_full_field_display_floor_masks_low_values_without_mutating_input():
+    flux = np.asarray([[0.0, 0.05, 0.1, 0.2, -1.0, np.nan]], dtype=np.float32)
+    original = flux.copy()
+    plotted = redraw.prepare_full_field_for_plot(flux, display_floor=0.1)
+    assert np.isnan(plotted[0, 0])
+    assert np.isnan(plotted[0, 1])
+    assert plotted[0, 2] == pytest.approx(0.1)
+    assert plotted[0, 3] == pytest.approx(0.2)
+    assert np.isnan(plotted[0, 4])
+    assert np.isnan(plotted[0, 5])
+    np.testing.assert_equal(flux, original)
+
+
+def test_bad_colormap_color_is_fully_transparent():
+    cmap = redraw.make_aurora_cmap()
+    assert cmap.get_bad()[3] == 0.0
+
+
+def test_panel_statistics_reports_display_floor_fraction():
+    flux = np.asarray([0.0, 0.05, 0.1, 1.0, np.nan], dtype=np.float32)
+    stats = redraw.panel_statistics(flux, display_floor=0.1)
+    assert stats["n_finite"] == 4
+    assert stats["fraction_below_display_floor"] == pytest.approx(0.5)
+    assert stats["max"] == pytest.approx(1.0)
+
+
 def test_validate_panel_shapes_rejects_mismatch():
     obs = np.zeros((80, 96), dtype=np.float32)
     recon = np.zeros((80, 96), dtype=np.float32)

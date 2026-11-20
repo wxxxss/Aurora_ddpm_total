@@ -1,0 +1,37 @@
+{
+  "source": "Author-supplied polar_mask_case_diagnostic(1).json, 2026-11-20",
+  "comparison_tolerance_erg_cm_minus2_s_minus1": 0.0001,
+  "interpretation": "A strict mask defined by (Polar flux<1) AND (OVATION>0) predicts preservation of low-flux cells where OVATION=0. Both saved figures change every such cell beyond tolerance, contradicting that strict gate. A flux-threshold-only mask is consistent with the figures, but output comparisons alone cannot certify checkpoint provenance or scientific observation support.",
+  "events": {
+    "Figure4_1996_04_03_02_15_UT": {
+      "total_cells": 7680,
+      "polar_flux_ge_1_cells": 448,
+      "polar_flux_lt_1_cells": 7232,
+      "low_flux_ovation_positive": 7060,
+      "low_flux_ovation_nonpositive": 172,
+      "changed_low_flux_ovation_nonpositive": 172,
+      "mean_abs_change_low_flux_ovation_nonpositive": 0.05180370794043356,
+      "max_abs_change_low_flux_ovation_nonpositive": 0.23560456931591034,
+      "changed_all_low_flux": 7228,
+      "max_abs_preserved_region_difference": 3.5166670997455185e-7
+    },
+    "Figure5_1996_04_01_08_40_UT": {
+      "total_cells": 7680,
+      "polar_flux_ge_1_cells": 1317,
+      "polar_flux_lt_1_cells": 6363,
+      "low_flux_ovation_positive": 6188,
+      "low_flux_ovation_nonpositive": 175,
+      "changed_low_flux_ovation_nonpositive": 175,
+      "mean_abs_change_low_flux_ovation_nonpositive": 0.053131380858394084,
+      "max_abs_change_low_flux_ovation_nonpositive": 0.26115861535072327,
+      "changed_all_low_flux": 6361,
+      "max_abs_preserved_region_difference": 0.0000054322078355539816
+    }
+  },
+  "limitations": [
+    "Flux below 1.0 is an intensity threshold, not proof that the sensor lacked coverage.",
+    "Every remapped Polar input cell has a finite numerical value, which may include fill or interpolated values.",
+    "Real-event full-field truth is unavailable, hence accuracy in unobserved areas is not established.",
+    "Comparison of time stamps and equal array lengths alone does not prove OVATION maps are calibrated or generated with identical driver records."
+  ]
+}

@@ -106,8 +106,15 @@ def main():
         "polar_postprocessed_cases":{},
         "missing_inputs":[],
     }
+    legacy_prepared=ROOT/"paper_modif/R2-1_R2-3/swath_prepared_cases"
     for case in ("Figure6","Figure7"):
         path=args.prepared_root/case/(case+"_swath_case.npz")
+        if not path.is_file() and args.prepared_root == DEFAULT_PREPARED:
+            # Untracked/private prepared NPZ files may still be in their old
+            # local directory after the tracked scripts and figures were moved.
+            old=legacy_prepared/case/(case+"_swath_case.npz")
+            if old.is_file():
+                path=old
         if not path.is_file():
             report["missing_inputs"].append(str(path))
             report["ssusi_prepared_cases"][case]={"available":False}
@@ -116,7 +123,7 @@ def main():
             for key in ("flux_grid","obs_mask","count_grid"):
                 if key not in npz:
                     raise KeyError(f"{path}: missing {key}")
-            report["ssusi_prepared_cases"][case]={"available":True,
+            report["ssusi_prepared_cases"][case]={"available":True,"source":str(path),
                 **masked_average_audit(npz["flux_grid"],npz["obs_mask"],npz["count_grid"])}
     if args.polar_data.is_file():
         data=np.load(args.polar_data,allow_pickle=True)

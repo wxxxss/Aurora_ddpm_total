@@ -81,30 +81,29 @@ def main():
         raise KeyError("Saved reconstructions must contain 'image'")
     if ov_all.ndim!=3:
         raise ValueError(f"OVATION maps should be (N,H,W), got {ov_all.shape}")
+    ovation_index_aligned = len(ov_all) == len(omni_all)
     report={"inputs":{k:str(getattr(args,k)) for k in ("observation","reconstruction","ovation","omni")},
             "note":("The legacy Polar source threshold is not sufficient to "
                     "attribute the masks used for manuscript Figures 4-5; "
                     "normalization, quality control and saved-model provenance "
                     "must be checked against the actual production run."),
+            "ovation_omni_index_alignment": {"valid": bool(ovation_index_aligned), "n_ovation": len(ov_all), "n_omni": len(omni_all)},
             "events":{}}
     for name,target in EVENTS.items():
         oidx,ots,odt=nearest_record(obs_all,target,args.max_seconds,"Polar")
         ridx,rts,rdt=nearest_record(recon_all,target,args.max_seconds,"Reconstruction")
         midx,mts,mdt=nearest_record(omni_all,target,args.max_seconds,"OMNI")
-        if midx>=len(ov_all):
-            raise IndexError(f"OVATION has {len(ov_all)} maps but matched OMNI index is {midx}; "
-                             "provide a time-aligned OVATION file.")
         measured=np.asarray(obs_all["aurora_image"][oidx],dtype=float)
         reconstructed=np.asarray(recon_all["image"][ridx],dtype=float)
-        simulated=np.asarray(ov_all[midx],dtype=float)
-        if measured.shape!=reconstructed.shape or measured.shape!=simulated.shape:
-            raise ValueError(f"Shape mismatch for {name}: {measured.shape}, {reconstructed.shape}, {simulated.shape}")
+        simulated=np.asarray(ov_all[midx],dtype=float) if ovation_index_aligned else None
+        if measured.shape!=reconstructed.shape or (simulated is not None and measured.shape!=simulated.shape):
+            raise ValueError(f"Shape mismatch for {name}: {measured.shape}, {reconstructed.shape}, {None if simulated is None else simulated.shape}")
         finite=np.isfinite(measured)
         finite_recon=np.isfinite(reconstructed)
         # This exactly reproduces the legacy mask except for explicit reporting of non-finite pixels.
         low=finite & (measured < args.threshold)
         high=finite & (measured >= args.threshold)
-        simulated_positive=np.isfinite(simulated)&(simulated>args.ovation_positive_threshold)
+        simulated_positive=(np.isfinite(simulated)&(simulated>args.ovation_positive_threshold)) if simulated is not None else None
         reliable=high&finite_recon
         recon_abs=np.abs(measured[reliable]-reconstructed[reliable])
         report["events"][name]={
@@ -118,9 +117,9 @@ def main():
             "legacy_candidate_flux_threshold":float(args.threshold),
             "legacy_candidate_missing_cells":int(low.sum()),
             "legacy_candidate_observed_cells":int(high.sum()),
-            "low_flux_and_OVATION_positive":int((low&simulated_positive).sum()),
-            "low_flux_and_OVATION_nonpositive":int((low&~simulated_positive).sum()),
-            "observed_flux_positive_where_OVATION_nonpositive":int((high&~simulated_positive).sum()),
+            "low_flux_and_OVATION_positive":int((low&simulated_positive).sum()) if simulated_positive is not None else None,
+            "low_flux_and_OVATION_nonpositive":int((low&~simulated_positive).sum()) if simulated_positive is not None else None,
+            "observed_flux_positive_where_OVATION_nonpositive":int((high&~simulated_positive).sum()) if simulated_positive is not None else None,
             "candidate_mask_fraction_of_all_cells":fraction_or_none(low),
             "saved_reconstruction_minus_observation_on_high_flux_cells":{
                 "count":int(recon_abs.size),
@@ -128,6 +127,8 @@ def main():
                 "maximum_absolute_error":float(recon_abs.max()) if recon_abs.size else None,
             }
         }
+    if not ovation_index_aligned:
+        print("WARNING: OMNI/OVATION lengths differ; no OVATION-positive categories were computed to avoid misleading temporal alignment.")
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(json.dumps(report,indent=2,ensure_ascii=False))

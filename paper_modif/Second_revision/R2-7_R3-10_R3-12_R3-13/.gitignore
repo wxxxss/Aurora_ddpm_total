@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+center_aligned_inputs/
+center_aligned_reconstruction/
+center_aligned_heldout/
+center_aligned_smoothness/

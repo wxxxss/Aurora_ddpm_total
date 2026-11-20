@@ -102,9 +102,10 @@ def native_to_centered(flux, lat, mlt, ut):
 def read_raw(path: Path):
     with Dataset(str(path), "r") as ds:
         def array(key):
-            return np.asarray(ds.variables[key][:].filled(np.nan)
-                if np.ma.isMaskedArray(ds.variables[key][:])
-                else ds.variables[key][:], dtype=np.float64).squeeze()
+            # Convert to floating-point *before* filling masked integer EDR
+            # arrays with NaN; otherwise .filled(np.nan) can raise TypeError.
+            raw = np.ma.asarray(ds.variables[key][:], dtype=np.float64)
+            return np.asarray(np.ma.filled(raw, np.nan), dtype=np.float64).squeeze()
         flux = array("ENERGY_FLUX_NORTH_MAP")
         lat = array("LATITUDE_GEOMAGNETIC_GRID_MAP")
         mlt = array("MLT_GRID_MAP")

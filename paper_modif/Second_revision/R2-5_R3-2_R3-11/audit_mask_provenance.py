@@ -37,7 +37,7 @@ def main():
       "assumed to describe the same data version or the same Figure 4-7 runs."
     )
     out=Path(__file__).resolve().parent/"mask_provenance.json"
-    out.write_text(json.dumps(record,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+    out.write_text(json.dumps(record,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(json.dumps(record,indent=2,ensure_ascii=False))
     print("Saved",out)
 

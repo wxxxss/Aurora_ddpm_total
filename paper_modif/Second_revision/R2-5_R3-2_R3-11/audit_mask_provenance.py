@@ -17,7 +17,7 @@ PATHS={
     "round1_polar_figures":"paper_modif/First_revision/R2-2_R2-4/redraw_polar_figures.py",
     "sampling":"models/ddpm.py"
 }
-PATTERN=re.compile(r"mask|need_repair|real_close_to_zero|sim_has_value|OBS_SUPPORT_THRESHOLD|np\\.where\\(obs_mask",re.I)
+PATTERN = re.compile(r"mask|need_repair|real_close_to_zero|sim_has_value|OBS_SUPPORT_THRESHOLD|np[.]where[(]obs_mask", re.I)
 def main():
     record={}
     for tag,path in PATHS.items():

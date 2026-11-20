@@ -11,6 +11,7 @@ this repo; this script cannot estimate instrument calibration uncertainty.
 """
 from __future__ import annotations
 import argparse
+import csv
 import json
 from pathlib import Path
 import numpy as np
@@ -125,6 +126,29 @@ def main():
                     raise KeyError(f"{path}: missing {key}")
             report["ssusi_prepared_cases"][case]={"available":True,"source":str(path),
                 **masked_average_audit(npz["flux_grid"],npz["obs_mask"],npz["count_grid"])}
+    archived_csv=ROOT/"paper_modif/First_revision/R2-1_R2-3/ssusi_swath_audit_v2/ssusi_swath_summary_v2.csv"
+    report["prior_swath_audit_comparison"]={}
+    if archived_csv.is_file():
+        with archived_csv.open("r",encoding="utf-8-sig",newline="") as h:
+            previous={r["case"]:r for r in csv.DictReader(h)}
+        for case in ("Figure6","Figure7"):
+            current=report["ssusi_prepared_cases"][case]
+            older=previous.get(case)
+            if not current.get("available") or older is None:
+                continue
+            old_fraction=float(older["direct_target_support_fraction"])
+            old_cells=round(old_fraction*80*96)
+            new_cells=current["cells_with_native_support"]
+            report["prior_swath_audit_comparison"][case]={
+                "archived_swath_audit_cells":old_cells,
+                "prepared_npz_supported_cells":new_cells,
+                "difference_npz_minus_archived_cells":new_cells-old_cells,
+                "fraction_difference":current["fraction_with_native_support"]-old_fraction,
+                "exact_agreement":new_cells==old_cells,
+                "interpretation":"Two archived products may differ in preprocessing details or source versions. Their discrepancy should not be silently rounded away or assigned a cause without comparing native-mask membership."
+            }
+    else:
+        report["missing_inputs"].append(str(archived_csv))
     if args.polar_data.is_file():
         data=np.load(args.polar_data,allow_pickle=True)
         if data.dtype.names is None or not {"utc","aurora_image"}.issubset(data.dtype.names):

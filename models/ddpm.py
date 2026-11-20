@@ -220,6 +220,12 @@ class DDPM(nn.Module):
         )  # 获得时间步表
 
         device = image.device
+        # Sampler mask convention: 1 = observed, 0 = missing.
+        # Discard all values in missing cells before the initial forward
+        # noising step. This prevents accidental leakage of held-out targets
+        # or stale/unreliable measurements into the reverse trajectory.
+        mask = (mask.to(device=device) > 0.5).to(dtype=image.dtype)
+        image = torch.where(mask.bool(), image, torch.zeros_like(image))
         x_t = torch.randn_like(image, device=device, dtype=torch.float32)
          # 2. 获取初始时间步T（最大的时间步）
         T = times[0]

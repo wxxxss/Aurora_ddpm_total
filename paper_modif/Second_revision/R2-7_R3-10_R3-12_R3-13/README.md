@@ -46,3 +46,17 @@ Its output is a count-based cutoff sensitivity, not a calibrated uncertainty int
 4. R2-7 visual differences are plausibly affected by the very different definitions and retained fractions of Polar threshold-constraint pixels and SSUSI swath support, plus frame-vs-orbit timing and instrument products; relative accuracy cannot be inferred from visual appearance alone.
 
 **Revision status**: descriptive/statistical audit and manuscript clarification can be completed from repository outputs; calibration threshold validation and full Polar native-grid reproduction remain open.
+
+## Author-run audit confirmation (2026-11-20)
+The author uploaded `grid_calibration_audit.json` and `statistical_units_audit.json`. Their derived, path-scrubbed results are stored in `verified_server_audit_summary.json`. The former reported `missing_inputs=[]` and read both private SSUSI prepared `.npz` files and the two gridded Polar cases.
+
+- Current prepared SSUSI cases have **4355/7680 (56.7057%)** and **4290/7680 (55.8594%)** supported target cells for Figure6 and Figure7, respectively. **4110/4355 (94.37%)** and **4034/4290 (94.03%)** supported cells contain two or more original samples, with **42268** and **41805** total native hits in the supported grid cells.
+- The earlier first-round `ssusi_swath_summary_v2.csv` reported **4345/7680 (56.5755%)** and **4279/7680 (55.7161%)** as direct support. The small **+10/+11-cell discrepancy** is real and the cause has **not** been established. The updated `audit_grid_calibration.py` compares the archived CSV with current prepared input counts under `prior_swath_audit_comparison`. Use the prepared-`.npz` figures for current input descriptions, but verify the precise map/checkpoint provenance before attributing them to all previously saved panels.
+- Postprocessed Polar maps contain no flux > 40; maxima were 4.0439 and 32.3327 erg cm^-2 s^-1. This is **not** a sensitivity test of the pre-screening 40 cutoff, because the surviving product is already processed. Figure5 contains 75 cells > 20, illustrating why an uncensored sensitivity test cannot be inferred from a censored input.
+- Event-unit audit confirmed **2 EDR cases**, **8202 spatial gradient edges**, **79 correlated PSD segments** (45+34). High-frequency fraction differences (SSUSI minus OVATION) are +0.07020 / -0.03223 for the two cases; slope differences are -0.02091 / -1.12370. The unweighted mean of two case averages is **+0.01898** / **-0.57230**, distinct from the 79-segment weighted pooled differences **+0.02611** / **-0.49552**. No event-level inferential p value or CI is justified from only two cases.
+
+### Re-run updated support audit (optional follow-up)
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_grid_calibration.py
+```
+Inspect the output `prior_swath_audit_comparison`. Reconciliation of the 10/11-cell difference and recovery of the original Polar native preprocessing/uncensored LBHL flux remain open. Synthetic unit tests were committed, but the user has not supplied their test-run output.

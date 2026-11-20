@@ -26,3 +26,14 @@ Generated outputs: `audit_results.json` and `mask_provenance.json` in this folde
 3. Verify the physical meaning and threshold of the Polar/UVI mask from the actual figure-generation pipeline; do not infer this from an unrelated legacy script.
 4. Re-run any relevant reconstruction experiments after the sampler's missing-value sanitization change, then compare against manuscript figures and metrics.
 5. Evaluate new observations, true withheld cells and OVATION baselines in the next experiment group.
+
+## Reported audit execution (20 November 2026)
+The author ran `audit_sampling.py` on their local `torch` environment and provided:
+- Observed pixels preserved: `true`.
+- Change in missing output when observed pixels were changed: maximum absolute difference `0.06910479068756104`.
+- Change in missing output when *only missing input values* were altered: `0.0`.
+- Attention Q shape: `[1,20,32]`; key/value sequence length: `1`; single-key softmax = `true`.
+
+These are code-path observations with an untrained local denoiser, **not** a satellite-accuracy benchmark and not evidence of an improvement over OVATION.
+
+The author also reported a Python 3.9 `re.error` in `audit_mask_provenance.py`. The failing regex used doubled backslashes in a raw regex. The pattern was corrected on `main` in commit `0f4094788794218bf98840927a355639e3fb201f`; the author should pull and rerun the provenance audit.

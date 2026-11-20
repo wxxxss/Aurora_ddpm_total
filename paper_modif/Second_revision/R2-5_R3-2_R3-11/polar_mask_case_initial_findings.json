@@ -1,0 +1,40 @@
+{
+  "provenance": "User-run check_polar_mask_cases.py output supplied on 2026-11-20; input paths omitted.",
+  "scope": "Figure 4/5 candidate mask and saved-output comparisons; no inference checkpoint lineage asserted.",
+  "ovation_omni_index_alignment": {
+    "valid": true,
+    "n_ovation": 8640,
+    "n_omni": 8640
+  },
+  "mask_threshold_flux": 1,
+  "events": {
+    "Figure4": {
+      "timestamp_utc": "1996-04-03T02:15:00",
+      "n_cells": 7680,
+      "below_threshold": 7232,
+      "above_or_equal_threshold": 448,
+      "candidate_fraction": 0.941667,
+      "below_threshold_ovation_positive": 7060,
+      "below_threshold_ovation_nonpositive": 172,
+      "observed_region_mean_absolute_difference": 8.883314857619348e-8,
+      "observed_region_max_absolute_difference": 3.5166670997455185e-7
+    },
+    "Figure5": {
+      "timestamp_utc": "1996-04-01T08:40:00",
+      "n_cells": 7680,
+      "below_threshold": 6363,
+      "above_or_equal_threshold": 1317,
+      "candidate_fraction": 0.828516,
+      "below_threshold_ovation_positive": 6188,
+      "below_threshold_ovation_nonpositive": 175,
+      "observed_region_mean_absolute_difference": 4.6066517731884584e-7,
+      "observed_region_max_absolute_difference": 0.0000054322078355539816
+    }
+  },
+  "caveats": [
+    "All 7680 cells in each input image are finite; finite does not establish observational support.",
+    "Threshold-excluded cells can include valid weak precipitation, not necessarily instrument gaps.",
+    "These comparisons support flux-threshold preservation but cannot distinguish flux-only from OVATION-gated missing masks without comparing saved output in OVATION-nonpositive low-flux cells.",
+    "Original checkpoint/script provenance remains to be confirmed."
+  ]
+}

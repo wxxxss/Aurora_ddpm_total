@@ -2,17 +2,21 @@
 """Synthetic unit tests for center-aligned SSUSI binning; no private EDR data."""
 import unittest
 import numpy as np
-from prepare_center_aligned_ssusi import native_to_centered
+from prepare_center_aligned_ssusi import native_to_centered, LAT_CENTERS
 
 class TestCenterAligned(unittest.TestCase):
-    def test_mlt_half_step_nearest_center(self):
+    def test_mlt_nearest_center_and_midnight_wrap(self):
         # 0.20h belongs to center 0.25h and 23.90h wraps to center 0h.
+        # Use an EXACT declared latitude-grid center rather than 70 deg,
+        # which lies halfway between rows 39 and 40. np.linspace-derived
+        # LAT_STEP differs slightly from the theoretical 40/79 floating
+        # value, so midpoint rounding is implementation-sensitive.
         f=np.array([[2.0,4.0,6.0]])
-        lat=np.array([[70.0,70.0,70.0]])
+        lat=np.full((1,3),float(LAT_CENTERS[40]))
         mlt=np.array([[0.20,23.90,0.01]])
         ut=np.ones_like(f)
         flux,mask,count,info=native_to_centered(f,lat,mlt,ut)
-        j=int(np.rint((70.0-50.0)/(40.0/79.0)))
+        j=40
         self.assertEqual(count[j,1],1)
         self.assertEqual(count[j,0],2)
         self.assertAlmostEqual(float(flux[j,1]),2.0)

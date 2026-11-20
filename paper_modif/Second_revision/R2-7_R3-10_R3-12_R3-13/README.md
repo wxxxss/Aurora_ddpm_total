@@ -75,3 +75,66 @@ python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_mlt_binning_alig
 ```
 
 Produces `mlt_binning_alignment_audit.json`: direct support, symmetric difference of support maps, original-sample assignment differences, flux difference on shared supported cells, and whether the locally prepared NPZ agrees with either convention. **Do not silently switch the production pipeline to a new binning rule or claim unchanged performance.** If this changes input products, the affected SSUSI figures, baseline comparisons and held-out evaluation must be recomputed on the corrected grid. The current manuscript is therefore a cumulative *working draft* pending this specific reproducibility check.
+
+## Native-EDR binning comparison: confirmed by author (2026-11-20)
+The author uploaded `mlt_binning_alignment_audit.json`. A path-scrubbed, numeric copy is in `mlt_binning_alignment_verified.json`. The source mapping is now confirmed:
+
+| Event | Edge-zero supported | Centered supported | Native samples assigned to different target cells | Symmetric difference (support mask) | MAE on jointly supported flux cells |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fig. 6 | 4355 | 4345 | 21005/42268 (49.69%) | 224 | 0.09289 |
+| Fig. 7 | 4290 | 4279 | 20721/41805 (49.57%) | 231 | 0.15371 |
+
+The old prepared `.npz` masks match **edge-zero** exactly. The older swath-v2 support summaries match **nearest-center** exactly. The 10/11-cell count discrepancy hid a more consequential ~50% reassignment of native samples and flux changes within shared cells. Differences are not merely rounding of coverage percentages. The mean absolute differences shown are measured in the energy-flux units of the SSUSI EDR.
+
+**Do not describe the old Figure6/7 reconstructions as center-aligned results.** The manuscript is a working version until the affected reconstructions and diagnostics are regenerated, and the SSUSI figures, Tables, response claims and spatial metrics are synchronized.
+
+### New center-aligned pipeline (without overwriting First_revision)
+Run from repository root. Files are generated only under `Second_revision/R2-7_R3-10_R3-12_R3-13/`.
+
+1. Synthetic tests (numpy and netCDF4):
+
+```bash
+python -m unittest discover -s paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13 -p 'test_*.py'
+```
+
+2. Generate the center-aligned case inputs with `UT_N>0` and direct native-cell averaging. The script asserts the expected centered support totals (4345 and 4279) and will refuse to overwrite an existing dataset unless `--overwrite` is specified deliberately.
+
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/prepare_center_aligned_ssusi.py
+```
+
+Check `center_aligned_inputs/center_alignment_manifest.json`, with **4345** and **4279** directly supported cells; first-revision inputs and results are untouched.
+
+3. Re-run the paper-model reconstructions (requires the author's trained weights, normalization, OMNI/OVATION and plotting dependencies). The earlier script is re-used, with only inputs/outputs redirected:
+
+```bash
+python paper_modif/First_revision/R2-1_R2-3/rerun_ssusi_reconstruction.py \
+  --prepared-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_inputs \
+  --output-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_reconstruction
+```
+
+If weights are elsewhere, supply `--checkpoint /path/to/weights.pth --norm-params /path/to/norm_params.pkl --device npu:0`. The old historical comparison figures should never be silently overwritten.
+
+4. Re-run the direct-OVATION / interpolation / conditional / unconditional held-out sector benchmark against the **regridded real SSUSI** support (requires both sets of weights):
+
+```bash
+python paper_modif/First_revision/R2-1_R2-3/ssusi_heldout_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_inputs \
+  --output-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_heldout
+```
+
+5. Recompute the Figure 8 local gradients and PSD segments on the same regridded support and use the **new** held-out metrics rather than mixing the old sector scores with the new input:
+
+```bash
+python paper_modif/First_revision/R1-1/smoothness_bias_analysis.py \
+  --prepared-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_inputs \
+  --heldout-metrics paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_heldout/metrics_per_holdout.csv \
+  --output-root paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/center_aligned_smoothness
+```
+
+This fifth stage may output pixel/segment bootstrap confidence intervals as part of the historical script; **do not restore those as event-level statistical claims in the manuscript**. Report descriptive event-level statistics and holdout metrics with independent sampling units clearly identified.
+
+### Required output provenance for manuscript revision
+Return the following generated text artifacts (not private raw EDR arrays): `center_alignment_manifest.json`, the two `Figure*_reconstruction_summary.json`, `center_aligned_heldout/benchmark_summary.json`, and `center_aligned_smoothness/smoothness_bias_summary.json`. Recheck the figures and the remaining first-revision statistics on the corrected grid before updating the paper's numeric results.
+
+**Status:** preprocessing correction *implemented*, but no center-aligned reconstruction, benchmark or PSD rerun has yet been reported by the author. No inference-side improvement or unchanged scientific metric is claimed.

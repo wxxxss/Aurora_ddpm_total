@@ -1,0 +1,110 @@
+{
+  "source": "Author-uploaded grid_calibration_audit.json and statistical_units_audit.json, 2026-11-20",
+  "grid": {
+    "hemisphere": "Northern",
+    "shape": [
+      80,
+      96
+    ],
+    "mlat_centers_deg": [
+      50,
+      90
+    ],
+    "mlat_center_spacing_deg": 0.5063291139240507,
+    "mlt_centers_hours": [
+      0,
+      23.75
+    ],
+    "mlt_spacing_hours": 0.25
+  },
+  "ssusi_prepared_npz": {
+    "Figure6": {
+      "supported_cells": 4355,
+      "total_cells": 7680,
+      "support_fraction": 0.5670572916666666,
+      "duplicate_supported_cells": 4110,
+      "duplicate_fraction": 0.9437428243398392,
+      "n_native_samples": 42268,
+      "max_samples_per_cell": 30
+    },
+    "Figure7": {
+      "supported_cells": 4290,
+      "total_cells": 7680,
+      "support_fraction": 0.55859375,
+      "duplicate_supported_cells": 4034,
+      "duplicate_fraction": 0.9403263403263403,
+      "n_native_samples": 41805,
+      "max_samples_per_cell": 29
+    }
+  },
+  "archived_first_revision_swath_summary": {
+    "Figure6": {
+      "support_fraction": 0.5657552083333334,
+      "supported_cells": 4345
+    },
+    "Figure7": {
+      "support_fraction": 0.5571614583333333,
+      "supported_cells": 4279
+    }
+  },
+  "mismatch": {
+    "Figure6": {
+      "npz_minus_archived_cells": 10
+    },
+    "Figure7": {
+      "npz_minus_archived_cells": 11
+    },
+    "status": "Unresolved: different first-revision inputs or binning implementations must be reconciled before identifying all figures with one support mask."
+  },
+  "polar_postprocessed": {
+    "Figure4": {
+      "n_finite": 7680,
+      "n_below_flux_1": 7232,
+      "n_ge_flux_1": 448,
+      "max_flux": 4.043886297529739,
+      "n_gt_flux_40": 0
+    },
+    "Figure5": {
+      "n_finite": 7680,
+      "n_below_flux_1": 6363,
+      "n_ge_flux_1": 1317,
+      "max_flux": 32.332662872235524,
+      "n_gt_flux_20": 75,
+      "n_gt_flux_40": 0
+    }
+  },
+  "polar_calibration": {
+    "adopted_LBHL_brightness_R_per_flux_unit": 110,
+    "upper_screening_threshold": 40,
+    "uncensored_data_available": false,
+    "40_cutoff_sensitivity_verified": false
+  },
+  "statistics": {
+    "independent_EDR_events": 2,
+    "total_spatial_gradient_edges": 8202,
+    "total_spatial_PSD_segments": 79,
+    "events": [
+      {
+        "case": "Figure6",
+        "gradient_edges": 4106,
+        "PSD_segments": 45,
+        "distinct_mlat_rows": 29,
+        "mean_high_frequency_fraction_diff": 0.07019778017979739,
+        "mean_spectral_slope_diff": -0.020905750789915883
+      },
+      {
+        "case": "Figure7",
+        "gradient_edges": 4096,
+        "PSD_segments": 34,
+        "distinct_mlat_rows": 25,
+        "mean_high_frequency_fraction_diff": -0.032230784711407806,
+        "mean_spectral_slope_diff": -1.1236954637233283
+      }
+    ],
+    "unweighted_two_event_means": {
+      "high_frequency_fraction_diff": 0.01898349773419479,
+      "spectral_slope_diff": -0.5723006072566221
+    },
+    "scope": "descriptive only, no event-level CI/p value"
+  }
+}

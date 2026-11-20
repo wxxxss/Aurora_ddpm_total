@@ -10,10 +10,10 @@ It also reports the actual number of reverse denoising-network evaluations and
 forward re-noising transitions implied by the RePaint-style sampling schedule.
 
 Run from the repository root, e.g.:
-    python paper_modif/R1-4/collect_r1_4_metrics.py
+    python paper_modif/First_revision/R1-4/collect_r1_4_metrics.py
 
 If the checkpoint cannot be found automatically, provide it explicitly:
-    python paper_modif/R1-4/collect_r1_4_metrics.py \
+    python paper_modif/First_revision/R1-4/collect_r1_4_metrics.py \
         --checkpoint /path/to/aurora_diff_best.pth \
         --history-checkpoint /path/to/aurora_diff_final.pth
 """
@@ -34,10 +34,10 @@ import torch
 import torch_npu
 # -----------------------------------------------------------------------------
 # Make repository-root imports work when this file is executed by path.
-# paper_modif/R1-4/collect_r1_4_metrics.py -> repo root is parents[2].
+# paper_modif/First_revision/R1-4/collect_r1_4_metrics.py -> repo root is parents[2].
 # -----------------------------------------------------------------------------
 SCRIPT_PATH = Path(__file__).resolve()
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -106,7 +106,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=str,
         default=str(SCRIPT_PATH.with_name("r1_4_metrics.json")),
-        help="JSON output path. Default: paper_modif/R1-4/r1_4_metrics.json",
+        help="JSON output path. Default: paper_modif/First_revision/R1-4/r1_4_metrics.json",
     )
     return parser.parse_args()
 

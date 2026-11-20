@@ -33,7 +33,7 @@ except Exception:
 
 SCRIPT_PATH = Path(__file__).resolve()
 SCRIPT_DIR = SCRIPT_PATH.parent
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 for p in (SCRIPT_DIR, REPO_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))

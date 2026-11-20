@@ -16,10 +16,10 @@ Default experiment:
 - paired-bootstrap 95% CIs and paired Wilcoxon p-values.
 
 Run from repository root:
-    python paper_modif/R1-3/condition_ablation.py
+    python paper_modif/First_revision/R1-3/condition_ablation.py
 
 Quick smoke test:
-    python paper_modif/R1-3/condition_ablation.py --max-samples 4 --skip-linearized
+    python paper_modif/First_revision/R1-3/condition_ablation.py --max-samples 4 --skip-linearized
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ import matplotlib.pyplot as plt
 
 SCRIPT_PATH = Path(__file__).resolve()
 SCRIPT_DIR = SCRIPT_PATH.parent
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 for _p in (str(REPO_ROOT), str(SCRIPT_DIR)):
     if _p not in sys.path:
         sys.path.insert(0, _p)

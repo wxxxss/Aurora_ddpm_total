@@ -30,7 +30,7 @@ from scipy.stats import ks_2samp, wasserstein_distance, wilcoxon
 
 SCRIPT_PATH = Path(__file__).resolve()
 SCRIPT_DIR = SCRIPT_PATH.parent
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -45,16 +45,16 @@ CASES = ("Figure6", "Figure7")
 MLAT_1D = np.linspace(50.0, 90.0, 80)
 MLT_1D = np.linspace(0.0, 24.0, 96, endpoint=False)
 
-DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_prepared_cases"
+DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_prepared_cases"
 DEFAULT_OVATION = Path(
     "/home/docker/data/private/AuroraData/generated_aurora_data/2005_omni_aurora/"
     "aurora_img_20050101.npy"
 )
 DEFAULT_HELDOUT = (
     REPO_ROOT
-    / "paper_modif/R2-1_R2-3/ssusi_heldout_benchmark_results/metrics_per_holdout.csv"
+    / "paper_modif/First_revision/R2-1_R2-3/ssusi_heldout_benchmark_results/metrics_per_holdout.csv"
 )
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R1-1/r1_1_results"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/First_revision/R1-1/r1_1_results"
 
 
 def parse_args() -> argparse.Namespace:

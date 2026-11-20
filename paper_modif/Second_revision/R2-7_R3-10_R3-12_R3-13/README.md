@@ -60,3 +60,18 @@ The author uploaded `grid_calibration_audit.json` and `statistical_units_audit.j
 python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_grid_calibration.py
 ```
 Inspect the output `prior_swath_audit_comparison`. Reconciliation of the 10/11-cell difference and recovery of the original Polar native preprocessing/uncensored LBHL flux remain open. Synthetic unit tests were committed, but the user has not supplied their test-run output.
+
+## Newly identified R3-10 alignment inconsistency (must resolve before finalizing)
+Code comparison establishes two distinct MLT mappings:
+
+- `First_revision/R2-1_R2-3/prepare_ssusi_swath_cases.py` uses `np.digitize(mlt, edges)`, where MLT edges are **0, 0.25, 0.50, ... 24 h**. With nominal grid centers `0,0.25,...,23.75`, this creates bins *offset from the nominal centers* (for example 0.20 h maps to index 0).
+- `First_revision/R2-1_R2-3/audit_ssusi_swath_v2.py` uses `np.rint(mlt/0.25) % 96`, associating samples with the **nearest** nominal grid center (0.20 h maps to index 1). The boundaries of these bins are shifted by half an MLT interval (0.125 h = 7.5 min) relative to the edge-zero convention.
+- Their archived direct-support percentages differ from the prepared NPZ by 10 and 11 cells, respectively, but support-count differences alone **cannot quantify how many samples/cells have changed assignments**. Different native filtering may also matter. Do not assert the half-bin shift is the sole explanation until the raw-EDR comparison is run.
+
+New comparison script, run from the repository root with `netCDF4` available and the original EDR files on disk:
+
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_mlt_binning_alignment.py
+```
+
+Produces `mlt_binning_alignment_audit.json`: direct support, symmetric difference of support maps, original-sample assignment differences, flux difference on shared supported cells, and whether the locally prepared NPZ agrees with either convention. **Do not silently switch the production pipeline to a new binning rule or claim unchanged performance.** If this changes input products, the affected SSUSI figures, baseline comparisons and held-out evaluation must be recomputed on the corrected grid. The current manuscript is therefore a cumulative *working draft* pending this specific reproducibility check.

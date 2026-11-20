@@ -55,6 +55,25 @@ def nearest_record(records, target, limit_seconds, label):
 def fraction_or_none(a):
     return round(float(np.mean(a)), 6) if a.size else None
 
+def change_stats(observed, reconstructed, region, tolerance=1e-4):
+    """Saved-output differences within a specified physically defined region.
+
+    In the OVATION-gated hypothesis, low-flux / OVATION-nonpositive
+    cells should be copied unchanged, so changes above tolerance
+    contradict strict gating. A zero difference alone does not prove gating.
+    """
+    valid = region & np.isfinite(observed) & np.isfinite(reconstructed)
+    diffs = np.abs(observed[valid] - reconstructed[valid])
+    return {
+        "comparable_cells": int(diffs.size),
+        "changed_cells_above_tolerance": int((diffs > tolerance).sum()),
+        "changed_fraction": float(np.mean(diffs > tolerance)) if diffs.size else None,
+        "mean_abs_difference": float(np.mean(diffs)) if diffs.size else None,
+        "median_abs_difference": float(np.median(diffs)) if diffs.size else None,
+        "max_abs_difference": float(np.max(diffs)) if diffs.size else None,
+        "change_tolerance": float(tolerance)
+    }
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--observation", type=Path, default=DEFAULT_OBS)
@@ -121,6 +140,22 @@ def main():
             "low_flux_and_OVATION_nonpositive":int((low&~simulated_positive).sum()) if simulated_positive is not None else None,
             "observed_flux_positive_where_OVATION_nonpositive":int((high&~simulated_positive).sum()) if simulated_positive is not None else None,
             "candidate_mask_fraction_of_all_cells":fraction_or_none(low),
+            "low_flux_output_change_all": change_stats(measured,reconstructed,low),
+            "low_flux_output_change_OVATION_positive": (
+                change_stats(measured,reconstructed,low&simulated_positive)
+                if simulated_positive is not None else None
+            ),
+            "low_flux_output_change_OVATION_nonpositive": (
+                change_stats(measured,reconstructed,low&~simulated_positive)
+                if simulated_positive is not None else None
+            ),
+            "mask_hypothesis_note": (
+                "If the original inference mask was strictly limited to "
+                "(flux < threshold) AND (OVATION > threshold), the low-flux "
+                "OVATION-nonpositive cells should be unchanged. Any material "
+                "change contradicts that strict gating. Unchanged cells alone "
+                "cannot prove the presence of such a gate."
+            ),
             "saved_reconstruction_minus_observation_on_high_flux_cells":{
                 "count":int(recon_abs.size),
                 "mean_absolute_error":float(recon_abs.mean()) if recon_abs.size else None,

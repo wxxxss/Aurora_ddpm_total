@@ -1,0 +1,32 @@
+{
+  "status": "author-reported successful generation on 2026-11-20",
+  "unittests": "not separately reported in the received message",
+  "assignment_rule": "nearest grid center, np.rint ties-to-even, cyclic 96-bin MLT",
+  "old_first_revision_inputs_untouched": true,
+  "cases": {
+    "Figure6": {
+      "n_native_valid": 42268,
+      "n_assigned": 42268,
+      "n_supported": 4345,
+      "support_fraction": 0.5657552083333334,
+      "multi_sample_cells": 4129,
+      "max_native_count_per_cell": 32,
+      "mean_native_count_per_supported_cell": 9.727963176064442,
+      "mask_symmetric_difference_vs_original": 224,
+      "raw_edr_sha256": "e3504def6d2451b8301755d801e17de4f537a6d439b7b23d4e287f1b756e0cec"
+    },
+    "Figure7": {
+      "n_native_valid": 41805,
+      "n_assigned": 41805,
+      "n_supported": 4279,
+      "support_fraction": 0.5571614583333333,
+      "multi_sample_cells": 4053,
+      "max_native_count_per_cell": 30,
+      "mean_native_count_per_supported_cell": 9.769806029446132,
+      "mask_symmetric_difference_vs_original": 231,
+      "raw_edr_sha256": "c43e5d25ebc5b6bed80ba32473d550c7efc857269e94d518d7ba7ddbb1b4a4be"
+    }
+  },
+  "scope": "Input preparation only; no DDPM reconstruction, held-out metrics, or PSD outputs have been supplied or independently checked. Do not reuse historical first-round performance values as corrected-grid outputs.",
+  "next_stage": "Run first-revision reconstruction, real-observation heldout baseline benchmark, and smoothness diagnostics with Second_revision center_aligned_inputs root and fresh output roots."
+}

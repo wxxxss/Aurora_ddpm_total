@@ -54,3 +54,20 @@ python paper_modif/Second_revision/R2-5_R3-2_R3-11/check_polar_mask_cases.py
 ```
 
 Outputs: `polar_mask_case_diagnostic.json`. This compares candidate mask categories and saved-image agreement only; it does not establish the causal mask rule if the production script/checkpoint is unknown.
+
+## Figure 4/5 saved-output audit: additional gate check
+The author uploaded `polar_mask_case_diagnostic.json` after running the script. A compact, path-scrubbed copy of the measured results is stored in `polar_mask_case_initial_findings.json` (2026-11-20).
+
+- Figure 4: 448 / 7680 cells had Polar flux >= 1; 7232 below threshold. Above-threshold saved-output maximum absolute difference: 3.52e-7. Of the low-flux cells, 7060 corresponded to OVATION>0 and 172 to OVATION<=0.
+- Figure 5: 1317 / 7680 cells had Polar flux >= 1; 6363 below threshold. Above-threshold maximum absolute difference: 5.43e-6. Of the low-flux cells, 6188 corresponded to OVATION>0 and 175 to OVATION<=0.
+- These values show very close preservation of above-threshold measurements but **do not** prove whether the actual inference mask was gated by OVATION. The old `repaired_polar.py` and exploratory `test.diff_polar.ipynb` contain different mask rules; figure-generating checkpoint provenance is not yet established.
+
+The `check_polar_mask_cases.py` script now also reports the saved reconstruction difference **within low-flux, OVATION-nonpositive cells**. This is the discriminating diagnostic: a strictly OVATION-gated mask would preserve those cells, while material changes would contradict that hypothesis. An unchanged cell cannot establish the mask by itself.
+
+After pulling the newest main branch, rerun:
+
+```bash
+python paper_modif/Second_revision/R2-5_R3-2_R3-11/check_polar_mask_cases.py
+```
+
+Inspect `low_flux_output_change_OVATION_nonpositive` in both Figure 4 and Figure 5. Before finalizing the manuscript, also verify the exact preprocessing code and checkpoint associated with the saved figures. Importantly, the very large flux-threshold exclusions are *not* proof that the corresponding satellite pixels were truly unobserved.

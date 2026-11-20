@@ -1,0 +1,39 @@
+{
+  "source": "User-run mlt_binning_alignment_audit.json uploaded 2026-11-20",
+  "target_grid": "80 northern MLAT centers 50..90; 96 MLT centers 0..23.75 h at 0.25 h spacing",
+  "discrepancy": "First-revision prepared EDR inputs use edge-zero MLT bins whereas archived swath-v2 audit uses nearest-center bins. Bin boundaries differ by 0.125 MLT hours.",
+  "events": {
+    "Figure6": {
+      "native_samples": 42268,
+      "native_samples_reassigned": 21005,
+      "fraction_native_reassigned": 0.4969480458029715,
+      "edge_zero_supported": 4355,
+      "centered_supported": 4345,
+      "mask_symmetric_difference": 224,
+      "mask_intersection": 4238,
+      "mask_union": 4462,
+      "mask_jaccard": 0.9497982967279247,
+      "mean_absolute_flux_diff_common_supported": 0.0928889917576926,
+      "prepared_equals_edge_zero": true
+    },
+    "Figure7": {
+      "native_samples": 41805,
+      "native_samples_reassigned": 20721,
+      "fraction_native_reassigned": 0.4956584140653032,
+      "edge_zero_supported": 4290,
+      "centered_supported": 4279,
+      "mask_symmetric_difference": 231,
+      "mask_intersection": 4169,
+      "mask_union": 4400,
+      "mask_jaccard": 0.9475,
+      "mean_absolute_flux_diff_common_supported": 0.1537058172212542,
+      "prepared_equals_edge_zero": true
+    }
+  },
+  "inference": "A small net support count difference is not a small change to gridded data. Roughly half of original samples move to different cells and both masks and cell-mean flux values change. Model reconstructions, heldout baseline metrics and SSUSI gradient PSD summaries need to be recomputed on a single center-aligned grid before claiming new final results.",
+  "limitations": [
+    "No center-aligned DDPM inference or heldout experiment has yet been run.",
+    "The new center-aligned input preparation matches the old audit's np.rint nearest-center convention but its outputs must be checked on the private raw EDR input.",
+    "Do not claim old Figure6/7 quantitative values unchanged."
+  ]
+}

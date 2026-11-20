@@ -51,7 +51,7 @@ from scipy.interpolate import griddata
 
 
 DEFAULT_RAW_DIR = Path(
-    "/home/docker/data/private/AuroraData/real_aurora_data_ssusi/2005"
+    "/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005"
 )
 DEFAULT_PROCESSED_NPY = Path(
     "/home/docker/data/private/AuroraData/process_ssusi/aurora_2005_ssusi.npy"

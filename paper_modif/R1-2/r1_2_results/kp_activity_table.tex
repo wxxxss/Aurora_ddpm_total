@@ -1,0 +1,18 @@
+\begin{table*}[htbp]
+\centering
+\caption{Reconstruction performance under low and elevated geomagnetic activity. The two activity groups contain balanced multi-year samples with $Kp\leq3$ and $Kp\geq4$, respectively.}
+\label{tab:kp_robustness}
+\begin{tabular}{llrrrr}
+\hline
+Group & Method & $n$ & SSIM & RMSE (95\% CI) & $R^2$ \\
+\hline
+Kp<=3 & Conditional DDPM & 48 & 0.998 & 0.032 [0.029, 0.035] & 0.994 \\
+Kp<=3 & Unconditional DDPM & 48 & 0.661 & 0.325 [0.283, 0.370] & 0.456 \\
+Kp<=3 & Interpolation & 48 & 0.226 & 0.469 [0.430, 0.513] & -0.188 \\
+\hline
+Kp>=4 & Conditional DDPM & 48 & 0.993 & 0.142 [0.096, 0.198] & 0.985 \\
+Kp>=4 & Unconditional DDPM & 48 & 0.809 & 0.593 [0.506, 0.686] & 0.672 \\
+Kp>=4 & Interpolation & 48 & 0.427 & 1.002 [0.875, 1.130] & 0.146 \\
+\hline
+\end{tabular}
+\end{table*}

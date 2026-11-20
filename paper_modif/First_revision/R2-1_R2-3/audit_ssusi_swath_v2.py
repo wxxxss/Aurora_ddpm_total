@@ -41,7 +41,7 @@ from scipy.interpolate import griddata
 
 SCRIPT = Path(__file__).resolve()
 REPO_ROOT = SCRIPT.parents[2]
-DEFAULT_RAW_ROOT = Path("/home/docker/data/private/AuroraData/real_aurora_data_ssusi/2005")
+DEFAULT_RAW_ROOT = Path("/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005")
 DEFAULT_PROCESSED = Path("/home/docker/data/private/AuroraData/process_ssusi/aurora_2005_ssusi.npy")
 DEFAULT_OUTDIR = SCRIPT.with_name("ssusi_swath_audit_v2")
 

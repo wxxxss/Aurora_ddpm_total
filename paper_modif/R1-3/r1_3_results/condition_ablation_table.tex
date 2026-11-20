@@ -1,0 +1,19 @@
+\begin{table*}[htbp]
+\centering
+\caption{Conditional-variable ablation on held-out January 2005 OVATION Prime samples. Each permutation preserves the marginal distribution of the selected solar-wind variable while breaking its correspondence with the target auroral map. Positive $\Delta$RMSE denotes degradation relative to the full five-variable condition. Confidence intervals are paired-bootstrap 95\% intervals.}
+\label{tab:condition_ablation}
+\begin{tabular}{lrrrr}
+\hline
+Condition & SSIM & RMSE & $R^2$ & $\Delta$RMSE (95\% CI) \\
+\hline
+Full condition & 0.995 & 0.089 & 0.988 & +0.000 [+0.000, +0.000] \\
+Permute Bx & 0.995 & 0.089 & 0.988 & +0.000 [-0.000, +0.001] \\
+Permute By & 0.980 & 0.147 & 0.960 & +0.058 [+0.030, +0.100] \\
+Permute Bz & 0.955 & 0.235 & 0.909 & +0.146 [+0.094, +0.205] \\
+Permute Vsw & 0.989 & 0.129 & 0.977 & +0.040 [+0.016, +0.068] \\
+Permute Pdyn & 0.995 & 0.089 & 0.988 & +0.000 [+0.000, +0.000] \\
+Permute all & 0.939 & 0.288 & 0.881 & +0.199 [+0.134, +0.276] \\
+Linearized encoder & 0.829 & 0.269 & 0.746 & +0.180 [+0.101, +0.281] \\
+\hline
+\end{tabular}
+\end{table*}

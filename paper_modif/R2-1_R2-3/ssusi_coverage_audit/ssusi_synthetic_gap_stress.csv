@@ -1,0 +1,9 @@
+file,timestamp,gap_center_mlt_h,gap_width_h,target_gap_cells,linearly_filled_gap_cells,bridge_fraction
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/001/dmspf16_ssusi_edr-aurora_2005001T144434-2005001T162625-REV06228_vA8.2.0r000.nc,2005-01-01T15:35:33,9.125,1.0,160,160,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/001/dmspf16_ssusi_edr-aurora_2005001T144434-2005001T162625-REV06228_vA8.2.0r000.nc,2005-01-01T15:35:33,9.125,2.0,320,320,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/001/dmspf16_ssusi_edr-aurora_2005001T144434-2005001T162625-REV06228_vA8.2.0r000.nc,2005-01-01T15:35:33,9.125,4.0,640,640,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/001/dmspf16_ssusi_edr-aurora_2005001T144434-2005001T162625-REV06228_vA8.2.0r000.nc,2005-01-01T15:35:33,9.125,6.0,960,960,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/004/dmspf16_ssusi_edr-aurora_2005004T021215-2005004T035407-REV06263_vA8.2.0r000.nc,2005-01-04T03:03:14.294964,9.125,1.0,160,160,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/004/dmspf16_ssusi_edr-aurora_2005004T021215-2005004T035407-REV06263_vA8.2.0r000.nc,2005-01-04T03:03:14.294964,9.125,2.0,320,320,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/004/dmspf16_ssusi_edr-aurora_2005004T021215-2005004T035407-REV06263_vA8.2.0r000.nc,2005-01-04T03:03:14.294964,9.125,4.0,640,640,1.0
+/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005/004/dmspf16_ssusi_edr-aurora_2005004T021215-2005004T035407-REV06263_vA8.2.0r000.nc,2005-01-04T03:03:14.294964,9.125,6.0,960,960,1.0

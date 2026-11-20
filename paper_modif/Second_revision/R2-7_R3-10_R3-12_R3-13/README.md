@@ -76,6 +76,11 @@ python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_mlt_binning_alig
 
 Produces `mlt_binning_alignment_audit.json`: direct support, symmetric difference of support maps, original-sample assignment differences, flux difference on shared supported cells, and whether the locally prepared NPZ agrees with either convention. **Do not silently switch the production pipeline to a new binning rule or claim unchanged performance.** If this changes input products, the affected SSUSI figures, baseline comparisons and held-out evaluation must be recomputed on the corrected grid. The current manuscript is therefore a cumulative *working draft* pending this specific reproducibility check.
 
+## Unit-test fix: latitude midpoint precision (2026-11-20)
+The initial `test_center_alignment.py` used a synthetic input at MLAT=70.0°, which lies exactly between two of the 80 grid latitude centers. The implementation computed `LAT_STEP` from `np.linspace`, while the test independently computed the ideal `40/79` step; floating-point rounding put the same midpoint into different adjacent latitude rows. This was a **test setup mismatch**, not evidence that the cyclic MLT mapping is incorrect. The test now supplies the exact declared latitude-grid center `LAT_CENTERS[40]` and checks MLT assignment/wrap at that row. No production preprocessing code was changed in this fix.
+
+Rerun `python -m unittest discover -s paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13 -p 'test_*.py'` before generating new inputs. The assistant validated the expected numpy index mapping locally; the complete suite still requires the user's environment to confirm.
+
 ## Native-EDR binning comparison: confirmed by author (2026-11-20)
 The author uploaded `mlt_binning_alignment_audit.json`. A path-scrubbed, numeric copy is in `mlt_binning_alignment_verified.json`. The source mapping is now confirmed:
 

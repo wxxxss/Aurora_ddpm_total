@@ -55,8 +55,8 @@ def main():
         "sampler_mask_convention":"1=observed; 0=missing",
         "observed_values_preserved":known_ok,
         "changed_observations_change_missing_prediction_max_abs":influence,
-        "unmasked_missing_input_leaks_into_output_max_abs":leakage,
-        "caution":"Missing cells must be zeroed/masked before calling sample; this test diagnoses if raw hidden values leak.",
+        "missing_input_perturbation_effect_max_abs":leakage,
+        "note":"The sampler now zeroes missing cells before initialization to prevent withheld-target leakage.",
         "attention_query_shape":[1,20,32],
         "attention_key_value_sequence_length":1,
         "attention_output_shape":list(y.shape),
@@ -67,6 +67,7 @@ def main():
     (SCRIPT.parent/"audit_results.json").write_text(json.dumps(report,indent=2)+"\n")
     assert known_ok,"Reliable pixels not preserved"
     assert influence>0,"Known-pixel influence not found"
+    assert leakage<1e-8,"Missing input values leaked into reconstruction"
     assert bool(torch.all(w==1)),"Single-key attention invariant failed"
 
 if __name__=="__main__":

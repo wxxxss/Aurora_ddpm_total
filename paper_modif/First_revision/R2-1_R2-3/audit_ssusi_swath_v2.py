@@ -15,10 +15,10 @@ The script audits the two manuscript SSUSI examples by default:
 - Figure 7 nominal time: 2005-01-04 03:03 UT
 
 Run from repository root:
-    python paper_modif/R2-1_R2-3/audit_ssusi_swath_v2.py
+    python paper_modif/First_revision/R2-1_R2-3/audit_ssusi_swath_v2.py
 
 Outputs are written to:
-    paper_modif/R2-1_R2-3/ssusi_swath_audit_v2/
+    paper_modif/First_revision/R2-1_R2-3/ssusi_swath_audit_v2/
 """
 
 from __future__ import annotations

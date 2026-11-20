@@ -21,7 +21,7 @@ It tests two specific concerns:
 The historical data are never overwritten.
 
 Typical run from repository root:
-    python paper_modif/R2-1_R2-3/audit_ssusi_preprocessing.py
+    python paper_modif/First_revision/R2-1_R2-3/audit_ssusi_preprocessing.py
 
 Useful options:
     --raw-dir /path/to/raw/2005/ssusi

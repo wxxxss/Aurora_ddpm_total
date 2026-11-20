@@ -15,7 +15,7 @@ No single midpoint timestamp is shown in the final figure title because each
 SSUSI Auroral EDR map represents an orbital acquisition interval.
 
 Run from repository root:
-    python paper_modif/R2-1_R2-3/diagnose_ssusi_reconstruction.py
+    python paper_modif/First_revision/R2-1_R2-3/diagnose_ssusi_reconstruction.py
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ from cartopy.feature.nightshade import Nightshade
 import aacgmv2
 
 SCRIPT_PATH = Path(__file__).resolve()
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -62,8 +62,8 @@ from models.ddpm import DDPM
 # =============================================================================
 # Defaults
 # =============================================================================
-DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_prepared_cases"
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_reconstruction_diagnostics"
+DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_prepared_cases"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_reconstruction_diagnostics"
 DEFAULT_CHECKPOINT = REPO_ROOT / "ckpt/cond/aurora_diff_best.pth"
 DEFAULT_NORM_PARAMS = REPO_ROOT / "ckpt/cond/norm_params.pkl"
 DEFAULT_OVATION = Path(

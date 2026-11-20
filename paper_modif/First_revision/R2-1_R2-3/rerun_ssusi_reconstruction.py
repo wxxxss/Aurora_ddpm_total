@@ -18,7 +18,7 @@ Key corrections relative to the legacy SSUSI pipeline:
      explicit (a)/(b)/(c) panel labels.
 
 Run from the repository root:
-    python paper_modif/R2-1_R2-3/rerun_ssusi_reconstruction.py
+    python paper_modif/First_revision/R2-1_R2-3/rerun_ssusi_reconstruction.py
 
 Useful overrides:
     --checkpoint /path/to/aurora_diff_best.pth
@@ -59,7 +59,7 @@ import aacgmv2
 
 
 SCRIPT_PATH = Path(__file__).resolve()
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -70,8 +70,8 @@ from models.ddpm import DDPM
 # -----------------------------------------------------------------------------
 # Defaults matching the revised SSUSI preparation and final paper model.
 # -----------------------------------------------------------------------------
-DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_prepared_cases"
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_reconstruction_results"
+DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_prepared_cases"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_reconstruction_results"
 DEFAULT_CHECKPOINT = REPO_ROOT / "ckpt/cond/aurora_diff_best.pth"
 DEFAULT_NORM_PARAMS = REPO_ROOT / "ckpt/cond/norm_params.pkl"
 LEGACY_NORM_PARAMS = Path(

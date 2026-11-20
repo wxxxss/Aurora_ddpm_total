@@ -22,7 +22,7 @@ selects the strongest non-overlapping sectors that satisfy minimum observation
 coverage and signal-content criteria.
 
 Default run:
-    python paper_modif/R2-1_R2-3/ssusi_heldout_benchmark.py
+    python paper_modif/First_revision/R2-1_R2-3/ssusi_heldout_benchmark.py
 
 Outputs:
     metrics_per_holdout.csv
@@ -59,7 +59,7 @@ import matplotlib.pyplot as plt
 
 SCRIPT_PATH = Path(__file__).resolve()
 SCRIPT_DIR = SCRIPT_PATH.parent
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 if str(SCRIPT_DIR) not in sys.path:
@@ -72,8 +72,8 @@ from models.simplenet import UNet as UnconditionalUNet
 from models.ddpm_nocond import DDPM_nocond
 
 
-DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/swath_prepared_cases"
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R2-1_R2-3/ssusi_heldout_benchmark_results"
+DEFAULT_PREPARED_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/swath_prepared_cases"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-1_R2-3/ssusi_heldout_benchmark_results"
 DEFAULT_COND_CHECKPOINT = REPO_ROOT / "ckpt/cond/aurora_diff_best.pth"
 DEFAULT_UNCOND_CHECKPOINT = REPO_ROOT / "ckpt/uncond/aurora_diff_best.pth"
 DEFAULT_COND_NORM = REPO_ROOT / "ckpt/cond/norm_params.pkl"

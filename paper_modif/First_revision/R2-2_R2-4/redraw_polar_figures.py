@@ -20,14 +20,14 @@ from matplotlib.image import imread
 from scipy import ndimage
 
 SCRIPT_PATH = Path(__file__).resolve()
-REPO_ROOT = SCRIPT_PATH.parents[2]
+REPO_ROOT = SCRIPT_PATH.parents[3]
 
 DEFAULT_POLAR_DATA = Path("/home/docker/data/private/AuroraData/real_aurora_data_polar/1996/resampled_5min_1996_0405.npy")
 DEFAULT_REPAIRED_DATA = Path("/home/docker/code/Aurora_DDPM/reasult/polar_res/new_res/repaired_polar_unetV3_ckptv2.npy")
 DEFAULT_OVATION_DATA = Path("/home/docker/data/private/AuroraData/generated_aurora_data/1996_omni_aurora/aurora_img_19960401.npy")
 DEFAULT_OMNI_DATA = Path("/home/docker/data/private/AuroraData/omni_real_data/omni_5min/1996/omni_19960401_5min.npy")
 DEFAULT_BACKGROUND = Path("/home/docker/data/private/AuroraData/background_img/natural-earth-1_large2048px.png")
-DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/R2-2_R2-4/polar_redraw_results"
+DEFAULT_OUTPUT_ROOT = REPO_ROOT / "paper_modif/First_revision/R2-2_R2-4/polar_redraw_results"
 
 EVENTS = {"Figure4": datetime(1996, 4, 3, 2, 15, 0), "Figure5": datetime(1996, 4, 1, 8, 40, 0)}
 MLAT_1D = np.linspace(50.0, 90.0, 80)

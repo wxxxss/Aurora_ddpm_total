@@ -1,0 +1,27 @@
+{
+  "source": "Computed from archived first-revision psd_segment_metrics.csv and gradient_summary.csv",
+  "independent_events": 2,
+  "events": {
+    "Figure6": {
+      "n_psd_segments": 45,
+      "n_unique_mlat_rows": 29,
+      "n_gradient_edges": 4106,
+      "hf_difference_mean": 0.07019778017979739,
+      "slope_difference_mean": -0.020905750789915883
+    },
+    "Figure7": {
+      "n_psd_segments": 34,
+      "n_unique_mlat_rows": 25,
+      "n_gradient_edges": 4096,
+      "hf_difference_mean": -0.032230784711407806,
+      "slope_difference_mean": -1.1236954637233283
+    }
+  },
+  "pooled": {
+    "n_psd_segments": 79,
+    "n_gradient_edges": 8202,
+    "hf_difference_mean": 0.026114600353202747,
+    "slope_difference_mean": -0.49552410825492893
+  },
+  "note": "These are DESCRIPTIVE event summaries. Adjacent MLAT rows/segments and gradient edges are not independent. Do not use the legacy segment-level CIs/p values as event-level evidence."
+}

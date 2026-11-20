@@ -37,3 +37,20 @@ The author ran `audit_sampling.py` on their local `torch` environment and provid
 These are code-path observations with an untrained local denoiser, **not** a satellite-accuracy benchmark and not evidence of an improvement over OVATION.
 
 The author also reported a Python 3.9 `re.error` in `audit_mask_provenance.py`. The failing regex used doubled backslashes in a raw regex. The pattern was corrected on `main` in commit `0f4094788794218bf98840927a355639e3fb201f`; the author should pull and rerun the provenance audit.
+
+## Mask-provenance audit received
+The author supplied `mask_provenance.json` from the corrected `audit_mask_provenance.py` run. The result confirms distinct historical criteria:
+- `repaired_polar.py`: `mask=0` when `polar < 1`. No OVATION criterion appears in that mask assignment.
+- `repaired_ssusi.py`: `mask=0` only for `(ssusi < 1) & (ovation > 0)`.
+- First-round `rerun_ssusi_reconstruction.py`: `mask=1` for native swath-supported grid cells (`UT_N > 0` propagated by direct binning), irrespective of measured flux magnitude.
+- First-round `redraw_polar_figures.py`: `OBS_SUPPORT_THRESHOLD=1.0` controls observational display and diagnostics, not the saved model's inference-time mask.
+
+**Do not merge these criteria into one claimed method.** The current manuscript describes an OVATION-dependent Polar mask, yet the legacy Polar reconstruction script does not implement that dependency. To trace Figure 4/5 provenance, run `check_polar_mask_cases.py` against the actual saved Polar reconstruction. Confirm its checkpoint and program version before changing the manuscript's operational criterion or completing the R3-11 response.
+
+Run from repository root:
+
+```bash
+python paper_modif/Second_revision/R2-5_R3-2_R3-11/check_polar_mask_cases.py
+```
+
+Outputs: `polar_mask_case_diagnostic.json`. This compares candidate mask categories and saved-image agreement only; it does not establish the causal mask rule if the production script/checkpoint is unknown.

@@ -23,7 +23,7 @@ import aacgmv2
 # 路径与全局配置
 # =====================================================================
 RAW_EDR_ROOT = "/home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2005"
-OUTPUT_DIR = "/home/docker/code/Aurora_DDPM_total/paper_modif/R2-1_R2-3/swath_prepared_cases"
+OUTPUT_DIR = "/home/docker/code/Aurora_DDPM_total/paper_modif/First_revision/R2-1_R2-3/swath_prepared_cases"
 
 BACKGROUND_IMG = "/home/docker/data/private/AuroraData/background_img/natural-earth-1_large2048px.png"
 

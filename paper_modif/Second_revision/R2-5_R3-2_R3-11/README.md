@@ -71,3 +71,10 @@ python paper_modif/Second_revision/R2-5_R3-2_R3-11/check_polar_mask_cases.py
 ```
 
 Inspect `low_flux_output_change_OVATION_nonpositive` in both Figure 4 and Figure 5. Before finalizing the manuscript, also verify the exact preprocessing code and checkpoint associated with the saved figures. Importantly, the very large flux-threshold exclusions are *not* proof that the corresponding satellite pixels were truly unobserved.
+
+## Discriminating gate result (20 November 2026)
+The second author-run `polar_mask_case_diagnostic(1).json` demonstrated that, among Polar cells with flux < 1 erg cm^-2 s^-1 **and OVATION <= 0**, saved reconstructions changed beyond 1e-4 erg cm^-2 s^-1 in **all 172/172 cells** (Figure 4) and **all 175/175 cells** (Figure 5). Mean absolute changes were 0.0518037 and 0.0531314 erg cm^-2 s^-1. By contrast, the max saved-output differences for flux >= 1 cells were only 3.52e-7 and 5.43e-6. See `polar_mask_case_discriminating_findings.json` for the source-grounded numeric summary.
+
+This evidence **contradicts a strict OVATION-positive gate on the Polar reconstruction mask**. It is consistent with the legacy `repaired_polar.py` flux-threshold rule. The manuscript's previous claim that Polar cells were reconstructed only where OVATION indicated possible emission should be corrected. Importantly, the below-threshold cells include unknown observational support and may include valid weak precipitation; their abundance (94.17% and 82.85% of the grid) does not mean the satellite lacked coverage over all those cells. A scientific test of an observation-support-based Polar mask requires more than this saved-output comparison.
+
+The Word manuscript was updated separately (data selection, Section 3.3, Polar results, and discussion) with the mask rule and limitation. This archive does not include that manuscript file because manuscript delivery is managed separately from experimental scripts. The first-batch sampling mechanism and single-key attention audits are unchanged; R3-7 still needs a conditioning ablation for an empirical claim.

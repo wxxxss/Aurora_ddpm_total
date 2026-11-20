@@ -22,6 +22,23 @@ python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_grid_calibration
 
 Outputs: `statistical_units_audit.json`, `psd_event_level_descriptive.csv` and `grid_calibration_audit.json`. The last script reports missing private inputs rather than inventing measurements.
 
+Sanity tests (no satellite data required):
+
+```bash
+python -m unittest discover -s paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13 -p 'test_*.py'
+```
+
+The `audit_grid_calibration.py` script checks both the archived `First_revision` prepared NPZ path and the historical `paper_modif/R2-1_R2-3/swath_prepared_cases` path for local, untracked case arrays. It emits `missing_inputs` if neither is available. Do not interpret missing outputs as zero or fully checked coverage.
+
+Optional, **only if calibrated uncensored physical Polar flux is available**:
+
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_uncensored_polar_threshold.py --uncensored-flux /path/to/pre_QC_calibrated_LBHL_flux.npy --thresholds 20 30 40 50 60
+```
+
+Its output is a count-based cutoff sensitivity, not a calibrated uncertainty interval or a proof that bright values are invalid. Never supply post-QC gridded products for this pre-QC test; otherwise the conclusion would be circular. Do not commit private observation arrays.
+
+
 ## Explicit remaining requirements
 1. Recover the **native-to-grid Polar/UVI conversion code** for the preprocessed flux products, including how duplicate native pixels and missing/quality flags were handled. That mapping cannot be established from the current committed code alone; do not claim it has been independently audited.
 2. Verify the **40 erg cm⁻² s⁻¹ cutoff** using the uncensored, calibrated Polar brightness/flux values and available quality flags. Perform threshold sensitivity (e.g. 20, 40, 60) before asserting a justified optimum.

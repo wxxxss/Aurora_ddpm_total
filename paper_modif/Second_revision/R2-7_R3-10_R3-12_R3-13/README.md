@@ -179,3 +179,24 @@ The conditional model does *not* uniformly outperform direct OVATION or interpol
 The updated structure analysis has **8194** support-safe gradient edges (**4103+4091**) and **79** PSD segments (**44+35**) from the same two EDRs. Log-gradient KS distance is **0.6842**, Wasserstein distance **0.1086**, and pooled SSUSI-to-OVATION gradient ratios **4.304** and **4.549** at the 95th and 99th percentiles, respectively. Pooled segment-weighted high-frequency PSD-fraction difference is **+0.00565** and spectral-slope difference is **−0.7300**. Earlier event-specific PSD values (45/34 segments) are invalid for these new inputs. To report revised per-event values, also provide **`center_aligned_smoothness/psd_comparison.csv` and `psd_segment_metrics.csv`**; these files were not included in the upload.
 
 The cumulative manuscript now reports the corrected-grid descriptive results and a direct-OVATION/SSUSI heldout baseline table, but the triptych figures remain pending the interval-time correction described above. **No model superiority or updated image quality is claimed on the basis of reruns not yet performed.**
+
+## Second-batch closing evidence: time-corrected Figure 6–8 (2026-11-22)
+
+The author reran the **center-aligned and temporally consistent** Figure 6/7 reconstructions and supplied the updated PSD CSV files. The current verified results are preserved in `timecorrected_figures_and_psd_verified.json`.
+
+- Figure 6 / Orbit 06228, 2005-01-01 **14:44:34–16:26:25 UT**: OVATION 1-minute frames **884–987**, OMNI 5-minute records averaged over the EDR interval, 4,345 supported cells (56.6%) and **maximum absolute preserved-observation error = 0**. Time-corrected DDPM generated missing-region mean flux **0.1080**, maximum **1.1268** erg cm^-2 s^-1.
+- Figure 7 / Orbit 06263, 2005-01-04 **02:12:15–03:54:07 UT**: OVATION frames **4452–4555**, orbit-interval-mean OMNI, 4,279 supported cells (55.7%) and **preserved-observation error = 0**. Generated missing-region mean **0.3898**, maximum **3.2837** erg cm^-2 s^-1.
+- The final two panel (c) OVATION reference images represent acquisition-interval means. The previous panels indexed a one-minute array with a five-minute OMNI index and must not be used in the submission.
+- Revised center-aligned structure analysis yields **8,194 support-safe gradient edges** (4,103 Figure 6, 4,091 Figure 7) and **79 supported PSD segments** (44 Figure 6, 35 Figure 7). The Figure 6 SSUSI-minus-OVATION high-frequency PSD-fraction difference is **+0.046455** and Figure 7 is **−0.045639**; the corresponding spectral-slope differences are **−0.241098** and **−1.344687**. Pooled segment-weighted values are **+0.005654** and **−0.730030**. The signs differ between events; no segment-based CI or p value supports event-level significance.
+- The real SSUSI holdout benchmark (12 nested selected sectors from just two events) remains as previously reported: conditional-DDPM mean RMSE **3.192**, direct-OVATION mean RMSE **3.147**, spatial-interpolation mean RMSE **3.014**. No performance superiority is asserted.
+
+Run the post-processing checks on the user's private data filesystem:
+
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/verify_timecorrected_reconstruction.py
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/verify_psd_event_stats.py
+```
+
+The author-provided `reconstruction_summary(1).json` and `psd_comparison(1).csv`/`psd_segment_metrics.csv` were independently checked in the manuscript-editing environment; the checks above enable repeatable verification on the original filesystem.
+
+The cumulative Word manuscript has now been updated to integrate the corrected time-aligned Figure 6/7 panels, center-aligned Figure 8, per-event PSD contrasts, and the direct real-SSUSI baseline table. The original manuscript upload lacked embedded figures; only the supplied corrected Figures 6–8 were inserted. R3-10 is resolved for **the two SSUSI EDR cases**, but Polar native pixel-aggregation provenance is still incomplete; R3-12's uncensored 40 erg cm^-2 s^-1 threshold sensitivity remains open.

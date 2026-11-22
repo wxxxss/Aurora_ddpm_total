@@ -1,0 +1,111 @@
+{
+  "source": "Uploaded benchmark_summary(1).json, event_level_summary.json and metrics_per_holdout(2).csv, examined 2026-11-22; 180 unique method rows; user-uploaded results, not a new assistant-run DDPM inference.",
+  "protocol": {
+    "month": "2005-01",
+    "n_acquisitions": 12,
+    "n_holdout_sectors": 36,
+    "holdout_widths_mlt_h": [
+      1,
+      2,
+      4
+    ],
+    "n_unique_models_in_missing_region": 4,
+    "n_display_methods": 5,
+    "n_method_evaluations": 180,
+    "primary_selection": "random by native support only, not hidden energy flux",
+    "excluded_development_orbits": [
+      "06228",
+      "06263"
+    ],
+    "temporal_independence": "12 date-separated EDR acquisition clusters; independence of geomagnetic storms not demonstrated"
+  },
+  "direct_and_fused_ovation_hidden_region_metrics_identical": true,
+  "equal_acquisition_weight_metrics": {
+    "conditional_ddpm": {
+      "rmse": 1.5031285132175916,
+      "mae": 0.7996645738185831,
+      "pearson_r": 0.38928183239046876,
+      "peak_ratio": 0.27005691531459713,
+      "mean_peak_abs_error": 8.078276582890087
+    },
+    "unconditional_ddpm": {
+      "rmse": 1.458749476019099,
+      "mae": 0.7402110916797334,
+      "pearson_r": 0.41709447118455506,
+      "peak_ratio": 0.24525882352893702,
+      "mean_peak_abs_error": 7.951417851779195
+    },
+    "direct_ovation_prime": {
+      "rmse": 1.7528003143017339,
+      "mae": 1.1131680740361798,
+      "pearson_r": 0.2790667499073629,
+      "peak_ratio": 0.6266910917216856,
+      "mean_peak_abs_error": 8.038527452283436
+    },
+    "spatial_interpolation": {
+      "rmse": 1.3941688192703487,
+      "mae": 0.7177125426199652,
+      "pearson_r": 0.3569511640992555,
+      "peak_ratio": 0.7811189762509284,
+      "mean_peak_abs_error": 4.105143039694263
+    }
+  },
+  "paired_event_conditional_minus_baseline_rmse": {
+    "unconditional_ddpm": {
+      "mean": 0.04437903719849229,
+      "cluster_bootstrap_ci95": [
+        -0.014037887486103216,
+        0.13465456446081184
+      ],
+      "event_wins_for_conditional": 5,
+      "sector_wins_for_conditional": 14
+    },
+    "direct_ovation_prime": {
+      "mean": -0.24967180108414247,
+      "cluster_bootstrap_ci95": [
+        -0.49179139760117213,
+        -0.055785240590691974
+      ],
+      "event_wins_for_conditional": 11,
+      "sector_wins_for_conditional": 27
+    },
+    "spatial_interpolation": {
+      "mean": 0.10895969394724236,
+      "cluster_bootstrap_ci95": [
+        -0.1272621611997561,
+        0.4239301148971805
+      ],
+      "event_wins_for_conditional": 8,
+      "sector_wins_for_conditional": 20
+    }
+  },
+  "by_width_rmse": {
+    "1h": {
+      "conditional_ddpm": 1.513,
+      "unconditional_ddpm": 1.415,
+      "direct_ovation_prime": 1.97,
+      "spatial_interpolation": 0.88
+    },
+    "2h": {
+      "conditional_ddpm": 1.167,
+      "unconditional_ddpm": 1.17,
+      "direct_ovation_prime": 1.397,
+      "spatial_interpolation": 1.237
+    },
+    "4h": {
+      "conditional_ddpm": 1.829,
+      "unconditional_ddpm": 1.791,
+      "direct_ovation_prime": 1.892,
+      "spatial_interpolation": 2.066
+    }
+  },
+  "diagnostic_warnings": [
+    "The mean of sector-level gradient ratios (conditional DDPM 1.335) is inflated by nearly flat true-gradient sectors. The ratio of pooled mean predicted to pooled mean true gradient is approximately 0.145, and should not be conflated with 1.335.",
+    "The mean of peak ratios is sensitive to quiet sectors with low true peak; mean absolute peak errors are more comparable (conditional DDPM ~8.08 vs interpolation ~4.11 erg cm^-2 s^-1).",
+    "Mean R^2 is unstable, particularly for direct OVATION (~-75.93) because of near-constant target sectors.",
+    "Acquisition-level cluster bootstrap covers only time-selected January 2005 cases and does not establish storm independence or multiyear generality.",
+    "No confidence interval for systematic prediction in truly unobserved regions is available; all scores are artificially withheld measured SSUSI cells.",
+    "No active-sector stress test on the 12 independent acquisitions has yet been returned; that follow-up is required before calling R3-5 closed."
+  ],
+  "reviewer_response_status": "All R2-1/R2-2/R2-3/R3-3/R3-4/R3-5 Responses withheld until final experiments, consistency review, and associated manuscript updates are complete."
+}

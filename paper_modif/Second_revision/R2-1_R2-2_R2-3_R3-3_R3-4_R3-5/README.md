@@ -74,3 +74,18 @@ First return `catalog_preview.json` or its console summary so we can establish w
 ## Scope and open questions
 
 No third-batch experiments were executed on the private server at code-creation time. No statistical superiority is claimed. Real SSUSI electron energy flux is an EDR product and may itself have calibration and temporal-integration biases. New acquisitions in one month do not guarantee independence across magnetic storms or generalization across years or Kp regimes. Full paper/Response edits follow *only after* the tests have been completed, metrics verified, and contradictions with the main text resolved.
+
+## Filename rollover fix (2026-11-22)
+
+The first catalog dry-run was blocked by an SSUSI EDR filename with identical start/end year-day tokens but a crossing-midnight clock interval:
+`2005244T235954-2005244T014123-REV09652`. The actual acquisition spans **2005-09-01 23:59:54 UTC through 2005-09-02 01:41:23 UTC**. The catalog parser now adds one calendar day to the end only when the date tokens are the same and the clocks imply a plausible late-night/early-morning rollover (start hour >=22, end hour <=4). The resulting duration must also be between 1 minute and 4 hours. Correctly dated cross-year intervals remain unchanged. Implausible filename times are listed in `n_rejected_invalid_timing` / `rejected_invalid_timing_examples` without stopping the catalog scan. The number of normalized cross-midnight names is recorded in `n_corrected_midnight_rollovers`. Four regression tests were added.
+
+**Rerun only the catalog checks first**, not the model:
+
+```bash
+git pull --ff-only origin main
+python -m unittest discover -s paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5 -p 'test_*.py'
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multievent_ssusi.py --dry-run
+```
+
+Only after the dry-run lists enough eligible, temporally separated January acquisitions should the user execute the actual preparation/benchmark. No reviewer Response is issued from this parser correction.

@@ -172,6 +172,16 @@ def main():
     summary=json.loads(bpath.read_text(encoding="utf-8"))
     summary["n_method_evaluations"]=len(frame)
     summary["experiment"]["selection_mode"]=args.selection_mode
+    # The underlying first-round benchmark still writes the active-window
+    # configuration fields. They are NOT used for flux-blind random selection.
+    if args.selection_mode=="random":
+        summary["experiment"]["selection"]["min_signal_fraction"]=None
+        summary["experiment"]["selection"]["signal_threshold"]=None
+        summary["experiment"]["selection"]["selection_uses_target_flux"]=False
+        summary["experiment"]["selection"]["reported_signal_fraction"]="post-selection diagnostic only"
+    else:
+        summary["experiment"]["selection"]["selection_uses_target_flux"]=True
+        summary["experiment"]["selection"]["reported_signal_fraction"]="used for exploratory active-region selection"
     summary["experiment"]["catalog_manifest"]=str(manifest_path)
     summary["experiment"]["n_acquisitions"]=len(case_ids)
     summary["experiment"]["inference_unit"]="EDR acquisition/temporal cluster, not sector or pixel"

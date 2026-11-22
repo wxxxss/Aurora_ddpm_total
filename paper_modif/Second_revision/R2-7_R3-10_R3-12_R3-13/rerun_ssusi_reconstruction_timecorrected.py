@@ -530,8 +530,9 @@ def main() -> None:
 
     if len(ovation_all) != len(omni):
         print(
-            f"WARNING: OVATION length ({len(ovation_all)}) != OMNI length ({len(omni)}). "
-            "The nearest OMNI index will still be used if it is within the OVATION array."
+            f"INFO: OVATION has {len(ovation_all)} one-minute frames and OMNI has "
+            f"{len(omni)} five-minute records; UTC intervals, NOT matching "
+            "array indices, determine the baseline frames and solar conditioning."
         )
 
     global_summary: Dict[str, Any] = {}
@@ -557,8 +558,18 @@ def main() -> None:
         omni_idx, omni_time, time_delta_s = nearest_time_index(omni["utc"], midpoint)
         solar_raw = interval_mean_solar(omni, start, end)
         solar_norm = normalize_solar(solar_raw, norm)
+        ovation_start = ovation_start_from_path(args.ovation)
+        # Refuse to report an incomplete orbit mean as an exact time match.
+        start_index = int(np.floor((start - ovation_start).total_seconds() / 60.0))
+        end_index = int(np.ceil((end - ovation_start).total_seconds() / 60.0))
+        if start_index < 0 or end_index >= len(ovation_all):
+            raise ValueError(
+                f"{case}: OVATION 1-minute array does not fully span "
+                f"{start}..{end}; required frames {start_index}..{end_index} "
+                f"of {len(ovation_all)}"
+            )
         ovation, ova_i0, ova_i1 = ovation_interval_mean(
-            ovation_all, ovation_start_from_path(args.ovation), start, end
+            ovation_all, ovation_start, start, end
         )
         if ovation.shape != (80, 96):
             raise ValueError(f"Expected OVATION map (80, 96), got {ovation.shape}")

@@ -72,7 +72,7 @@ def describe(df):
           "mean_sector_peak_ratio":float(a.peak_ratio.mean()),
           "mean_sector_gradient_ratio":float(a.gradient_ratio.mean()),
           "ratio_of_predicted_to_measured_peak_means":float(a.pred_peak.mean()/a.truth_peak.mean()),
-          "ratio_of_predicted_vs_measured_gradient_means":float(a.pred_gradient_mean.mean()/a.truth_gradient_mean.mean()),
+          "ratio_of_predicted_to_measured_gradient_means":float(a.pred_gradient_mean.mean()/a.truth_gradient_mean.mean()),
           "mean_peak_absolute_error":float(np.mean(np.abs(
               df.loc[df.method==method,"pred_peak"].to_numpy() -
               df.loc[df.method==method,"truth_peak"].to_numpy()))),

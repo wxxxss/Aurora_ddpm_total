@@ -1,0 +1,83 @@
+{
+  "source": "Author-run --dry-run of prepare_multievent_ssusi.py; supplied in chat 2026-11-22. Source file system paths intentionally excluded.",
+  "month": "2005-01",
+  "scanned_2005_F16_EDR_paths": 4846,
+  "parsed_paths": 4846,
+  "corrected_filename_midnight_rollovers": 1,
+  "rejected_invalid_filename_ranges": 0,
+  "eligible_january_paths": 434,
+  "selected_acquisitions": 12,
+  "min_gap_between_selected_EDR_intervals_hours": 24,
+  "excluded_prior_development_orbits": [
+    "06228",
+    "06263"
+  ],
+  "selection_uses_target_flux": false,
+  "events": [
+    {
+      "orbit": "06237",
+      "start_utc": "2005-01-02T06:01:58",
+      "end_utc": "2005-01-02T07:43:49"
+    },
+    {
+      "orbit": "06274",
+      "start_utc": "2005-01-04T20:53:32",
+      "end_utc": "2005-01-04T22:35:23"
+    },
+    {
+      "orbit": "06310",
+      "start_utc": "2005-01-07T10:03:32",
+      "end_utc": "2005-01-07T11:45:23"
+    },
+    {
+      "orbit": "06347",
+      "start_utc": "2005-01-10T00:55:05",
+      "end_utc": "2005-01-10T02:36:56"
+    },
+    {
+      "orbit": "06383",
+      "start_utc": "2005-01-12T14:04:43",
+      "end_utc": "2005-01-12T15:46:34"
+    },
+    {
+      "orbit": "06420",
+      "start_utc": "2005-01-15T04:56:39",
+      "end_utc": "2005-01-15T06:38:30"
+    },
+    {
+      "orbit": "06456",
+      "start_utc": "2005-01-17T18:06:16",
+      "end_utc": "2005-01-17T19:48:07"
+    },
+    {
+      "orbit": "06493",
+      "start_utc": "2005-01-20T08:57:50",
+      "end_utc": "2005-01-20T10:39:41"
+    },
+    {
+      "orbit": "06529",
+      "start_utc": "2005-01-22T22:07:49",
+      "end_utc": "2005-01-22T23:49:40"
+    },
+    {
+      "orbit": "06566",
+      "start_utc": "2005-01-25T12:59:23",
+      "end_utc": "2005-01-25T14:41:14"
+    },
+    {
+      "orbit": "06602",
+      "start_utc": "2005-01-28T02:09:01",
+      "end_utc": "2005-01-28T03:50:52"
+    },
+    {
+      "orbit": "06638",
+      "start_utc": "2005-01-30T15:19:00",
+      "end_utc": "2005-01-30T17:00:51"
+    }
+  ],
+  "limitations": [
+    "The catalog proves file names/dates, not sufficient measured support in random heldout windows or availability of time-matched OMNI/OVATION inputs.",
+    "Different acquisition dates do not imply independent geomagnetic storms.",
+    "No third-batch model inference or reviewer claim has yet been verified."
+  ]
+}

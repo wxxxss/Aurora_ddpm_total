@@ -89,3 +89,29 @@ python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multiev
 ```
 
 Only after the dry-run lists enough eligible, temporally separated January acquisitions should the user execute the actual preparation/benchmark. No reviewer Response is issued from this parser correction.
+
+## January 2005 time-selected catalog — verified (author dry-run)
+
+The author's corrected parser scanned **4,846** F16/2005 EDR paths, successfully parsed **4,846**, corrected **one** same-day-token midnight rollover, and rejected **zero** invalid filename ranges. Within January it found **434** eligible paths and selected **12**, at least 24 h apart, excluding development orbits 06228 and 06263. Dates run from 2005-01-02 through 2005-01-30. A privacy-trimmed record of the 12 selected orbits is stored as \`time_selected_january_2005_catalog_verified.json\`.
+
+**This establishes calendar availability only.** It does not establish that every EDR contains a usable 60°–80° MLAT sector for each of 1-, 2-, 4-hour MLT holdout widths, or that monthly OMNI/OVATION arrays span all acquisition times.
+
+A new **no-model preflight** was therefore added. It checks the prepared SSUSI \`npz\` grids and every planned random holdout sector, strict known/target disjointness, the declared 80×96 center-aligned grid, and the full EDR UTC interval in OMNI and OVATION. It writes a report even if an acquisition is unusable.
+
+\`\`\`bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+# Fast synthetic regression checks — no satellite inputs needed:
+python -m unittest discover -s paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5 -p 'test_*.py'
+
+# Prepare the fixed calendar-selected EDRs:
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multievent_ssusi.py --max-events 12 --min-events 6 --min-gap-hours 24
+
+# Before loading a DDPM checkpoint:
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py
+\`\`\`
+
+Inspect \`preflight_multievent_report.json\`, particularly \`ready_for_primary_inference\`, \`n_fully_evaluable_acquisitions\`, and any \`errors\`. The preflight uses exactly the same geometry-only, hash-seeded random selection as the primary benchmark. **Run the model benchmark only when \`ready_for_primary_inference = true\`.** If it fails, report the audit rather than silently dropping acquisitions or changing the selection threshold after seeing model performance.
+
+At least 12 different EDR files does **not** imply 12 statistically independent geomagnetic storms. The paper must report the actual number of evaluable acquisitions, their distribution in activity and solar-wind conditions, and the baseline comparison without claiming unjustified population-wide superiority.

@@ -37,24 +37,24 @@
       },
       "unconditional_ddpm": {
         "rmse": 3.2713785505376425,
-        "mae": 1.2836,
-        "pearson_r": 0.5429,
-        "peak_ratio": 0.0972,
-        "gradient_ratio": 0.1227
+        "mae": 1.283598061548286,
+        "pearson_r": 0.5429374223574034,
+        "peak_ratio": 0.09720084862547711,
+        "gradient_ratio": 0.12272014922763945
       },
       "ovation_prime": {
         "rmse": 3.147028201854894,
-        "mae": 1.6128,
-        "pearson_r": 0.1911,
-        "peak_ratio": 0.2486,
-        "gradient_ratio": 0.1851
+        "mae": 1.6128402602411664,
+        "pearson_r": 0.1910529592865319,
+        "peak_ratio": 0.24856916873752874,
+        "gradient_ratio": 0.1850854994248129
       },
       "interpolation": {
-        "rmse": 3.014306776541271,
-        "mae": 1.198,
-        "pearson_r": 0.3827,
-        "peak_ratio": 0.4929,
-        "gradient_ratio": 0.3593
+        "rmse": 3.0143067765412703,
+        "mae": 1.1980057547422065,
+        "pearson_r": 0.38268665467706114,
+        "peak_ratio": 0.4929079286062688,
+        "gradient_ratio": 0.3593012341953916
       }
     },
     "paired_rmse_conditional_minus_baseline": {

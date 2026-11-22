@@ -143,3 +143,33 @@ This fifth stage may output pixel/segment bootstrap confidence intervals as part
 Return the following generated text artifacts (not private raw EDR arrays): `center_alignment_manifest.json`, the two `Figure*_reconstruction_summary.json`, `center_aligned_heldout/benchmark_summary.json`, and `center_aligned_smoothness/smoothness_bias_summary.json`. Recheck the figures and the remaining first-revision statistics on the corrected grid before updating the paper's numeric results.
 
 **Status:** preprocessing correction *implemented*, but no center-aligned reconstruction, benchmark or PSD rerun has yet been reported by the author. No inference-side improvement or unchanged scientific metric is claimed.
+
+## Corrected-grid author rerun and hidden temporal mismatch (2026-11-22)
+The author supplied corrected-grid `reconstruction_summary.json`, `benchmark_summary.json`, `metrics_per_holdout.csv`, `metrics_summary.csv`, `smoothness_bias_summary.json`, `gradient_summary.csv`, `gradient_comparison.csv`, Figure6/7 triptychs, and the structure-diagnostic plot. Verified summary: `center_aligned_rerun_findings.json`.
+
+**Reconstruction and evaluation are not yet fully synchronized:** the first-revision figure-maker reconstructed Fig6/7 with the *nearest single 5-min OMNI record* (at 15:35/03:05 UT), and used the same OMNI *array position* (187/901) to index a 1-min OVATION series. Those indices do not refer to the corresponding solar-wind time in the 1-min OVATION series. In contrast, the separate real-observation heldout benchmark and spatial PSD audit use acquisition-interval means. The uploaded Figure6/7 triptychs are therefore **not final time-matched figure panels**. Retain the previous run as a diagnostic; do not describe it as a time-consistent OVATION interval mean.
+
+The new `rerun_ssusi_reconstruction_timecorrected.py` clones the first-round figure-making procedure without overwriting its historical source and uses **UTC acquisition-interval means for OMNI conditioning and the OVATION baseline**. It explicitly rejects incomplete 1-min OVATION orbit coverage and saves the indices used in the JSON result.
+
+```bash
+git pull --ff-only origin main
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/rerun_ssusi_reconstruction_timecorrected.py
+```
+
+Required results: `center_aligned_reconstruction_timecorrected/reconstruction_summary.json` plus the fresh `Figure6/Figure6_comparison_vmax5.png` and `Figure7/Figure7_comparison_vmax5.png`. Model weights and normalization must match the existing tested checkpoint. This **does not** require rerunning the separate heldout benchmark or the spatial PSD analysis, since both already use orbit-mean time alignment.
+
+### Corrected grid: completed real-observation benchmark
+The delivered benchmark contains **12 MLT-sector holdouts** from two SSUSI EDR acquisitions, evaluated across **four methods** (48 method evaluations). Descriptive means are:
+
+| Method | RMSE | MAE | Pearson r | Peak ratio | Gradient ratio |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Conditional DDPM | 3.1924 | 1.3316 | 0.4518 | 0.1140 | 0.0981 |
+| Unconditional DDPM | 3.2714 | 1.2836 | 0.5429 | 0.0972 | 0.1227 |
+| Direct interval-mean OVATION | 3.1470 | 1.6128 | 0.1911 | 0.2486 | 0.1851 |
+| Spatial interpolation | 3.0143 | 1.1980 | 0.3827 | 0.4929 | 0.3593 |
+
+The conditional model does *not* uniformly outperform direct OVATION or interpolation on real measured flux; its peak and gradient retention remain poor. The 12 sectors are not independent events and were selected for coverage and auroral signal. Do not use a naive bootstrap across sectors for independent-event significance.
+
+The updated structure analysis has **8194** support-safe gradient edges (**4103+4091**) and **79** PSD segments (**44+35**) from the same two EDRs. Log-gradient KS distance is **0.6842**, Wasserstein distance **0.1086**, and pooled SSUSI-to-OVATION gradient ratios **4.304** and **4.549** at the 95th and 99th percentiles, respectively. Pooled segment-weighted high-frequency PSD-fraction difference is **+0.00565** and spectral-slope difference is **−0.7300**. Earlier event-specific PSD values (45/34 segments) are invalid for these new inputs. To report revised per-event values, also provide **`center_aligned_smoothness/psd_comparison.csv` and `psd_segment_metrics.csv`**; these files were not included in the upload.
+
+The cumulative manuscript now reports the corrected-grid descriptive results and a direct-OVATION/SSUSI heldout baseline table, but the triptych figures remain pending the interval-time correction described above. **No model superiority or updated image quality is claimed on the basis of reruns not yet performed.**

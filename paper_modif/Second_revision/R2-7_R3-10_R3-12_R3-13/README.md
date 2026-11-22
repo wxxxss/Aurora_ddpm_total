@@ -156,6 +156,12 @@ git pull --ff-only origin main
 python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/rerun_ssusi_reconstruction_timecorrected.py
 ```
 
+After the new reconstruction finishes, verify its interval-frame alignment and observation-preservation invariants:
+
+```bash
+python paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/verify_timecorrected_reconstruction.py
+```
+
 Required results: `center_aligned_reconstruction_timecorrected/reconstruction_summary.json` plus the fresh `Figure6/Figure6_comparison_vmax5.png` and `Figure7/Figure7_comparison_vmax5.png`. Model weights and normalization must match the existing tested checkpoint. This **does not** require rerunning the separate heldout benchmark or the spatial PSD analysis, since both already use orbit-mean time alignment.
 
 ### Corrected grid: completed real-observation benchmark

@@ -92,12 +92,13 @@ def check_manifest(manifest,prepared_root,min_events,ovation_path):
             raise ValueError(f"Overlapping EDR acquisitions in manifest near {case}")
     return ids
 
-def random_selector(flux,obs,mlat,mlt,**kwargs):
+def random_selector(flux,obs,mlat,mlt,*, selection_seed=2026,**kwargs):
     # Derive deterministic RNG seed from the coverage-mask geometry, NOT from
     # withheld energy flux or model predictions.
     seed=int.from_bytes(hashlib.sha256(
         np.asarray(obs,dtype=np.uint8).tobytes() +
-        str(kwargs.get("width_h")).encode()).digest()[:8],"little")%(2**32)
+        str(kwargs.get("width_h")).encode() +
+        str(selection_seed).encode()).digest()[:8],"little")%(2**32)
     kwargs.pop("min_signal_fraction",None)
     kwargs.pop("signal_threshold",None)
     windows=random_observed_holdouts(flux,obs,mlat,mlt,seed=seed,**kwargs)
@@ -143,7 +144,8 @@ def main():
     old.CASES=tuple(case_ids)
     old.ovation_interval_mean=strict_ovation_coverage(old.ovation_interval_mean)
     if args.selection_mode=="random":
-        old.select_holdout_windows=random_selector
+        old.select_holdout_windows=lambda flux,obs,lat,mlt,**kw: random_selector(
+            flux,obs,lat,mlt,selection_seed=args.seed,**kw)
     # Else the original flux-conditioned active selector remains in place.
     # Run the original tested model execution with EXACTLY the new case list.
     old_argv=sys.argv

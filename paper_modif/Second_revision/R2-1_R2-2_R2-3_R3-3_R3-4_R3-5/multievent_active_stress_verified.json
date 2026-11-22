@@ -1,0 +1,97 @@
+{
+  "source": "User uploaded event_level_summary(1).json and metrics_per_holdout(3).csv plus 3 diagnostics, 2026-11-22; 12 acquisitions, 36 high-flux masks, 180 five-method evaluations. Values compared with source CSV; no assistant-run DDPM inference.",
+  "selection": "Post-hoc flux-selected ACTIVE sectors; 60-80 MLAT, 1/2/4 h MLT windows, same 12 acquisition dates as flux-blind random primary; do not infer unselected event frequency from these results.",
+  "counts": {
+    "acquisitions": 12,
+    "sectors": 36,
+    "method_evaluations": 180,
+    "common_masks_all_five_methods": true,
+    "direct_equals_observed_fused_ovation_on_hidden_pixels": true
+  },
+  "acquisition_equal_metrics": {
+    "conditional_ddpm": {
+      "rmse": 2.939613323038818,
+      "mae": 1.582115480790869,
+      "pearson_r": 0.4427024402549394,
+      "mean_sector_peak_ratio": 0.15776928942715182,
+      "mean_sector_gradient_ratio": 0.132679731552103,
+      "gradient_ratio_of_aggregated_means": 0.08607189419281135,
+      "peak_ratio_of_aggregated_means": 0.09757536367032933,
+      "mean_absolute_peak_error": 15.048306988345253
+    },
+    "unconditional_ddpm": {
+      "rmse": 2.8702978631941085,
+      "mae": 1.466541051855106,
+      "pearson_r": 0.5182927562224637,
+      "mean_sector_peak_ratio": 0.15093568353987397,
+      "mean_sector_gradient_ratio": 0.20162917187217264,
+      "gradient_ratio_of_aggregated_means": 0.11492064627428515,
+      "mean_absolute_peak_error": 15.011243724160726
+    },
+    "direct_ovation": {
+      "rmse": 3.1565859036839155,
+      "mae": 1.9070853532237093,
+      "pearson_r": 0.2419968481776115,
+      "mean_sector_peak_ratio": 0.3333821986202195,
+      "mean_sector_gradient_ratio": 0.19879938572050035,
+      "gradient_ratio_of_aggregated_means": 0.0997852358764422,
+      "mean_absolute_peak_error": 14.65539968593253
+    },
+    "spatial_interpolation": {
+      "rmse": 2.5574863046206584,
+      "mae": 1.2873451756663894,
+      "pearson_r": 0.4080190910516048,
+      "mean_sector_peak_ratio": 0.5512737320386789,
+      "mean_sector_gradient_ratio": 0.3930875171042744,
+      "gradient_ratio_of_aggregated_means": 0.44810919105529223,
+      "mean_absolute_peak_error": 8.673777396894163
+    }
+  },
+  "paired_acquisition_rmse_conditional_minus_baseline": {
+    "unconditional_ddpm": {
+      "mean": 0.06931545984470976,
+      "ci95": [
+        -0.05798577883900716,
+        0.27370275032979896
+      ],
+      "wins_of_12": 5,
+      "sectors_won_of_36": 15
+    },
+    "direct_ovation": {
+      "mean": -0.2169725806450974,
+      "ci95": [
+        -0.5402033281096579,
+        -0.002388705481970381
+      ],
+      "wins_of_12": 9,
+      "sectors_won_of_36": 24
+    },
+    "interpolation": {
+      "mean": 0.3821270184181598,
+      "ci95": [
+        0.06369598637938062,
+        0.847091372201146
+      ],
+      "wins_of_12": 1,
+      "sectors_won_of_36": 13
+    }
+  },
+  "active_vs_random_reference": {
+    "flux_blind_random_conditional_rmse": 1.5031285132175916,
+    "active_conditional_rmse": 2.939613323038818,
+    "flux_blind_random_conditional_peak_ratio": 0.27005691531459713,
+    "active_conditional_peak_ratio": 0.15776928942715182,
+    "flux_blind_random_mean_true_peak": 9.380562615891298,
+    "active_mean_true_peak": 16.675416852037113,
+    "flux_blind_random_mean_true_flux": 0.9160926716543408,
+    "active_mean_true_flux": 1.9305487734972344,
+    "warning": "Selection mechanisms differ and are correlated within same orbits. These comparisons are descriptive, not a causal effect of higher activity."
+  },
+  "image_checks": [
+    "F16 orbit 06237/2005-01-02 width4 center9.5 MLT",
+    "F16 orbit06456/2005-01-17 width4 center6.5 MLT",
+    "F16 orbit06529/2005-01-22 width4 center7.0 MLT"
+  ],
+  "caution": "Panels clip image display to 5 erg cm^-2 s^-1; target peaks in active CSV reach 45.918 erg cm^-2 s^-1. Numeric metrics use unclipped targets. Near-zero gradients affect random mean-of-ratios, so report separate ratio of mean gradients.",
+  "reviewer_response_release": "Withhold English Responses until manuscript figure/table cross-reference and diagnostic analysis QA are completed."
+}

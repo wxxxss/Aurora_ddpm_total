@@ -1,0 +1,93 @@
+{
+  "source": "Author uploaded center-aligned recon/benchmark/smoothness results 2026-11-22; numbers transcribed from files and independently checked against metrics_per_holdout CSV",
+  "input_preparation": "Center-aligned nearest-MLT grid 0..23.75 h every 0.25 h; 4345/7680 and 4279/7680 supported cells",
+  "reconstruction": {
+    "Figure6": {
+      "orbit": "06228",
+      "solar_conditioning_in_current_uploaded_reconstruction": "single nearest OMNI 5min record at 2005-01-01T15:35:00 UT",
+      "observed_exact_max_abs_error": 0,
+      "missing_generated_mean_flux": 0.11727730184793472
+    },
+    "Figure7": {
+      "orbit": "06263",
+      "solar_conditioning_in_current_uploaded_reconstruction": "single nearest OMNI 5min record at 2005-01-04T03:05:00 UT",
+      "observed_exact_max_abs_error": 0,
+      "missing_generated_mean_flux": 0.34565216302871704
+    }
+  },
+  "timing_mismatch_detected": {
+    "original_script": "First_revision/R2-1_R2-3/rerun_ssusi_reconstruction.py",
+    "original_behavior": "ovation_all[omni_idx] applies 5-minute OMNI array index to a 1-minute OVATION array and selects a single OVATION frame, rather than interval mean; DDPM conditioned on a nearest midpoint 5-minute OMNI record",
+    "affected_outputs": "Uploaded Figure6/7 triptych reconstructions and panels (b,c); do not claim final time-consistent figures",
+    "unaffected_results": "The separately executed heldout benchmark and SSUSI PSD diagnostics explicitly use acquisition-interval OMNI/OVATION means",
+    "fix": "Second_revision/R2-7_R3-10_R3-12_R3-13/rerun_ssusi_reconstruction_timecorrected.py (must be run and inspected)"
+  },
+  "synthetic_vs_observed": "Real SSUSI benchmark uses 12 actively selected held-out MLT sectors nested within just 2 EDR events; not independent event-level replication.",
+  "heldout_benchmark": {
+    "n_EDR_events": 2,
+    "n_heldout_sectors": 12,
+    "n_method_evaluations": 48,
+    "method_means": {
+      "conditional_ddpm": {
+        "rmse": 3.19241538032163,
+        "mae": 1.3316091709908782,
+        "pearson_r": 0.45177702264193553,
+        "peak_ratio": 0.11402305150118076,
+        "gradient_ratio": 0.0981366164901723
+      },
+      "unconditional_ddpm": {
+        "rmse": 3.2713785505376425,
+        "mae": 1.2836,
+        "pearson_r": 0.5429,
+        "peak_ratio": 0.0972,
+        "gradient_ratio": 0.1227
+      },
+      "ovation_prime": {
+        "rmse": 3.147028201854894,
+        "mae": 1.6128,
+        "pearson_r": 0.1911,
+        "peak_ratio": 0.2486,
+        "gradient_ratio": 0.1851
+      },
+      "interpolation": {
+        "rmse": 3.014306776541271,
+        "mae": 1.198,
+        "pearson_r": 0.3827,
+        "peak_ratio": 0.4929,
+        "gradient_ratio": 0.3593
+      }
+    },
+    "paired_rmse_conditional_minus_baseline": {
+      "unconditional_ddpm": -0.0789631702160125,
+      "ovation_prime": 0.04538717846673576,
+      "interpolation": 0.1781086037803594
+    },
+    "conditional_rmse_win_counts_of_12": {
+      "unconditional_ddpm": 8,
+      "ovation_prime": 7,
+      "interpolation": 5
+    },
+    "qualifier": "Means over correlated/partly overlapping held-out sectors; case-to-case heterogeneity and active-sector selection constrain generality."
+  },
+  "gradient_psd": {
+    "support_safe_edges": {
+      "Figure6": 4103,
+      "Figure7": 4091,
+      "total": 8194
+    },
+    "matched_supported_psd_segments": {
+      "Figure6": 44,
+      "Figure7": 35,
+      "total": 79
+    },
+    "pooled_log1p_gradient_ks_distance": 0.6841591408347572,
+    "pooled_log1p_gradient_wasserstein": 0.10859117979146965,
+    "ssusi_over_ovation_gradient_p95_ratio": 4.304409607951273,
+    "ssusi_over_ovation_gradient_p99_ratio": 4.549028675079618,
+    "pooled_high_frequency_psd_fraction_difference_ssusi_minus_ovation": 0.005653815084716124,
+    "pooled_psd_spectral_slope_difference_ssusi_minus_ovation": -0.7300298599127156,
+    "inference": "Pooled segment CIs/Wilcoxon p-values and pixel-level KS p-values are not event-independent and must not be presented as significance across events.",
+    "missing_from_upload": "New per-event psd_comparison.csv and psd_segment_metrics.csv are required to update the manuscript with validated event-level differences."
+  },
+  "status": "Real heldout benchmark and gradient/PSD recomputation received. Time-corrected Figure6/7 inference not yet run; manuscript and reviewer response remain provisional for that point."
+}

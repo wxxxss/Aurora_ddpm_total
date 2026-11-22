@@ -162,3 +162,41 @@ The active selector may reject quiet acquisitions with insufficient high-signal 
 ### Main-text revision and response restriction
 
 The cumulative Word manuscript has been updated *separately* as an interim third-batch working draft, adding the 12-acquisition experiment to Section 2.5 and Section 4.2, a new Table 9, and more cautious abstract/discussion claims. This edit does not close the full batch. **No English Response for R2-1/R2-2/R2-3/R3-3/R3-4/R3-5 is to be drafted or delivered until active stress results, code auditing, and manuscript consistency are complete.**
+
+## Third-batch activity-selected validation completed (2026-11-22)
+
+Author-provided \`event_level_summary(1).json\` and \`metrics_per_holdout(3).csv\` have been checked against 180 matched method rows (36 deliberately active-sector holdouts, 12 acquisition clusters, 1/2/4 MLT-hour widths), along with three illustrative event images. The fully processed, path-free quantitative result is in \`multievent_active_stress_verified.json\`; the earlier flux-blind primary outcome is in \`multievent_random_results_verified.json\`. **Do not pool the selection modes.** All metrics use true observed SSUSI pixels that are hidden from the model at sampling time.
+
+| Method | Random RMSE | Active RMSE | Active MAE | Active r | Active mean peak ratio | Active mean sector-gradient ratio | Active ratio of mean gradients | Active mean abs. peak error |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Conditional DDPM | 1.503 | 2.940 | 1.582 | 0.443 | 0.158 | 0.133 | 0.086 | 15.048 |
+| Unconditional DDPM | 1.459 | 2.870 | 1.467 | 0.518 | 0.151 | 0.202 | 0.115 | 15.011 |
+| Direct OVATION | 1.753 | 3.157 | 1.907 | 0.242 | 0.333 | 0.199 | 0.100 | 14.655 |
+| Spatial interpolation | 1.394 | 2.557 | 1.287 | 0.408 | 0.551 | 0.393 | 0.448 | 8.674 |
+
+The observation-fused OVATION predictions *inside the withheld cells* equal direct OVATION exactly, by construction. These are one predictive baseline, not two independent methods.
+
+Active-sector paired acquisition mean RMSE differences (conditional minus comparator):
+- unconditional DDPM **+0.0693**, acquisition-cluster 95% interval [−0.0580, +0.2737], conditional wins in **5/12** acquisitions;
+- direct OVATION Prime **−0.2170**, cluster interval [−0.5402, −0.0024], conditional wins in **9/12** acquisitions;
+- spatial interpolation **+0.3821**, cluster interval [+0.0637, +0.8471], conditional wins in **1/12** acquisitions.
+
+The active-sector true peak values range from **0.540 to 45.918 erg cm^-2 s^-1**. The selector chooses the highest-summed-log-flux eligible window within *each acquisition*, including quiet acquisitions; do not imply all windows are necessarily storm-intense or represent independent geomagnetic storms. Among active sectors, the mean of per-sector peak ratios (0.158 for the conditioned model) is not the ratio of mean peaks (0.0976). Likewise, the mean of sector gradient ratios (0.133) is not the ratio of aggregate mean gradients (0.0861). The figure comparison color scale is clipped to 5 erg cm^-2 s^-1 for display only; *all reported metrics use unclipped flux*.
+
+### Reproducibility / manuscript integration
+
+After both primary and active result directories are available on the author server:
+
+\`\`\`bash
+git pull --ff-only origin main
+python -m unittest discover -s paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5 -p 'test_*.py'
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/compare_random_active.py
+\`\`\`
+
+Output \`benchmarks/random_active_comparison.json\` verifies that all five methods use matched withheld observations within each protocol, rechecks direct/fused OVATION equivalence, and reports acquisition-paired RMSE wins and actual missing-region peak/gradient attenuation. The source inputs \`metrics_per_holdout.csv\` are not committed because of the author workstation's data organization; only a text audit summary is versioned.
+
+The complete cumulative Word manuscript has been updated separately with the two distinct 12-acquisition protocols (random and active), activity-selected real SSUSI Table 10, the representative 17 January 2005 six-panel Figure 12, explicit no-leakage and independent-sample limitations, and the synthetic-domain fact that direct OVATION is the synthetic reference by construction (rather than an independently predictive baseline).
+
+**Scientific result:** On the January 2005 selected measured pixels, conditional diffusion has lower RMSE than direct OVATION but does not reliably outperform unconditional diffusion or spatial interpolation. It strongly attenuates withheld precipitation peaks and gradients, especially in activity-selected sectors. Thus this batch has supplied the reviewer-requested quantitative tests and corrected the manuscript's claims, **not demonstrated recovery of fine auroral detail nor multi-storm/year generalization**.
+
+Reviewer-specific copy-paste English Responses may now be finalized **only after** the cumulative manuscript's render/cross-reference QA is complete, and must present the above negative findings as prominently as the mean improvement over direct OVATION. Remaining comments outside this batch (e.g., R3-12 Polar uncensored cutoff; Kp>5/multiyear) are not claimed resolved.

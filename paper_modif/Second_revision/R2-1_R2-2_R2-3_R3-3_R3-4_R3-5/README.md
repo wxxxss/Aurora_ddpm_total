@@ -115,3 +115,50 @@ python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multi
 Inspect \`preflight_multievent_report.json\`, particularly \`ready_for_primary_inference\`, \`n_fully_evaluable_acquisitions\`, and any \`errors\`. The preflight uses exactly the same geometry-only, hash-seeded random selection as the primary benchmark. **Run the model benchmark only when \`ready_for_primary_inference = true\`.** If it fails, report the audit rather than silently dropping acquisitions or changing the selection threshold after seeing model performance.
 
 At least 12 different EDR files does **not** imply 12 statistically independent geomagnetic storms. The paper must report the actual number of evaluable acquisitions, their distribution in activity and solar-wind conditions, and the baseline comparison without claiming unjustified population-wide superiority.
+
+## Primary 12-acquisition experiment completed (2026-11-22; author files)
+
+The author supplied \`benchmark_summary(1).json\`, \`event_level_summary.json\`, and \`metrics_per_holdout(2).csv\`. The source files contain **12 distinct January 2005 F16 acquisitions**, **36 native-SSUSI-supported masked sectors** (one each of 1-, 2-, 4-hour widths per acquisition), and **180 method-evaluation rows**. Each row was compared only against genuinely measured withheld SSUSI pixels. The result has been archived as \`multievent_random_results_verified.json\` (no private input paths). This result is **not** the same as the earlier two-orbit, 12 aurorally active-sector experiment.
+
+The previously uploaded outputs report event-equal mean withheld-pixel RMSE **1.5031 conditional DDPM**, **1.4587 unconditional DDPM**, **1.7528 direct OVATION**, and **1.3942 interpolation** (erg cm^-2 s^-1). Observation-fused OVATION has *identical hidden-pixel errors to direct OVATION*, not another independent source of predictive information.
+
+Paired acquisition-level RMSE differences, conditional minus baseline, are:
+- vs direct OVATION: **−0.2497** (acquisition-level bootstrap 95% interval **[−0.4918, −0.0558]**, 11/12 acquisitions and 27/36 sectors favor conditional)
+- vs unconditional DDPM: **+0.0444** (interval **[−0.0140, +0.1347]**, 5/12 acquisitions and 14/36 sectors favor conditional)
+- vs interpolation: **+0.1090** (interval **[−0.1273, +0.4239]**, 8/12 acquisitions and 20/36 sectors favor conditional)
+
+These conditional intervals summarize 12 selected **acquisition clusters** from *one month*; this is not evidence of 12 independent geomagnetic storms or of multi-year generalization. The conditioned model is superior to direct OVATION on mean RMSE for these cases, but **it does not demonstrate improvement over the unconditional DDPM or interpolation**.
+
+### Sharp-feature metric caveat
+
+The conditional model's mean *per-sector* peak-intensity ratio is **0.2701** and peak absolute error is **8.0783** erg cm^-2 s^-1; interpolation's are **0.7811** and **4.1051**, respectively. Sector-gradient ratios become extremely unstable when the true mean gradient is close to zero: the conditional mean of *sector ratios* is **1.3347**, but the *ratio of mean reconstructed to mean measured gradient* is only **0.1456** (interpolation: **0.5828**). These are distinct statistics, not a contradiction. Avoid claiming that an arithmetic mean gradient ratio >1 proves resolved sharp structures. Mean R² is also unstable when reference variance is nearly zero in quiet sectors.
+
+### Verify user's CSV / JSON consistency (no DDPM rerun)
+
+\`\`\`bash
+git pull --ff-only origin main
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/audit_multievent_results.py
+python -m unittest discover -s paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5 -p 'test_*.py'
+\`\`\`
+
+The audit checks **all 36 matched masks and five method rows**, direct=fused OVATION in heldout regions, acquisition-weighted summary consistency, paired win counts, and the near-zero gradient-ratio pathology. Output \`benchmarks/random_primary/audit_multievent_report.json\`.
+
+The old first-round benchmark writes \`min_signal_fraction\` and \`signal_threshold\` into its report metadata even when the new random selector *ignores them*. The multi-event wrapper now explicitly sets these fields to \`null\` in future **random** outputs and flags that held-out brightness is only a post-selection diagnostic; the measured predictions, metrics, and previous CSV results require **no rerun** for this metadata-only change.
+
+### Last required experimental complement for R3-5
+
+Run the **exploratory, intentionally high-flux sector stress test** using the same 12 time-selected EDRs and previously prepared input maps. This test deliberately uses withheld flux to select extreme sectors and MUST be separately labeled, never combined with random-primary results or presented as an unbiased sample of the January month.
+
+\`\`\`bash
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/multievent_heldout_benchmark.py \
+  --selection-mode active \
+  --output-root paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/benchmarks/active_stress
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/event_level_statistics.py \
+  --metrics paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/benchmarks/active_stress/metrics_per_holdout.csv
+\`\`\`
+
+The active selector may reject quiet acquisitions with insufficient high-signal windows; report the actual number of eligible acquisitions and masks rather than silently lowering thresholds or extrapolating results to all 12. Provide \`active_stress/metrics_per_holdout.csv\`, \`active_stress/event_level_summary.json\`, plus a few \`diagnostics/\` images with the brightest target arcs. These are needed to give an evidence-backed R3-5 response about sharp peaks and gradients.
+
+### Main-text revision and response restriction
+
+The cumulative Word manuscript has been updated *separately* as an interim third-batch working draft, adding the 12-acquisition experiment to Section 2.5 and Section 4.2, a new Table 9, and more cautious abstract/discussion claims. This edit does not close the full batch. **No English Response for R2-1/R2-2/R2-3/R3-3/R3-4/R3-5 is to be drafted or delivered until active stress results, code auditing, and manuscript consistency are complete.**

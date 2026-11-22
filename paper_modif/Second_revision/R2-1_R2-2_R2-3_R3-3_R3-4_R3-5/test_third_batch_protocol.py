@@ -59,6 +59,32 @@ class AcquisitionCatalogTests(unittest.TestCase):
         self.assertEqual(r["start"],datetime(2005,1,1,14,44,34))
         self.assertEqual(r["end"],datetime(2005,1,1,16,26,25))
 
+    def test_midnight_rollover_same_day_tokens(self):
+        # The end YYYYDDD can repeat the start date even when the EDR
+        # crosses midnight. This filename was reported by the author.
+        p=Path("dmspf16_ssusi_edr-aurora_2005244T235954-2005244T014123-REV09652_vA8.2.0r000.nc")
+        r=parse_edr_filename(p)
+        self.assertEqual(r["start"],datetime(2005,9,1,23,59,54))
+        self.assertEqual(r["end"],datetime(2005,9,2,1,41,23))
+        self.assertEqual(r["end"]-r["start"],timedelta(hours=1,minutes=41,seconds=29))
+        self.assertTrue(r["filename_midnight_rollover"])
+
+    def test_cross_year_with_correct_end_day(self):
+        p=Path("dmspf16_ssusi_edr-aurora_2005365T230000-2006001T010000-REV09999_vA8.2.0r000.nc")
+        r=parse_edr_filename(p)
+        self.assertEqual(r["end"],datetime(2006,1,1,1))
+        self.assertFalse(r["filename_midnight_rollover"])
+
+    def test_nonmidnight_backward_clock_rejected(self):
+        p=Path("dmspf16_ssusi_edr-aurora_2005244T120000-2005244T100000-REV09652_vA8.2.0r000.nc")
+        with self.assertRaises(ValueError):
+            parse_edr_filename(p)
+
+    def test_unreasonably_long_acquisition_rejected(self):
+        p=Path("dmspf16_ssusi_edr-aurora_2005244T235954-2005245T120000-REV09652_vA8.2.0r000.nc")
+        with self.assertRaises(ValueError):
+            parse_edr_filename(p)
+
     def test_time_selection_excludes_development_orbits(self):
         records=[]
         for day,orbit in [(1,"06228"),(3,"06263"),(7,"06500"),(12,"06600"),(21,"06700")]:

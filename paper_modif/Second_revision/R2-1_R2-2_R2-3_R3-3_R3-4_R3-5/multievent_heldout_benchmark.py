@@ -54,6 +54,10 @@ def parse_args():
     p.add_argument("--windows-per-width",type=int,default=1)
     p.add_argument("--seed",type=int,default=2026)
     args,rest=p.parse_known_args()
+    # Never let the optional, truth-selected stress test overwrite
+    # the PRIMARY brightness-blind randomized validation results.
+    if args.selection_mode=="active" and args.output_root==DEFAULT_OUTPUT:
+        args.output_root=HERE/"benchmarks/active_stress"
     forbidden={"--prepared-root","--output-root","--manifest","--selection-mode",
                "--min-events","--windows-per-width","--seed","--bootstrap"}
     if any(x in forbidden for x in rest):

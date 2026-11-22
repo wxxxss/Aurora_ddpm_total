@@ -40,8 +40,23 @@ def parse_edr_filename(path):
     if not match: return None
     a=datetime.strptime(match.group(1)+match.group(2),"%Y%j%H%M%S")
     b=datetime.strptime(match.group(3)+match.group(4),"%Y%j%H%M%S")
-    if b<=a:raise ValueError(f"EDR has non-positive interval: {path}")
-    return {"path":path,"start":a,"end":b,"midpoint":a+(b-a)/2,"orbit":match.group(5)}
+    # Some SSUSI filenames repeat the start YYYYDDD for an end time that
+    # actually falls after midnight. E.g. 2005244T235954-2005244T014123
+    # means 2005-09-01 23:59:54 to 2005-09-02 01:41:23.
+    # Only normalize an unambiguous late-night-to-early-morning transition.
+    crossed_midnight_in_name=False
+    if b<=a:
+        same_day_token=match.group(1)==match.group(3)
+        plausible_clock_rollover=(a.hour>=22 and b.hour<=4)
+        if not (same_day_token and plausible_clock_rollover):
+            raise ValueError(f"EDR has non-positive interval without plausible midnight rollover: {path}")
+        b+=timedelta(days=1)
+        crossed_midnight_in_name=True
+    duration=b-a
+    if not (timedelta(minutes=1)<=duration<=timedelta(hours=4)):
+        raise ValueError(f"EDR acquisition duration {duration} outside 1min..4h: {path}")
+    return {"path":path,"start":a,"end":b,"midpoint":a+(b-a)/2,
+            "orbit":match.group(5),"filename_midnight_rollover":crossed_midnight_in_name}
 
 def month_bounds(month):
     start=datetime.strptime(month+"-01","%Y-%m-%d")
@@ -125,14 +140,27 @@ def main():
     if not args.edr_root.exists():raise FileNotFoundError(args.edr_root)
     allpaths=sorted(args.edr_root.rglob("*.nc"))
     parsed=[]
+    rejected=[]
     for path in allpaths:
-        x=parse_edr_filename(path)
+        try:
+            x=parse_edr_filename(path)
+        except ValueError as exc:
+            # Do not let a malformed EDR in September abort a January
+            # catalog. Retain its exact filename and reason for auditing.
+            rejected.append({"file":str(path),"reason":str(exc)})
+            continue
         if x is not None:parsed.append(x)
+    if rejected:
+        print(f"WARNING: skipped {len(rejected)} EDR filename(s) with invalid timing; see catalog_preview.json.")
     selected,n_eligible=select_acquisitions(parsed,args.month,args.max_events,args.min_gap_hours,args.include_figure_events)
     metadata={
       "experiment":"Time-based, flux-blind SSUSI EDR acquisition selection",
       "month":args.month,
       "n_edr_paths_scanned":len(allpaths),
+      "n_parsed_edr_paths":len(parsed),
+      "n_corrected_midnight_rollovers":sum(int(x["filename_midnight_rollover"]) for x in parsed),
+      "n_rejected_invalid_timing":len(rejected),
+      "rejected_invalid_timing_examples":rejected[:20],
       "n_eligible_month_paths":n_eligible,
       "n_selected":len(selected),
       "min_temporal_gap_hours":args.min_gap_hours,

@@ -183,3 +183,43 @@ or R3-1 as assertions of real-satellite solar-cycle generalization.
   reconstruction scores.
 - Do NOT issue English reviewer Responses or claim new manuscript results
   until the real-Kp measurements and full-text consistency checks are complete.
+
+
+## 2026-11-23 — completed 6+6 REAL SSUSI Kp holdout run, manuscript still interim
+
+The author provided:
+- \`kp_benchmark/benchmark_summary.json\`: 12 new January 2005 F16 EDR acquisitions, 3 **flux-blind random** holdout-sector widths (1, 2, 4 MLT h) per acquisition, 36 selected sectors, 180 evaluation rows, and the previously used conditional/unconditional checkpoints and normalization files;
+- \`kp_benchmark/metrics_per_holdout.csv\`: actual measured withheld SSUSI target metrics for conditional DDPM, unconditional DDPM, direct OVATION, observed-fused OVATION and interpolation;
+- \`kp_benchmark/kp_group_real_holdout_summary.json\`: case-equal mean statistics split by **Kp>5 (6 EDRs, Kp 5.3–6.0)** and **Kp<=3 (6 EDRs, Kp 0.7–3.0)**.
+
+All 36 sector masks contain five matched method results and common target values. The fusion display and direct OVATION have the same withheld-pixel predictions. A source-data-independent numerical record has been committed as \`kp_6plus6_real_holdout_verified.json\`. The author's CSV was also independently recomputed and checked against the JSON summary. The **updated** \`analyze_high_kp_benchmark.py\` adds automatic verification of consistent withheld truth/coordinates, strict Kp groups and flux-blind selection, plus aggregate peak/gradient diagnostics and absolute peak error; the associated synthetic unit tests are in \`test_fourth_batch.py\`. Re-running this summary script does **not** require new model inference.
+
+### Real observed-target results (erg cm^-2 s^-1)
+
+| Model | 6 EDRs, Kp>5 RMSE | 6 EDRs, Kp<=3 RMSE | Kp>5 MAE | Kp>5 sector peak ratio | Kp>5 aggregate-gradient ratio |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Conditional DDPM | **2.821** | **0.358** | 1.425 | 0.194 | 0.103 |
+| Unconditional DDPM | 2.751 | 0.321 | 1.319 | 0.184 | 0.116 |
+| Direct OVATION Prime | 3.172 | 0.510 | 1.843 | 0.366 | 0.241 |
+| Spatial interpolation | 2.687 | 0.396 | 1.420 | 0.880 | 0.619 |
+
+In the strong-activity group, conditional-DDPM minus baseline paired acquisition-level mean RMSE is **-0.351** vs direct OVATION (6/6 acquisition wins), **+0.069** vs unconditional DDPM (2/6 wins), and **+0.134** vs interpolation (3/6 wins). In quiet conditions, conditional diffusion has lower RMSE than direct OVATION in 6/6 acquisitions and lower RMSE than unconditional diffusion in **0/6**.
+
+**Crucial real-data limitation:** mean true withheld flux is ~**1.535** erg cm^-2 s^-1 in Kp>5 acquisitions versus **0.117** in Kp<=3. Their gross RMSE difference is therefore **not a controlled causal effect of Kp**. A larger dynamic range and more intense precipitation lead to higher absolute error for all methods. The strong-group conditional model's ratio of mean predicted to mean measured peaks is **0.129** (interpolation: 0.868); its ratio of mean gradients is **0.103** (interpolation: 0.619), and its mean absolute peak error is **12.954** versus interpolation's **3.048**. This is not evidence of robust small-scale peak reconstruction. Seven quiet withheld sectors had reference gradient below 0.01, inflating the arithmetic mean of their gradient ratios (conditional 4.867) compared with the ratio of aggregate mean gradients (0.311).
+
+The 12 test EDRs occupy separate dates **within January 2005**, but multiple acquisitions and dates may belong to the same space-weather episode. No p value, independent-storm replication count or cross-solar-cycle confidence interval is inferred.
+
+### Cumulative manuscript and status
+
+The cumulative Word working manuscript has been updated separately (31 pages, 11 tables, 20 retained original math objects), including a new Table 11 for the strict real SSUSI Kp groups, Section 2.5's cohort selection, Section 4.5's strict Kp synthetic-versus-measured distinction, and Abstract/Key Points/Discussion. Older Table 4 remains a **different**, balanced synthetic experiment with Kp>=4. The archived broader synthetic audit had 240 samples (80/year) with only 17 strict Kp>5 targets. These must not be substituted for the 12 real SSUSI acquisition results.
+
+The experiment materially addresses the *measured-real-data* aspect of R2-4, but **R2-8 and R3-1 remain open**: the 1996-only training data and calendar-disjoint OVATION-based synthetic tests do not establish cross-year REAL satellite generalization, and hashes cannot establish the precise inference checkpoint's original training code/model provenance. The public train.py refers to a currently absent \`models/unet_v1.py\` and a historical output directory unlike the current checkpoint locations. This does not itself prove the checkpoint invalid; investigate original run logs, archived source and training commands. Do not issue premature Responses for open comments.
+
+Re-audit the newly reported Kp metrics (no DDPM):
+\`\`\`bash
+git pull --ff-only origin main
+python -m unittest discover -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/analyze_high_kp_benchmark.py
+\`\`\`
+
+Next scientifically necessary decision: recover training lineage (original run log/source commit and the \`unet_v1\` version if actually used); then assess **independent-year real satellite test availability**. Avoid simply adding more synthetic OVATION target periods as a substitute for real observational generalization. If usable real data from another year are available and time-matched OMNI/OVATION arrays can be constructed, run a prospectively selected heldout comparison on genuinely separate-year acquisitions before closing R2-8/R3-1.

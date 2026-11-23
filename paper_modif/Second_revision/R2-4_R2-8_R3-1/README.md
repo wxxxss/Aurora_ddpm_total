@@ -1098,3 +1098,85 @@ external-year evidence. The exact original training log, final
 model source version and saved-checkpoint lineage are still
 not proven, and available samples do not establish representative
 storm independence or solar-cycle-wide performance.
+
+
+## 2026-11-23 — CHECKPOINT LINEAGE: evaluated conditional checkpoint differs from two historical best snapshots
+
+Author-provided `checkpoint_provenance_audit.json` and the subsequent
+`sha256sum`/historical `find` logs were checked and archived in
+`author_checkpoint_lineage_followup_20261123.json`. They establish:
+
+- **Evaluated** conditional (both Jan 2005 / Jan 2006 real-SSUSI tests):
+  `Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth`,
+  SHA-256 `875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12`,
+  **410,372,478 bytes**.
+- Evaluated unconditional:
+  `Aurora_DDPM_total/ckpt/uncond/aurora_diff_best.pth`,
+  SHA-256 `8061c33f406e47ff2e793e96473c9d5eec1649bb70e02a1bc570bbcaace4bac3`,
+  **438,683,928 bytes**.
+- Historical `Aurora_DDPM_final/ckpt/cond/ckptv4_unetv1/aurora_diff_best.pth`:
+  SHA-256 `9da2949204ce94b187ca2e263e7a44f1602175448eb5e6bab037fefbef9e504a`.
+- Historical `Aurora_DDPM_final/ckpt/cond/ckptv1_unetv1/aurora_diff_best.pth`:
+  SHA-256 `cbbb41400701b5e4473c4fb4dc7f3e47c19250faafdaea58d225c31914f6b660`.
+
+**These three conditional checkpoint files are not byte-identical.**
+The repository's present `train.py` declares 1996 April–May
+training, imports `models.unet_v1`, and points its best checkpoint to
+`Aurora_DDPM_final/.../ckptv4_unetv1`; but the evaluated file is NOT
+that byte-identical snapshot. Two distinct historical
+`models/unet_v1.py` versions also exist (5 and 7 default wind
+dimensions). It would be **scientifically incorrect** to claim that
+the present `train.py` directly generated the evaluated weights
+without original run logs/source snapshot/weight-level evidence.
+
+The author's historical listing used `find ... | head -100`, so
+later archive candidates were **not inspected at all**. This
+incompleteness does not imply that any observed checkpoint has been
+found to be an exact match.
+
+### Last bounded provenance check (NO weight loading or retraining)
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_historical_checkpoint_matches.py
+```
+
+This reads **every** checkpoint pathname and size under the two known
+historical `ckpt` directories. It computes streaming SHA-256
+**only** for archived files with the same size as one of the evaluated
+conditional or unconditional weights. This avoids reading GBs of
+non-candidate checkpoints; it does not unpickle or import old training
+files, and it does not mutate models.
+
+Return only the small
+`historical_checkpoint_match_audit.json` report; weight files stay
+local. Inspect `byte_identical_archive_paths`,
+`matching_size_archive_paths`, and `n_archive_checkpoint_files`.
+
+- **Exact SHA match:** establishes binary file identity only; still
+  check original model source revision, normalization and train/data
+  provenance before attributing the checkpoint to a precise run.
+- **No exact SHA match:** no serialized-byte identity within those
+  archive directories; historical source version is **unverified**.
+  It remains possible that numerically identical tensors were saved
+  with different serialization/metadata; do not claim this is
+  disproven. A bounded shape-only comparison can be considered if
+  indispensable, but original log absence should be disclosed
+  instead of indefinitely searching the filesystem.
+
+These findings do **not** invalidate the empirical January 2005/2006
+real-SSUSI results obtained with the explicitly identified evaluated
+checkpoints. They limit claims about the *nominal 1996 training
+run and model implementation lineage*. Do not retrain on heldout SSUSI
+or change architecture before final reviewer-response preparation.
+
+**R3-1 remains unclosed on exact lineage**. R2-8 external-year SSUSI
+observed-target testing is complete within the documented year/activity
+sampling limits. Revise final manuscript language according to the
+actual provenance audit outcome, then proceed to the complete
+reviewer-by-reviewer response (not before).

@@ -12,7 +12,7 @@ File-hash equality shows identical source bytes, NOT checkpoint provenance.
 Original run command, training logs and saved run metadata are still needed.
 """
 from __future__ import annotations
-import argparse,hashlib,json,re
+import argparse,ast,hashlib,json,re
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
@@ -46,11 +46,47 @@ def describe_file(p):
     })
     return result
 
+def class_structure(path):
+    """Parse source without importing or executing it; summarize differences."""
+    path=Path(path)
+    if not path.is_file():
+        return {"path":str(path),"exists":False}
+    try:
+        source=path.read_text(encoding="utf-8",errors="replace")
+        tree=ast.parse(source,filename=str(path))
+    except (SyntaxError,OSError,UnicodeError) as exc:
+        return {"path":str(path),"exists":True,
+                "parse_error":f"{type(exc).__name__}: {exc}"}
+    classes=[item for item in tree.body if isinstance(item,ast.ClassDef)]
+    unet=next((item for item in classes if item.name=="UNet"),None)
+    if unet is None:
+        return {"path":str(path),"exists":True,
+                "class_names":[item.name for item in classes],
+                "unet_class_found":False}
+    methods=[item for item in unet.body if isinstance(item,(ast.FunctionDef,ast.AsyncFunctionDef))]
+    constructor=next((m for m in methods if m.name=="__init__"),None)
+    argnames=[a.arg for a in constructor.args.args] if constructor else []
+    argdefaults=[ast.unparse(v) for v in constructor.args.defaults] if constructor else []
+    unet_ast=ast.dump(unet,annotate_fields=True,include_attributes=False)
+    return {"path":str(path),"exists":True,"unet_class_found":True,
+            "class_names":[item.name for item in classes],
+            "unet_base_classes":[ast.unparse(x) for x in unet.bases],
+            "unet_constructor_arguments":argnames,
+            "unet_constructor_default_expressions":argdefaults,
+            "unet_methods":[m.name for m in methods],
+            "unet_ast_sha256":hashlib.sha256(unet_ast.encode()).hexdigest()}
+
+
 def inspect(copies,train_scripts):
     candidates=[describe_file(p) for p in copies]
     scripts=[describe_file(p) for p in train_scripts]
     hashes={item["sha256"] for item in candidates if item["exists"]}
+    structure=[class_structure(p) for p in copies]
+    unet_ast={r["unet_ast_sha256"] for r in structure if r.get("unet_class_found")}
     return {
+        "unet_structural_comparison":structure,
+        "same_unet_ast_if_multiple_versions":len(unet_ast)==1 if len(unet_ast)>1 or
+               sum(int(x.get("unet_class_found",False)) for x in structure)>1 else None,
         "candidate_unet_v1_files":candidates,
         "candidate_training_scripts":scripts,
         "n_distinct_available_unet_source_hashes":len(hashes),
@@ -76,6 +112,8 @@ def main():
     print(json.dumps({"n_distinct_unet_v1_versions":result["n_distinct_available_unet_source_hashes"],
                       "same_unet_v1_bytes":result["same_unet_v1_bytes_if_multiple_copies"],
                       "sources":result["candidate_unet_v1_files"],
+                      "unet_structural_comparison":result["unet_structural_comparison"],
+                      "same_unet_ast":result["same_unet_ast_if_multiple_versions"],
                       "training_scripts":result["candidate_training_scripts"],
                       "checkpoint_training_lineage_verified":False,
                       "output":str(args.output)},indent=2))

@@ -50,7 +50,7 @@ class TestGapPreservation(unittest.TestCase):
         df,catalog,legacy=fixture()
         wrong=(df.utc>=pd.Timestamp("2006-01-20T00:00")) & (
                df.utc<=pd.Timestamp("2006-01-20T13:40"))
-        df.loc[wrong,FIELDS]=np.nan
+        df.loc[wrong,list(FIELDS)]=np.nan
         arr,qa,events=process(df,catalog,legacy)
         self.assertTrue(events["all_preselected_acquisitions_raw_valid"])
         self.assertTrue(np.isnan(arr["Bx"][wrong.to_numpy()]).all())

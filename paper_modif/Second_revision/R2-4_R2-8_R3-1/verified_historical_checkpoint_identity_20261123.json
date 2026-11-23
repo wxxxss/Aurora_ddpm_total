@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-23",
+  "source_uploaded_file": "historical_checkpoint_match_audit.json",
+  "method": "Read-only two-root archive inventory of all *.pth/*.pt/*.ckpt, exact serialized-file byte length and streaming SHA-256 for length-matched files; no torch weight loading.",
+  "scan_counts": {
+    "archived_checkpoint_files": 1054,
+    "archived_best_named_files": 61,
+    "sha256_hashed_archived_size_candidates": 2
+  },
+  "current_2005_2006_real_ssusi_evaluation": {
+    "conditional": {
+      "current_path": "/home/docker/code/Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth",
+      "sha256": "875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12",
+      "bytes": 410372478,
+      "byte_identical_historical_path": "/home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv2_unetv3/aurora_diff_best.pth",
+      "exact_serialized_identity_verified": true,
+      "archive_parent_label": "ckptv2_unetv3",
+      "actual_training_architecture_revision_verified": false,
+      "archive_file_mtime_utc": "2026-03-06T11:43:27.681119+00:00",
+      "mtime_is_training_date": false
+    },
+    "unconditional": {
+      "current_path": "/home/docker/code/Aurora_DDPM_total/ckpt/uncond/aurora_diff_best.pth",
+      "sha256": "8061c33f406e47ff2e793e96473c9d5eec1649bb70e02a1bc570bbcaace4bac3",
+      "bytes": 438683928,
+      "byte_identical_historical_path": "/home/docker/code/Aurora_DDPM/ckpt/diffusion_ckpt_simplenet/ckpt_v8/aurora_diff_best.pth",
+      "exact_serialized_identity_verified": true,
+      "archive_parent_label": "ckpt_v8",
+      "actual_training_architecture_revision_verified": false,
+      "archive_file_mtime_utc": "2026-01-28T13:46:42.576731+00:00",
+      "mtime_is_training_date": false
+    }
+  },
+  "earlier_historical_hypothesis_disconfirmed_as_exact_file_identity": {
+    "assumed_training_script_path": "/home/docker/code/Aurora_DDPM_total/train.py",
+    "configured_save_dir": "/home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv4_unetv1",
+    "match_with_current_conditional_checkpoint": false,
+    "inference": "The current train.py cannot be cited as a directly verified producer of the evaluated conditional ckptv2_unetv3 file. Archive labels are not direct proof of source version or dataset."
+  },
+  "remaining_unverified": [
+    "Exact training command and successful training run metadata for the original conditional or unconditional file.",
+    "Original time-stamped source snapshot actually imported in each historical run.",
+    "Training dataset identifiers/fingerprints proving Apr-May 1996 data inputs for these exact archived files.",
+    "Whether the recorded training/validation-loss curve (Figure 3) belongs to either of the evaluated checkpoints.",
+    "Exact original training-side architecture version. Current inference architecture is observable through the tested code path."
+  ],
+  "manuscript_impact": {
+    "Section 2.5": "Qualify nominal 1996 training as documented development configuration, distinct from independently traced checkpoint bytes.",
+    "Section 3.3": "Report both exact matching archived model paths and full SHA-256, distinguish binary identity from run/data provenance.",
+    "Section 3.2": "Frame architecture as the evaluated inference-side network, not proven historical training snapshot.",
+    "Figure 3": "Label as reported development loss curve, not authenticated loss history of evaluated archived weights.",
+    "Table 6": "Mark configuration as documented development setting not an independently linked run.",
+    "Discussion Conclusion": "State checkpoint file identity resolved, training execution/data provenance not resolved.",
+    "2005 2006 heldout metrics": "No modifications or reruns warranted solely by checkpoint identity audit."
+  },
+  "r3_1_status": "Partially resolved: exact evaluated weight file archived version IDs now verified, but original run-specific source/dataset provenance still not independently established. Do not state a fully reproducible 1996 training lineage.",
+  "response_policy": "No final English response to user until other remaining reviewer items and manuscript consistency fully addressed."
+}

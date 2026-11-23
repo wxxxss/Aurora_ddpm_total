@@ -689,3 +689,61 @@ finite `nanmean`) should the existing model benchmark run, with
 **Current R2-8 and R3-1 status: OPEN.** No independent-year model
 result exists yet, and precise checkpoint training lineage remains
 unverified. No final reviewer Responses are issued.
+
+## 2006 duplicate EDR case identities — fixed at source inventory (2026-11-23)
+
+The author ran the new `reselect_2006_omni_qualified_ssusi.py
+--dry-run` and the file inventory raised:
+`ValueError: Duplicate EDR case identity in source directory:
+F16_2006012T222703_REV11544`. This occurs BEFORE any raw OMNI
+reselection, native flux read or model inference. There may be
+multiple processing versions of the same orbit/start time or even
+disagreeing acquisition end times. This is an **inventory ambiguity**;
+do not interpret the duplicate filenames as independent acquisitions.
+
+The scanner now groups source files by (start-UTC, orbit) *as encoded
+in the deterministic case ID*. It then follows an explicit source
+version rule:
+
+1. For a case in the original 12-EDR flux-blind catalog,
+   **preserve the exact original `source_file` path**.
+   Raise an error if the originally chosen file is missing, even
+   when a different processed version is available.
+2. For a previously unused case with the **same start/end times**
+   across multiple files, prefer the highest explicit filename
+   processing revision (e.g., `vA8.2.0r001` over
+   `vA8.2.0r000`). Equal versions use lexical path order.
+   This rule NEVER evaluates the flux values or predictions.
+3. If a new case has **conflicting end times** among files sharing
+   its orbit/start identity, exclude that ambiguous acquisition
+   from the candidate population and record the conflict.
+4. All duplicates, source versions, chosen paths, excluded candidates
+   and reasons are recorded under
+   `source_scan.duplicate_identity_resolution` in the output
+   `catalog_preview.json`. The saved preview, if used for
+   `--prepare`, is checked against BOTH orbit identity and
+   source file path, plus OMNI source CDF SHA.
+
+The results previously uploaded (8 clean, 4 invalid old EDRs) and
+the source-quality gate are **unchanged** by the filename fix.
+The `--dry-run` must still verify the ability to select a
+12-case cohort with >=24-hour separation.
+
+Re-run after pulling:
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/reselect_2006_omni_qualified_ssusi.py --dry-run
+```
+
+Please inspect `n_duplicate_identity_groups`,
+`n_conflicting_end_time_groups_excluded`,
+`retained`, `replaced`, `n_selected` and
+`ready_for_preparation`. If the last is false, stop and report
+the preview; do not relax source quality or timing thresholds.
+
+No model inference has been performed by this fix; R2-8 and R3-1
+remain open.

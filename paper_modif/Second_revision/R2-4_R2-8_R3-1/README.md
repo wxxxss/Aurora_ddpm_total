@@ -250,3 +250,52 @@ log, and the missing \`models/unet_v1.py\` (possibly in an older local checkout
 such as \`Aurora_DDPM_final\`). File hashes recorded previously are not proof
 of the code that produced model weights; the original run metadata is needed.
 Do not upload hundreds of megabytes of checkpoint bytes.
+
+
+## Cross-year inventory crash fix and recovered local UNet sources (2026-11-23)
+
+The original \`survey_crossyear_real_inputs.py\` aborted on the first unreadable
+OVATION \`.npy\` monthly product, with \`EOFError: No data left in file\`,
+so the \`crossyear_real_input_survey.json\` output did **not** exist. The
+error may mean a zero-byte placeholder or an otherwise malformed/incomplete
+NPY; its exact identity is not known until the inventory is rerun.
+
+The corrected survey:
+- Records each OMNI/OVATION file's **existence, byte size, read status,
+  NumPy shape and exact error**.
+- Continues across all requested months if a file is missing, empty,
+  unreadable, truncated or has an unexpected grid/cadence.
+- Writes \`crossyear_real_input_survey.json\` even when **no months are usable**;
+  \`ssusi_month_input_issues\` flags months with real EDR files but broken
+  or missing OMNI/OVATION inputs.
+- Does **not** infer valid model data from a mere filename. A zero-byte
+  OVATION file should not be deleted or regenerated automatically before its
+  source workflow is identified.
+- Has regression tests for zero-byte, malformed, truncated, and full-survey
+  JSON-output behavior in \`test_crossyear_survey.py\`.
+
+The author also located two old architecture sources:
+\`/home/docker/code/Aurora_DDPM_final/models/unet_v1.py\` and
+\`/home/docker/code/Aurora_DDPM/models/unet_v1.py\`.
+This means the historical UNet source is not entirely missing locally,
+although it was not tracked in the **current** \`Aurora_DDPM_total\` repo.
+A lightweight \`inspect_historical_training_sources.py\` program records
+both versions' hashes and source markers and checks historical \`train.py\`
+files without loading checkpoint weights. These files may help trace training
+lineage; their mere existence is **not** proof of which one trained the actual
+published checkpoint.
+
+Run after pulling the fix:
+
+\`\`\`bash
+git pull --ff-only origin main
+python -m unittest discover -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/survey_crossyear_real_inputs.py
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/inspect_historical_training_sources.py
+\`\`\`
+
+Return the small JSON files
+\`crossyear_real_input_survey.json\` and
+\`historical_training_sources_audit.json\`, or the summary sections of their
+printed output. Do not upload checkpoint weights or raw EDR files.
+**R2-8 and R3-1 remain open; no final English Response is released yet.**

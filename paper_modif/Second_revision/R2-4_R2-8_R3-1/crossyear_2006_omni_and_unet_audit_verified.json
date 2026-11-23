@@ -1,0 +1,82 @@
+{
+  "upload_date": "2026-11-23",
+  "source_files": [
+    "crossyear_omni_sources.json",
+    "historical_training_sources_audit(1).json"
+  ],
+  "validated_input_scope": "Paths, byte sizes, reported file-level AST metadata; CDF headers, Epoch timestamps and actual field contents have NOT been read by assistant.",
+  "cdf_discovery": {
+    "claimed_candidate_total": 28,
+    "actual_year_2006_candidates_after_excluding_two_2020_false_positives": 26,
+    "hro2_five_minute_cdf_2006_months": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "hro_five_minute_cdf_2006_months": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "hourly_cdf_2006_months": [
+      1,
+      7
+    ],
+    "preprocessed_2006_model_input_npy_found": 0,
+    "year2020_false_positives": 2,
+    "january_candidate": "/home/docker/data/ro-share/omni/omni_cdaweb/hro2_5min/2006/omni_hro2_5min_20060101_v01.cdf",
+    "january_candidate_size_bytes": 2130328,
+    "status": "Source filename/byte count discovered; CDF Epoch and variable schema still unverified.",
+    "next_actions": "Run audit_and_prepare_2006_omni.py --month 1; only if ready_for_conversion=true run with --convert; then prepare flux-blind SSUSI January 2006 cohort, preflight, and heldout comparisons."
+  },
+  "historical_unet_structure": {
+    "final_local_file_sha256": "dc376e090fbab2e3c5fe220cf23d6bc4759a28c95188b9d8fc656d5e32f5bff3",
+    "older_local_file_sha256": "75cfcd5b79ab069a38a09262d719f9653ea4494a359c8b51963463c6f37cdafa",
+    "final_architecture_default_solar_wind_dim": 5,
+    "older_architecture_default_solar_wind_dim": 7,
+    "final_unet_constructor_args": [
+      "self",
+      "in_channels",
+      "out_channels",
+      "time_emb_dim",
+      "solar_wind_dim",
+      "hidden_dim",
+      "num_fourier_freq"
+    ],
+    "older_unet_constructor_args": [
+      "self",
+      "in_channels",
+      "out_channels",
+      "time_emb_dim",
+      "solar_wind_dim",
+      "hidden_dim"
+    ],
+    "same_unet_AST": false,
+    "checkpoint_lineage_verified": false,
+    "note": "5-dimension source interface is consistent with current [Bx,By,Bz,V,P] input but does not prove that source produced the checkpoint. Older 7-dimensional source is structurally nonidentical."
+  },
+  "scientific_status": {
+    "R2-4": "Actual Kp>5 vs Kp<=3 January 2005 SSUSI holdout evaluation previously completed; limited to 6+6 acquisitions.",
+    "R2-8": "OPEN: no 2006 real SSUSI withheld-target performance yet.",
+    "R3-1": "OPEN: source and saved-checkpoint training lineage not proven.",
+    "reviewer_responses": "Not released."
+  }
+}

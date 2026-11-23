@@ -31,7 +31,7 @@ class TestEventOMNI(unittest.TestCase):
         # Both cases are 2 and 4 Jan, missing block is 20 Jan.
         missing=(df.utc>=pd.Timestamp("2006-01-20T00:00")) & (
                  df.utc<=pd.Timestamp("2006-01-20T13:40"))
-        df.loc[missing,FIELDS]=np.nan
+        df.loc[missing,list(FIELDS)]=np.nan
         out=run(catalog,df,SimpleNamespace(VALID_RANGES=RANGES))
         self.assertEqual(out["n_fully_raw_valid_acquisitions"],2)
         self.assertEqual(out["raw_invalid_total_5min_records_any_field"],165)

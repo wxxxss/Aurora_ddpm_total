@@ -88,11 +88,22 @@ def source_quality_index(records,times,mask):
     quality={}
     for rec in records:
         name=case_name(rec)
-        data=audit_acquisition({
-            "case_id":name,
-            "acquisition_start":rec["start"].isoformat(),
-            "acquisition_end":rec["end"].isoformat()
-        },times,mask)
+        try:
+            data=audit_acquisition({
+                "case_id":name,
+                "acquisition_start":rec["start"].isoformat(),
+                "acquisition_end":rec["end"].isoformat()
+            },times,mask)
+        except ValueError as exc:
+            # Some source EDRs may be too short to contain an OMNI tick.
+            # They are unusable, but must not abort the full January scan.
+            data={
+                "case_id":name,"raw_fully_valid_acquisition":False,
+                "n_omni_5min_records_inside":0,
+                "n_any_field_invalid_inside":0,
+                "n_invalid_by_field":{k:None for k in ("Bx","By","Bz","V","P")},
+                "quality_error":str(exc)
+            }
         quality[name]=data
     return quality
 
@@ -182,6 +193,8 @@ def main():
     p.add_argument("--edr-root",type=Path,default=DEFAULT_EDR)
     p.add_argument("--old-catalog",type=Path,default=DEFAULT_OLD)
     p.add_argument("--old-source-audit",type=Path,default=DEFAULT_OLD_AUDIT)
+    p.add_argument("--prior-cdf-audit",type=Path,
+        default=HERE/"omni_200601_cdf_audit.json")
     p.add_argument("--cdf",type=Path,default=DEFAULT_CDF)
     p.add_argument("--output-root",type=Path,default=DEFAULT_NEW)
     p.add_argument("--min-gap-hours",type=float,default=24.)
@@ -197,6 +210,14 @@ def main():
     old=json.loads(args.old_catalog.read_text(encoding="utf-8"))
     if old["month"]!="2006-01":
         raise ValueError("Wrong input year-month")
+    # The original CDF audit records the byte-level source used when
+    # declaring the 825-minute gap. Do not unknowingly switch revisions.
+    current_sha=get_sha256(args.cdf)
+    if args.prior_cdf_audit.is_file():
+        prior_cdf=json.loads(args.prior_cdf_audit.read_text(encoding="utf-8"))
+        original_sha=prior_cdf.get("source_cdf_sha256")
+        if original_sha and original_sha!=current_sha:
+            raise RuntimeError("2006 source CDF SHA differs from previous gap audit. Re-audit before cohort selection.")
     legacy=load_legacy()
     df,meta=legacy.extract_raw_dataframe(args.cdf,year=2006)
     times,valid=calendar_validity(df,2006,1,legacy.VALID_RANGES)
@@ -236,7 +257,7 @@ def main():
         "min_temporal_gap_hours":args.min_gap_hours,
         "include_development_figures":False,
         "source_cdf":str(args.cdf),
-        "source_cdf_sha256":get_sha256(args.cdf),
+        "source_cdf_sha256":current_sha,
         "source_mapping":meta["model_to_source_mapping"],
         "original_time_only_catalog":str(args.old_catalog),
         "source_scan":scan,

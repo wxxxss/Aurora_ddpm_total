@@ -471,3 +471,108 @@ counts in a single event-pseudoreplicated CI.
 2006 observed-target inference and an honest accounting of original
 checkpoint training lineage. No English Response or unsupported manuscript
 performance claims are delivered at this stage.
+
+## January 2006 OMNI 825-minute outage: safe conditional path (2026-11-23)
+
+The author returned `omni_200601_cdf_audit.json` and the SSUSI EDR
+`--dry-run` catalog. Both were checked and summarized in
+`author_2006_01_omni_quality_and_edr_preview_verified.json`.
+
+**Observed source facts:** the HRO2 CDF contains all **8,928** 5-minute
+timestamps, from January 1 00:00 through January 31 23:55 UTC, with
+no clock gaps/duplicates. There are nevertheless **308 invalid Bx/By/Bz
+records (3.45%)**, **402 invalid V/P records (4.50%)**, and each channel
+has a longest invalid streak of **825 minutes (13 h 45 min)**. The
+declared full-month missingness cap of 5% is satisfied but the
+independent **60-minute maximum gap cap** is violated. Therefore the
+original `audit_and_prepare_2006_omni.py --convert` correctly refused
+to write the NPY. **Do not pass --max-invalid-gap-minutes 825 or
+unconditionally fill/bfill these observations.** The conversion failed
+by design, not due to a code crash.
+
+The author also identified 418 January EDR candidates and selected
+12 flux-blind, temporally spaced F16 acquisitions (January 2–30). This
+establishes ONLY timestamp availability; it does not tell whether the
+selected acquisition intervals overlap the long OMNI outages or have
+sufficient native SSUSI support.
+
+### Stage 1: require original five-field solar-wind completeness for EVERY selected EDR
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+# Audit original raw CDF values inside the 12 preregistered SSUSI intervals.
+# No NPY write, no DDPM; outputs a JSON even if one EDR is affected.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_omni_event_coverage.py
+```
+
+Output `omni_200601_event_coverage_audit.json` includes each orbit's
+`n_invalid_by_field`, `first_invalid_utc`,
+`raw_fully_valid_acquisition`, and the total number of valid orbits.
+Report the actual coverage rather than choosing a looser threshold
+after inspecting predicted model errors.
+
+If **all_preselected_acquisitions_raw_valid is true**, it is
+scientifically acceptable to run a source-qualified analysis without
+replacing the rest of January's missing OMNI measurements by fake
+values. For that constrained use, the following second program is
+available. It does **not** relax or overwrite the original whole-month
+conversion rule.
+
+### Stage 2: only if all 12 EDRs pass Stage 1
+
+```bash
+# No-write dry audit: fill only short, bracketed <=60min missing runs;
+# preserve longer outages as NaN. Requires ALL selected EDRs raw valid.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_2006_gap_preserving_omni.py
+
+# Only when ready_for_event_qualified_write=true:
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_2006_gap_preserving_omni.py --write
+
+# Prepare the same 12 time-selected real SSUSI swaths, after quality audit.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multievent_ssusi.py \
+  --edr-root /home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2006 \
+  --month 2006-01 --max-events 12 --min-gap-hours 24 \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs
+```
+
+The resulting *qualified* array is deliberately named
+`omni_20060101_5min_gap_preserving.npy` in the 2006 OMNI folder.
+The unresolved long gaps remain explicitly **NaN** and are forbidden
+as model inputs. The independent CDF audit proves that the selected
+EDR intervals do not intersect those gaps.
+
+### Stage 3: require BOTH OMNI/OVATION source + native-SSUSI holdout preflight
+
+```bash
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy \
+  --output paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_preflight.json
+```
+
+This existing preflight is sufficient ONLY in combination with the
+source-CDF `all_preselected_acquisitions_raw_valid` gate above;
+its per-acquisition finite means alone would otherwise allow partially
+missing OMNI to pass. **No DDPM inference before both gates pass.**
+
+If Stage 1 identifies even one invalid EDR, do **not** run Stage 2;
+the cohort must be selected again using prespecified time and valid
+source-OMNI availability, without consulting withheld SSUSI flux or
+model reconstruction error. Alternatively use a different month with
+sufficient CDF quality and fully valid 1-min OVATION reference maps.
+
+After clean input preflight, the 2006 independent-year comparison can
+use the existing `multievent_heldout_benchmark.py` with explicit
+`--omni ...gap_preserving.npy` and 2006 `--ovation`, keeping
+the existing 2005 checkpoints, masks and method baselines constant.
+
+**R2-8 and R3-1 remain OPEN**: a catalog with valid timestamps or
+preserved missing regions is not yet a measured real-observation
+cross-year performance result. The original checkpoint training
+lineage is still not verified. No reviewer Response is issued.

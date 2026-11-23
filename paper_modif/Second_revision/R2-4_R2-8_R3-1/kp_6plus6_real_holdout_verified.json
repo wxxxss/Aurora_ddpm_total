@@ -1,0 +1,137 @@
+{
+  "source": "Author-uploaded kp_group_real_holdout_summary.json, metrics_per_holdout(4).csv, benchmark_summary(2).json, independently recomputed from 180 CSV rows on 2026-11-23.",
+  "protocol": {
+    "year_month": "2005-01",
+    "n_acquisitions": 12,
+    "n_kp_gt5_acquisitions": 6,
+    "n_kp_le3_acquisitions": 6,
+    "n_holdout_sectors": 36,
+    "number_of_methods_including_fused_ovation": 5,
+    "n_method_evaluations": 180,
+    "sector_widths_mlt_hours": [
+      1,
+      2,
+      4
+    ],
+    "selected_on_heldout_flux": false,
+    "observed_truth": "artificially withheld native-supported real SSUSI energy flux",
+    "conditioning": "OMNI interval mean",
+    "ovation": "one-minute maps averaged over EDR interval"
+  },
+  "validation": {
+    "all_36_sectors_have_five_complete_methods": true,
+    "identical_truth_pixels_masks_across_methods": true,
+    "ovation_direct_and_observation_fused_identical_on_hidden_pixels": true,
+    "selection_scores_are_zero": true,
+    "confirmed_summary_matches_csv": true,
+    "no_double_counting_sector_pixels_as_events": true
+  },
+  "high_kp_gt5": {
+    "kp_midpoint_min": 5.300000190734863,
+    "kp_midpoint_max": 6,
+    "n_acquisitions": 6,
+    "n_sectors": 18,
+    "event_equal_mean_rmse": {
+      "conditional_ddpm": 2.8206940230639113,
+      "unconditional_ddpm": 2.751274978233326,
+      "ovation_prime": 3.1721100464600043,
+      "interpolation": 2.68710814404948
+    },
+    "event_equal_mean_mae": {
+      "conditional_ddpm": 1.4254577572777756,
+      "unconditional_ddpm": 1.319078046255831,
+      "ovation_prime": 1.842874986238999,
+      "interpolation": 1.420401282796549
+    },
+    "conditional_vs_baselines_rmse": {
+      "unconditional_ddpm": {
+        "delta": 0.06941904483058525,
+        "event_wins": 2
+      },
+      "ovation_prime": {
+        "delta": -0.35141602339609346,
+        "event_wins": 6
+      },
+      "interpolation": {
+        "delta": 0.13358587901443075,
+        "event_wins": 3
+      }
+    },
+    "peak_ratio_sector_mean": {
+      "conditional_ddpm": 0.1944560402519131,
+      "interpolation": 0.8796317175584325
+    },
+    "peak_ratio_of_aggregate_mean_peaks": {
+      "conditional_ddpm": 0.12898203068855071,
+      "interpolation": 0.8681215981069771
+    },
+    "gradient_ratio_of_aggregate_mean_gradients": {
+      "conditional_ddpm": 0.10276839926241225,
+      "interpolation": 0.6190134431658934
+    },
+    "mean_absolute_peak_error": {
+      "conditional_ddpm": 12.953751497798494,
+      "interpolation": 3.048403183619182
+    },
+    "mean_true_heldout_flux": 1.5345561871249036,
+    "mean_true_heldout_peak": 14.871968150138857,
+    "caution": "Conditional model modestly improves RMSE against direct OVATION on all six acquisitions but does not beat unconditional DDPM or interpolation on group-mean RMSE and heavily attenuates physical peaks/gradients."
+  },
+  "low_kp_le3": {
+    "kp_midpoint_min": 0.699999988079071,
+    "kp_midpoint_max": 3,
+    "n_acquisitions": 6,
+    "n_sectors": 18,
+    "event_equal_mean_rmse": {
+      "conditional_ddpm": 0.3576324340224433,
+      "unconditional_ddpm": 0.320541083998753,
+      "ovation_prime": 0.5104615010383956,
+      "interpolation": 0.3959762905925562
+    },
+    "event_equal_mean_mae": {
+      "conditional_ddpm": 0.18673225713693234,
+      "unconditional_ddpm": 0.14081811342923792,
+      "ovation_prime": 0.34053803242281094,
+      "interpolation": 0.16476043243607505
+    },
+    "conditional_vs_baselines_rmse": {
+      "unconditional_ddpm": {
+        "delta": 0.03709135002369035,
+        "event_wins": 0
+      },
+      "ovation_prime": {
+        "delta": -0.15282906701595228,
+        "event_wins": 6
+      },
+      "interpolation": {
+        "delta": -0.03834385657011282,
+        "event_wins": 2
+      }
+    },
+    "peak_ratio_sector_mean": {
+      "conditional_ddpm": 0.8862876370835902,
+      "interpolation": 0.8036776888571624
+    },
+    "peak_ratio_of_aggregate_mean_peaks": {
+      "conditional_ddpm": 0.1774637363403714,
+      "interpolation": 0.8161184589094754
+    },
+    "gradient_ratio_sector_mean_conditional_ddpm": 4.866963579911962,
+    "gradient_ratio_aggregate_conditional_ddpm": 0.31069470141161476,
+    "n_sectors_true_gradient_below_0_01": 7,
+    "mean_absolute_peak_error": {
+      "conditional_ddpm": 2.222261435455746,
+      "interpolation": 0.49037312240236336
+    },
+    "mean_true_heldout_flux": 0.11729963911742299,
+    "mean_true_heldout_peak": 2.6667881914310985
+  },
+  "outstanding_requirements": [
+    "The source identity and original training run log for conditional and unconditional checkpoints remain unverified; public train.py imports missing models/unet_v1.py and its output directory differs from tested checkpoint path.",
+    "1996 aurora-OMNI five-minute cadence was confirmed by the time-alignment audit; no immediate need to retrain solely on cadence grounds.",
+    "Real-satellite Kp>5 data are limited to six EDR acquisitions on six dates in January 2005 with Kp midpoints 5.3-6.0, not a broad set of independent storms/years.",
+    "Results for the 12-EDR Kp-group sample do not establish temporal or solar-cycle generalization to other years; R2-8 and R3-1 remain open.",
+    "Group error magnitudes differ along with true auroral flux distributions, so relative group RMSE changes are not causal effects of Kp.",
+    "No review Responses supplied until all respective issues have experiment/source/provenance and manuscript checks completed."
+  ]
+}

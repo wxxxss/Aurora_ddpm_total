@@ -223,3 +223,30 @@ python paper_modif/Second_revision/R2-4_R2-8_R3-1/analyze_high_kp_benchmark.py
 \`\`\`
 
 Next scientifically necessary decision: recover training lineage (original run log/source commit and the \`unet_v1\` version if actually used); then assess **independent-year real satellite test availability**. Avoid simply adding more synthetic OVATION target periods as a substitute for real observational generalization. If usable real data from another year are available and time-matched OMNI/OVATION arrays can be constructed, run a prospectively selected heldout comparison on genuinely separate-year acquisitions before closing R2-8/R3-1.
+
+
+### Next low-cost task: determine real cross-year data availability (R2-8 / R3-1)
+
+The audited six-high/six-quiet acquisition comparison has finished, but does not
+establish **real measured SSUSI reconstruction transfer to another calendar
+year**. A new inventory script \`survey_crossyear_real_inputs.py\` checks
+2004/2006/2007/2008/2009 F16 EDR availability and the presence/shape of
+appropriately matched OMNI and OVATION monthly inputs without loading any
+model or processing full satellite flux maps.
+
+\`\`\`bash
+git pull --ff-only origin main
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/survey_crossyear_real_inputs.py
+\`\`\`
+
+The output is \`paper_modif/Second_revision/R2-4_R2-8_R3-1/crossyear_real_input_survey.json\`.
+If \`n_months_with_all_potential_inputs\` is zero, provide the summary anyway:
+generation of date-matched OVATION/OMNI arrays and an advance-held-out
+satellite catalog would be needed for independent-year evaluation.
+This survey alone is NOT evidence of cross-year prediction skill.
+
+Source/provenance follow-up: look for the *original* training run script,
+log, and the missing \`models/unet_v1.py\` (possibly in an older local checkout
+such as \`Aurora_DDPM_final\`). File hashes recorded previously are not proof
+of the code that produced model weights; the original run metadata is needed.
+Do not upload hundreds of megabytes of checkpoint bytes.

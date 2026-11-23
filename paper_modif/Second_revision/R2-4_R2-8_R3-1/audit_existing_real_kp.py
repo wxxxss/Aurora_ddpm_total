@@ -57,6 +57,11 @@ def report_kp(manifest,metrics,times,kps,protocol):
             rows.append(rec)
     return rows,kp_by_case
 
+def mean_or_none(values):
+    a=np.asarray(values,dtype=float)
+    good=a[np.isfinite(a)]
+    return float(np.mean(good)) if len(good) else None
+
 def summarize(rows):
     d=pd.DataFrame(rows)
     output={}
@@ -71,7 +76,7 @@ def summarize(rows):
             method_means={}
             for method in METHODS:
                 r=a[a.method==method]
-                method_means[method]={stat:float(r[stat].mean()) for stat in STATS}
+                method_means[method]={stat:mean_or_none(r[stat]) for stat in STATS}
             paired={}
             for baseline in ("unconditional_ddpm","ovation_prime","interpolation"):
                 r=a[a.method==baseline]

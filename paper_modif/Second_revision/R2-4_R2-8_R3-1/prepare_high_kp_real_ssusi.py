@@ -56,7 +56,13 @@ def inspect_candidates(root,month,times,kps,excluded):
     bad=[]
     eligible=[]
     for file in sorted(root.rglob("*.nc")):
-        record=parse_edr_filename(file)
+        try:
+            record=parse_edr_filename(file)
+        except ValueError as err:
+            # An invalid filename in an unrelated month must not suppress
+            # the activity availability audit of January.
+            bad.append({"file":str(file),"reason":str(err)})
+            continue
         if record is None:continue
         if record["start"].strftime("%Y-%m")!=month:continue
         observed+=1
@@ -70,7 +76,8 @@ def inspect_candidates(root,month,times,kps,excluded):
                      "n_time_matched_candidates":len(eligible),
                      "n_excluded_orbits":len(excluded),
                      "n_unmatched_kp_files":missing_time,
-                     "n_invalid_file_intervals":len(bad)}
+                     "n_invalid_file_intervals":len(bad),
+                     "invalid_examples":bad[:20]}
 
 def evenly_pick_days(rows,max_events,forbidden_days=frozenset()):
     # Choose <=1 EDR per UTC calendar day. Preferred pass: acquisition
@@ -180,6 +187,15 @@ def main():
         case=case_name(record)
         entry=next(x for x in metadata["cases"] if x["case_id"]==case)
         entry.update({k:v for k,v in enriched.items() if k not in entry})
+        # The reused third-batch preparer describes calendar-only selection.
+        # Override that metadata truthfully for this Kp-stratified cohort.
+        meta_path=args.output_root/case/(case+"_metadata.json")
+        detail=json.loads(meta_path.read_text(encoding="utf-8"))
+        detail["selection_protocol"]="Kp-only high versus quiet event-time stratum; no SSUSI flux used"
+        detail["kp_midpoint"]=entry["kp_midpoint"]
+        detail["kp_group"]=entry["kp_group"]
+        detail["kp_values_change_within_acquisition"]=entry["kp_values_change_within_acquisition"]
+        meta_path.write_text(json.dumps(detail,indent=2)+"\n",encoding="utf-8")
         print(f"{case}: Kp={entry['kp_midpoint']:.1f}, {entry['kp_group']}, {enriched['n_supported_cells']}/7680 observed cells")
     metadata["n_prepared"]=len(chosen)
     out=args.output_root/"manifest.json"

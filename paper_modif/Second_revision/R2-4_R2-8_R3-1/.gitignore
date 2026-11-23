@@ -18,3 +18,5 @@ real_2006_01_benchmark/
 real_2006_01_preflight.json
 omni_200601_event_coverage_audit.json
 omni_200601_gap_preserving_audit.json
+real_2006_01_omni_qualified_inputs/
+omni_200601_omni_qualified_summary.json

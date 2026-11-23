@@ -1237,3 +1237,100 @@ identity from still-unverified run/source/data provenance.
 The user-requested next phase is a full consistency check followed by
 an appropriately bounded reviewer response; DO NOT declare exact
 training-lineage closure solely on directory names or SHA identity.
+
+
+## 2026-11-23 — NEXT REVIEWER PRIORITY: R3-8 fixed-mask stochastic DDPM uncertainty
+
+The full 2005/2006 heldout SSUSI evidence and both evaluated historical
+weight-file SHA-256 identities have been independently verified. A
+full reviewer completion audit (`R2_R3_2026_11_23_completion_gate.md`)
+found that the **highest-priority still-unanswered measurable item**
+is Reviewer #3's request for **multiple stochastic reconstructions
+and uncertainty**, rather than another large cross-year/storm benchmark.
+
+**Do not confuse two different sampler parameters:**
+`model.sample(n_sample=5)` would change the reverse/forward jumping
+schedule inside ONE RePaint-type sample, not perform five independently
+seeded reconstructions. Keep `N_SAMPLE=1`,
+`NUM_INFERENCE_STEPS=300`, the **original** conditional
+`ckpt/cond/aurora_diff_best.pth` and original log/flux normalizer,
+and run the same fixed SSUSI masks under five different *random
+seeds*. This is an unchanged-model stochastic uncertainty analysis.
+
+A new audited script
+`audit_2006_stochastic_reconstruction.py` holds the January 2006
+**12 EDR cases / 36 flux-blind observed-pixel sectors (1/2/4-h MLT)**
+fixed. Each mask is regenerated from the SAME `selection_seed=2026`
+and original native `obs_mask` geometry, then checked against
+the original saved `metrics_per_holdout.csv` for the identical
+sector center, number of observed hidden pixels, coverage and
+three widths. All forecast seeds differ only in diffusion PRNG
+state; masks, data, solar condition, weights and inference step
+count remain unchanged.
+
+**First command: model-free dry-run check of 36 exact original masks**
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_stochastic_reconstruction.py \
+  --dry-run
+```
+
+Expected preflight summary:
+`ready_for_stochastic_inference=true`,
+`n_original_fixed_masks=36`,
+`n_repeated_draws_per_mask=5`,
+`n_requested_conditional_model_runs=180`,
+`all_mask_centers_and_support_counts_match_primary_csv=true`.
+No GPU/NPU inference is performed and no weights are loaded during
+this flag, although the original benchmark module is imported.
+**If any check fails, stop and return the error**: do not
+reselect targets based on flux, change the benchmark 2026 seed,
+or relax native support thresholds.
+
+**Second command: fixed-mask five-seed real-SSUSI inference, NO retrain**
+
+```bash
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_stochastic_reconstruction.py
+```
+
+Writes, without touching original 2006 benchmark outputs:
+`real_2006_01_stochastic_uncertainty/stochastic_protocol.json`,
+`real_2006_01_stochastic_uncertainty/sector_results/*.json`,
+and `real_2006_01_stochastic_uncertainty/stochastic_uncertainty_summary.json`.
+
+If interrupted during the 180 model draws, rerun with **`--resume`**
+to retain already completed, identity/seed/coverage-checked
+sector JSON files. No plotting, image saving, or full raw
+predictive-map archive is done by default; it reports all 36
+per-mask measurements, the 12 event-equal mean metrics and
+a descriptive pixelwise 10%–90% draw-quantile inclusion statistic.
+
+**Interpretation:** these standard deviations quantify
+conditional **sampling randomness** for exactly fixed observed
+pixels, model, and solar forcing. They are NOT event-cluster
+bootstrap confidence intervals, are NOT coverage-calibrated
+posterior predictive intervals, and do not prove the DDPM
+predictive distribution is accurate. Never report a
+`best-of-five` reconstruction chosen by comparison with heldout
+SSUSI truth. Keep the verified main Table 12 RMSE 0.661642
+and all existing baselines unchanged.
+
+**Send the terminal summaries and**
+`real_2006_01_stochastic_uncertainty/stochastic_uncertainty_summary.json`;
+the complete `sector_results` directory is only required if
+the numeric summary appears inconsistent or a full appendix
+is needed. All local outputs remain gitignored.
+
+**After R3-8:** complete R2 Figure 4–7 direct IMF Bz/V/P
+annotations and first-use instrument expansions; explain
+R3 Table 2 vs Table 3 RMSE protocol discrepancy; correct
+OVATION Bx/P driver explanation, citations and Data/Software
+Availability; then produce revised clean + marked Word,
+standalone figures and final comprehensive reviewer response.
+No more 2006 data re-selection, model retraining or
+2007–2009 input-generation is currently warranted.

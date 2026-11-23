@@ -576,3 +576,116 @@ the existing 2005 checkpoints, masks and method baselines constant.
 preserved missing regions is not yet a measured real-observation
 cross-year performance result. The original checkpoint training
 lineage is still not verified. No reviewer Response is issued.
+
+## 2026-11-23 — 8/12 pass raw OMNI; 4 replacements REQUIRED before 2006 inference
+
+The author ran the original 12-orbit CDF quality gate and returned
+`omni_200601_event_coverage_audit.json`.
+
+**Result: eight valid / four invalid**. The month contains 8,522 of
+8,928 five-minute ticks with all five fields raw valid; 406 ticks have
+at least one invalid field. The four invalid preselected EDRs are:
+
+| Original F16 orbit | Bad 5-min samples inside EDR | Affected fields |
+| --- | ---: | --- |
+| REV11430, Jan 4 | 3 | V, P |
+| REV11576, Jan 15 | 21 | Bx, By, Bz, V, P |
+| REV11612, Jan 17 | 1 | V, P |
+| REV11795, Jan 30 | 1 | V, P |
+
+The **825-minute uninterrupted source outage** affects the Jan 15
+candidate especially. The old `real_2006_01_inputs` catalog is now
+identified as **not suitable for inference**. The gap-preserving OMNI
+generator correctly refused both audit and `--write`; no new model
+input file was produced and no checkpoint inference should be run.
+
+### New selection protocol — no target flux or predictions involved
+
+New program `reselect_2006_omni_qualified_ssusi.py` reads the
+time-only January 2006 catalog and all 418 January EDR filenames
+and checks each candidate's acquisition UTC interval against **raw**
+2006 HRO2 source CDF [Bx, By, Bz, V, P]. It retains the eight
+original preselected cases that pass every raw sample, replacing the
+four failed cases with the closest-in-time **source-qualified** orbit
+that satisfies the same **>=24 h gap BETWEEN EDR intervals**.
+A deterministic stable timestamp/path tie-break resolves equal-distance
+cases. Selection is **before model inference** and does not read
+SSUSI flux, grid support, OVATION brightness, or model predictions.
+
+The old selection is NOT overwritten. The new output directory is
+`real_2006_01_omni_qualified_inputs`. The program saves all
+exclusions, candidate counts, retained/replaced case identities,
+distance from original time slots, source CDF SHA-256, and protocol
+limitations in its new `catalog_preview.json` and `manifest.json`.
+
+A source-quality screen is **not random sampling** of all solar-wind
+conditions and may change the cohort's activity distribution. This
+limitation must appear in the paper; the retained eight are not
+representative proof of 2006 or an independent storm set.
+
+### Phase A: check what the new selection actually yields — no model
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/reselect_2006_omni_qualified_ssusi.py --dry-run
+```
+
+Check `ready_for_preparation`, `n_original_valid_preserved`,
+`n_output_cases`, and `replacements` in:
+
+`paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs/catalog_preview.json`
+
+If `ready_for_preparation=false` or fewer than twelve new qualified
+EDRs are available, report the preview. DO NOT loosen the 24h separation,
+allow invalid raw solar wind, or claim all 12 EDRs survived the filter.
+
+### Phase B: only after complete preview + unit tests pass
+
+```bash
+# Generates new 80 x 96 native SSUSI support grids only after selection
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/reselect_2006_omni_qualified_ssusi.py --prepare
+
+# Audits SAME NEW 12-case manifest, not original failed catalog
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_omni_event_coverage.py \
+  --catalog paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs/manifest.json
+
+# Audit eligible, gap-preserving OMNI without writing files
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_2006_gap_preserving_omni.py \
+  --catalog paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs/manifest.json
+
+# Write only when ready_for_event_qualified_write=true and no previous file exists
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_2006_gap_preserving_omni.py \
+  --catalog paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs/manifest.json \
+  --write
+```
+
+The output `omni_20060101_5min_gap_preserving.npy` leaves ALL long
+source gaps as NaN (short bracketed gaps ≤60 min may be filled). The
+selected acquisition intervals remain raw-source complete; they do not
+rely on any interpolation. The original full-month `--convert`
+refusal remains intact.
+
+### Phase C: model-free observed-pixel/OMNI/OVATION preflight
+
+```bash
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy \
+  --output paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_preflight.json
+```
+
+Only if both raw-source audit and this preflight pass (not merely
+finite `nanmean`) should the existing model benchmark run, with
+`--prepared-root real_2006_01_omni_qualified_inputs`, explicit 2006
+`--omni` and `--ovation`, and a separate
+`real_2006_01_benchmark` output folder.
+
+**Current R2-8 and R3-1 status: OPEN.** No independent-year model
+result exists yet, and precise checkpoint training lineage remains
+unverified. No final reviewer Responses are issued.

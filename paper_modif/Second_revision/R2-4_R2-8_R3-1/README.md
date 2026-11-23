@@ -999,3 +999,102 @@ The author originally requested no new English responses to R2-4,
 R2-8 or R3-1 until each is genuinely resolved, including checkpoint
 lineage and full manuscript source consistency. No new reviewer
 Responses are released here.
+
+
+## 2026-11-23 — VERIFIED complete January 2006 observed-target results (replaces preliminary console rounding)
+
+The author submitted the **original full-precision**
+`real_2006_01_benchmark/metrics_per_holdout.csv`,
+`benchmark_summary.json`, `event_level_summary.json` (after fixing
+blank/NaN diagnostics), and `real_2006_01_solar_conditioning_range_audit.json`.
+All 180 CSV rows were independently recomputed and matched to the author's
+event summary (12 F16 EDR acquisitions, 36 target-flux-blind sectors, 5
+method rows per sector). The exact numeric audit is committed as
+`verified_2006_independent_year_real_holdout_results.json`.
+
+All 5 model/display methods used **identical hidden measured SSUSI target
+pixels** and 1/2/4-h MLT windows, with no unequal truth/coverage/center
+entries or nonzero flux-based selection scores. Direct OVATION and fused
+OVATION are **exactly identical** on measured hidden pixels, so only
+**four distinct predictions** are meaningful in the performance table.
+
+**Twelve-acquisition equally weighted mean errors** (RMSE/MAE in
+erg cm^-2 s^-1; lower is better):
+
+| Method | RMSE | MAE | Mean absolute peak error | Ratio of aggregate predicted/measured peaks | Ratio of aggregate predicted/measured gradient |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Conditional DDPM | 0.661642 | 0.286331 | 4.749005 | 0.108367 | 0.183580 |
+| Unconditional DDPM | 0.642301 | 0.255975 | 4.765793 | 0.102457 | 0.275689 |
+| Direct OVATION Prime | 0.783899 | 0.408588 | 4.602032 | 0.161523 | 0.183573 |
+| Spatial interpolation | 0.635479 | 0.239251 | 3.297304 | 0.394146 | 0.443703 |
+
+**Paired event-level conditional minus baseline RMSE**:
+
+| Baseline | Mean paired difference | Event-bootstrap 95% CI | Acquisitions where conditional improves |
+| --- | ---: | --- | ---: |
+| Unconditional DDPM | +0.019341 | [+0.008547, +0.030063] | 3/12 |
+| Direct OVATION | -0.122257 | [-0.163156, -0.082216] | 12/12 |
+| Spatial interpolation | +0.026163 | [-0.022373, +0.074900] | 4/12 |
+
+Thus the model improves against the **unmodified OVATION generator**
+(conditional RMSE 15.6% lower), but **does not establish superiority
+over unconditional DDPM or interpolation** on a genuinely measured,
+independently dated satellite cohort. No post hoc model or checkpoint
+selection was conducted on 2006 cases. The reported intervals resample
+the 12 acquisition clusters and cannot establish independence of
+actual geomagnetic storms.
+
+**Physical morphology:** conditional reconstructed peak magnitudes
+reach only 0.108 of the measured aggregate mean peaks; the
+reconstructed-to-observed gradient magnitude ratio is 0.184, versus
+0.394 and 0.444 for interpolation. The mean of event means of
+individual sector peak ratios is a **different estimator**
+(conditional 0.382), dominated by weak denominators and missingness.
+Report the aggregate physical ratio alongside any sector-ratio means.
+Two completely zero-truth sectors in the January 10 EDR have
+scientifically undefined correlation and relative peak/gradient
+metrics, correctly left blank/NaN, not imputed as zero. Interpolation
+Pearson r is defined for 11 EDR means; other methods 12.
+
+**High-leverage measured event:** preflight-valid REV11610
+(17 January 2006, 849 native-supported map cells) has conditional
+mean RMSE 3.61924 and contributes 45.6% of the sum of 12
+acquisition-mean conditional RMSEs. It **must remain in the primary
+12-acquisition analysis**. The labeled leave-one-out sensitivity
+reduces absolute conditional mean RMSE to 0.39277, but conditional
+minus unconditional mean RMSE stays **+0.01939**, while conditional
+minus interpolation stays **+0.00958**.
+
+**1996-training normalizer external-year check:** zero of twelve
+2006 EDR mean vectors clipped against the saved [min, min+range]
+range for any Bx/By/Bz/V/P input; all individual raw-valid 5-min values
+inside the selected EDRs also remain within these stored bounds.
+This rules out simple inference-bound truncation for **these 12
+cases only**, not broader input-regime shift nor the unresolved
+trained-checkpoint provenance.
+
+**2005 vs 2006 caveat:** the original January 2005 random 12-EDR
+observed-target sample has conditional RMSE 1.503129, versus 0.661642
+in the different January 2006 sample. Their measured mean hidden
+fluxes are **0.9161 versus 0.2467 erg cm^-2 s^-1**. Do NOT present
+lower absolute 2006 RMSE as better cross-year accuracy or an effect
+of the year: the target intensities and acquisition populations differ.
+
+**Cumulative manuscript:** the full 34-page working Word manuscript
+has now been updated with independent-year methodology in Section 2.5,
+a new Section 4.7, new **Table 12**, updated Abstract/Key Points/Plain
+Language Summary/Discussion, and corrections to outdated statements
+claiming all real SSUSI cohorts were drawn from January 2005. It
+retains earlier Kp>5 results in Table 11 and the prior tables/figures
+and 20 original mathematical formula objects. The manuscript was
+rendered and visually checked as a complete document; the Word
+artifact is delivered separately to the author. No final English
+reviewer Responses are released.
+
+**Open R2-8/R3-1:** measured test data now cover a second calendar
+year (2006) independent of the nominal 1996 synthetic training source
+and previously studied 2005 SSUSI. This is substantive but limited
+external-year evidence. The exact original training log, final
+model source version and saved-checkpoint lineage are still
+not proven, and available samples do not establish representative
+storm independence or solar-cycle-wide performance.

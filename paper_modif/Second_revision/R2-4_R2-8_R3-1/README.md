@@ -362,3 +362,117 @@ OMNI as a stand-in for 2006.
 
 **Open reviewer comments:** R2-8 and R3-1 remain open; no reviewer
 Response is generated from this file inventory.
+
+
+## 2026-11-23 update — 2006 five-minute CDF FOUND; strict source audit before test
+
+New author uploads: \`crossyear_omni_sources.json\` and a fresh
+\`historical_training_sources_audit.json\`. The summary is archived as
+\`crossyear_2006_omni_and_unet_audit_verified.json\`.
+
+**Availability.** Twelve 2006 HRO2 five-minute CDF files and twelve 2006 HRO
+five-minute CDF files are present under
+\`/home/docker/data/ro-share/omni/omni_cdaweb/{hro2_5min,hro_5min}/2006/\`.
+Two additional **2020** CDF files were inadvertently included in the old
+scanner because the text \`2006\` appears within \`20200601\`. The
+\`find_crossyear_omni_sources.py\` candidate-year filter and regression
+tests have now been corrected. There are **26 actual 2006 candidates** in
+these known folders (24 five-minute monthly CDFs plus 2 hourly CDFs).
+This proves **source file presence**, not real Epoch coverage or usable
+conditioning values. No matching 2006 five-minute model-ready NPYs were
+found yet.
+
+**Historical architectures.** The old
+\`Aurora_DDPM_final/models/unet_v1.py\` has a default
+\`solar_wind_dim=5\` and a \`num_fourier_freq\` parameter; the separate
+\`Aurora_DDPM/models/unet_v1.py\` defaults to
+\`solar_wind_dim=7\` and has a structurally distinct cross-modal design.
+They must not be silently interchanged. Neither hash nor source AST
+proves which generated the current pretrained checkpoint. The current
+inference checkpoint's known strict compatibility with
+\`models/unet.py\` is likewise NOT its historical training log.
+
+### Phase A — validate the January 2006 HRO2 CDF (no inference, no NPY writing)
+
+\`\`\`bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 \
+  -p 'test_*.py'
+
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_and_prepare_2006_omni.py \
+  --year 2006 --month 1
+\`\`\`
+
+The JSON \`omni_200601_cdf_audit.json\` MUST have
+\`ready_for_conversion=true\` and
+\`calendar_time_grid.exact_regular_complete_5min_utc=true\`.
+The audit uses the prior tested OMNI CDF decoder and variable selection
+\`Epoch,BX_GSE,BY_GSM,BZ_GSM,flow_speed,Pressure\` (allowing documented
+alternative speed source), same physical range checks, and a strict
+fraction/gap guard (default ≤5% invalid values per channel, maximum
+60 consecutive invalid minutes). It checks all source timestamps against
+the **exact** 2006 January 5-minute calendar. The prior 2005
+generator's example-event audit is NOT used for 2006.
+
+### Phase B — only if Phase A passed
+
+\`\`\`bash
+# Create VERIFIED January 2006 solar-wind input, do not overwrite existing files.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_and_prepare_2006_omni.py \
+  --year 2006 --month 1 --convert
+
+# Select separate 2006 acquisition dates without inspecting measured flux.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multievent_ssusi.py \
+  --edr-root /home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2006 \
+  --month 2006-01 --max-events 12 --min-gap-hours 24 \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs \
+  --dry-run
+
+# If the preview selects >=6 nonoverlapping times, prepare real native SSUSI masks.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/prepare_multievent_ssusi.py \
+  --edr-root /home/docker/data/private/AuroraData/real_aurora_data_ssusi/f16/2006 \
+  --month 2006-01 --max-events 12 --min-gap-hours 24 \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs
+\`\`\`
+
+**The second prepare command is subject to the exact path correction
+below** (use \`R2-1_R2-2_R2-3_R3-3_R3-4_R3-5\`; NEVER type
+\`R2-1_R2-2_R2-3_R3-3_R3-4_R3-5\`).
+This note documents and prevents an accidental path typo.
+
+\`\`\`bash
+# Check exact UTC coverage and flux-blind masks for January 2006, NOT 2005.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy \
+  --output paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_preflight.json
+\`\`\`
+
+No model inference until \`real_2006_01_preflight.json\` confirms
+\`ready_for_primary_inference=true\`, with full 2006 OMNI+OVATION UTC
+coverage, clean native SSUSI support and matched flux-blind masked targets.
+
+### Phase C — only after the independent-year preflight passes
+
+\`\`\`bash
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/multievent_heldout_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_inputs \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark \
+  --selection-mode random --windows-per-width 1 --min-events 6 \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy
+\`\`\`
+
+Keep the original 2005 checkpoints and baseline definitions unchanged.
+Evaluate only genuinely measured, withheld SSUSI cells, with event-equal
+summary and suitable baselines; do not mix 2006 and 2005 selected case
+counts in a single event-pseudoreplicated CI.
+
+**Reviewer status:** R2-8 and R3-1 remain OPEN pending genuine independent
+2006 observed-target inference and an honest accounting of original
+checkpoint training lineage. No English Response or unsupported manuscript
+performance claims are delivered at this stage.

@@ -1,0 +1,72 @@
+{
+  "audit_date": "2026-11-23",
+  "source": "Author-provided omni_200601_event_coverage_audit.json and command outputs",
+  "source_cdf": "/home/docker/data/ro-share/omni/omni_cdaweb/hro2_5min/2006/omni_hro2_5min_20060101_v01.cdf",
+  "january_cdf_5minute_ticks": 8928,
+  "ticks_with_all_five_model_variables_raw_valid": 8522,
+  "ticks_with_at_least_one_invalid_model_field": 406,
+  "preselected_time_flux_blind_ssusi_acquisitions": 12,
+  "raw_valid_acquisitions": 8,
+  "invalid_acquisitions": [
+    {
+      "case_id": "F16_2006004T204551_REV11430",
+      "orbit": "11430",
+      "invalid_ticks": 3,
+      "fields": [
+        "V",
+        "P"
+      ]
+    },
+    {
+      "case_id": "F16_2006015T044857_REV11576",
+      "orbit": "11576",
+      "invalid_ticks": 21,
+      "fields": [
+        "Bx",
+        "By",
+        "Bz",
+        "V",
+        "P"
+      ]
+    },
+    {
+      "case_id": "F16_2006017T175844_REV11612",
+      "orbit": "11612",
+      "invalid_ticks": 1,
+      "fields": [
+        "V",
+        "P"
+      ]
+    },
+    {
+      "case_id": "F16_2006030T165325_REV11795",
+      "orbit": "11795",
+      "invalid_ticks": 1,
+      "fields": [
+        "V",
+        "P"
+      ]
+    }
+  ],
+  "clean_orbits": [
+    "11393",
+    "11466",
+    "11503",
+    "11539",
+    "11649",
+    "11685",
+    "11722",
+    "11758"
+  ],
+  "gap_preserving_converter": {
+    "initial_dry_run": "refused",
+    "initial_write_attempt": "refused",
+    "status_correct": true,
+    "wrote_new_npy": false,
+    "reason": "Preselected original 12 EDRs include four with invalid raw five-minute OMNI; do not interpolate this away."
+  },
+  "next_workflow": "Retain eight original clean acquisitions and deterministically replace four invalid time slots with nearest-in-time original-CDF-qualified F16 EDRs, while keeping >=24h between entire acquisition intervals; never select on satellite flux or model metrics.",
+  "repo_program": "reselect_2006_omni_qualified_ssusi.py",
+  "original_catalog_unchanged": true,
+  "reviewer_status": "R2-8 and R3-1 remain open; 2006 real heldout model inference and historical checkpoint lineage unresolved. No reviewer Responses."
+}

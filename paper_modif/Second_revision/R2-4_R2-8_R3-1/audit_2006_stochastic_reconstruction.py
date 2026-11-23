@@ -231,7 +231,10 @@ def main():
         "reference_primary_csv_sha256":sha256(args.reference_csv),
         "trained_conditional_checkpoint":str(args.cond_checkpoint),
         "trained_conditional_checkpoint_sha256":sha256(args.cond_checkpoint) if not args.dry_run else None,
+        "trained_conditional_norm_sha256":sha256(args.cond_norm) if not args.dry_run else None,
+        "source_omni_sha256":sha256(args.omni) if not args.dry_run else None,
         "source_manifest":str(args.prepared_root/"manifest.json"),
+        "source_manifest_sha256":sha256(args.prepared_root/"manifest.json"),
         "mask_geometry":[
             {"case":case,"width_h":w,"rank":1,"center_h":float(choice["center_h"]),
              "heldout_pixels":int(choice["n_pixels"]),
@@ -255,7 +258,10 @@ def main():
     manifest_path=args.output_root/"stochastic_protocol.json"
     if manifest_path.exists():
         prior=json.loads(manifest_path.read_text(encoding="utf-8"))
-        for k in ("reference_primary_csv_sha256","trained_conditional_checkpoint_sha256","mask_geometry"):
+        for k in ("reference_primary_csv_sha256",
+                  "trained_conditional_checkpoint_sha256",
+                  "trained_conditional_norm_sha256","source_omni_sha256",
+                  "source_manifest_sha256","mask_geometry"):
             if prior.get(k)!=manifest_info[k]:
                 raise RuntimeError(f"Previously started stochastic output mismatches changed source {k}")
     else:
@@ -274,6 +280,16 @@ def main():
             if not args.resume:
                 raise FileExistsError(f"{output_file} already exists; rerun with --resume if protocol unchanged")
             report=json.loads(output_file.read_text(encoding="utf-8"))
+            expected_seeds=[
+                args.selection_seed+case_idx*1000+width_idx*100+10+
+                SEED_DISTANCE*repeat for repeat in range(N_REPEATS)]
+            if (report.get("case")!=case or
+                report.get("width_h")!=w or
+                report.get("rank")!=1 or
+                report.get("random_seeds")!=expected_seeds or
+                report.get("n_draws")!=N_REPEATS or
+                report.get("n_heldout_real_observed_pixels")!=int(choice["n_pixels"])):
+                raise RuntimeError(f"Resumed per-sector output does not match immutable seed/holdout protocol: {output_file}")
             reports.append(report)
             print("EXISTING:",output_file.name,flush=True)
             continue

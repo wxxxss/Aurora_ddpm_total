@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-23",
+  "evidence_files": [
+    "author uploaded checkpoint_provenance_audit.json",
+    "author uploaded 粘贴的文本 (1)(20261123-101803).txt"
+  ],
+  "verified_checkpoint_files": {
+    "current_conditional": {
+      "path": "/home/docker/code/Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth",
+      "bytes": 410372478,
+      "sha256": "875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12"
+    },
+    "current_unconditional": {
+      "path": "/home/docker/code/Aurora_DDPM_total/ckpt/uncond/aurora_diff_best.pth",
+      "bytes": 438683928,
+      "sha256": "8061c33f406e47ff2e793e96473c9d5eec1649bb70e02a1bc570bbcaace4bac3"
+    },
+    "historical_conditional_ckptv4_unetv1": {
+      "path": "/home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv4_unetv1/aurora_diff_best.pth",
+      "sha256": "9da2949204ce94b187ca2e263e7a44f1602175448eb5e6bab037fefbef9e504a"
+    },
+    "historical_conditional_ckptv1_unetv1": {
+      "path": "/home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv1_unetv1/aurora_diff_best.pth",
+      "sha256": "cbbb41400701b5e4473c4fb4dc7f3e47c19250faafdaea58d225c31914f6b660"
+    },
+    "checked_historical_best_models_binary_identical_to_evaluated_conditional": false
+  },
+  "source_status": {
+    "checked_main_train_py_config": "1996 Apr-May, imports models.unet_v1, declared best save dir /home/docker/code/Aurora_DDPM_final/ckpt/cond/ckptv4_unetv1",
+    "checked_current_repo_unet_v1_exists": false,
+    "alternate_historical_unet_v1_versions_found": 2,
+    "historical_source_version_correspondence_verified": false,
+    "trained_checkpoint_lineage_verified": false
+  },
+  "limitations": [
+    "Prior author's find output was truncated by head -100. It does not enumerate all old candidate checkpoints.",
+    "Three different SHA hashes prove only binary serialization difference, not numerical tensor inequality.",
+    "A matching SHA identifies bytes, but does not itself prove which source, optimizer/data snapshots, or command produced the file.",
+    "There is no basis for claiming the exact current evaluated weights were produced by the present copy of train.py."
+  ],
+  "followup_script": "audit_historical_checkpoint_matches.py",
+  "followup_rule": "Inventory all checkpoint files in the two historical ckpt roots; calculate SHA only for archived files whose byte length equals the current conditional or unconditional checkpoint length; never load or upload weights. If no candidate matches, record limited provenance rather than invent an exact training lineage.",
+  "scientific_impact": "The previously validated 2005/2006 real SSUSI results remain empirical for the actually evaluated weight files, but attributing the trained model to the advertised 1996 training command remains provisional.",
+  "manuscript_status": "No new numerical results; existing complete fourth-batch Word working manuscript remains cumulative but training-provenance text needs qualified phrasing at final consistency review. Do not release final English R2-8/R3-1 responses yet."
+}

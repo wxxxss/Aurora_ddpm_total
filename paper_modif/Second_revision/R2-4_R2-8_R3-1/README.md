@@ -86,3 +86,100 @@ If preflight fails, do NOT force reconstruction by silently changing observation
 ## No reviewer Response until resolved
 
 In line with the user's instruction, do not deliver R2-4, R2-8, or R3-1 English reviewer reply text until original input alignment, checkpoint provenance, Kp>5 satellite results, and cumulative manuscript consistency are verified.
+
+
+## Author-audited stage-one results — 2026-11-23 (new)
+
+The author supplied all four JSON reports requested above. A sanitized synthesis
+is committed in \`author_audits_2026_11_23_verified.json\`.
+
+**1996 cadence concern: provisionally ruled out.** April 1996 has 8,640
+OVATION frames and 8,640 five-minute OMNI samples; May has 8,928 and 8,928,
+respectively. The OMNI UTC axis is regular at 5-minute intervals and begins
+exactly on the month boundary; under the complete-month 5-minute OVATION frame
+assumption, all **17,568** historical array pairs are aligned, with zero
+discarded frames and maximum inferred time offset zero minutes. This rules out
+the hypothesized 1-minute-vs-5-minute pairing bug for these particular files,
+**but it does not directly verify per-image stored timestamps or checkpoint
+training lineage**. Do not announce retraining is necessary solely because the
+loader lacks an explicit timestamp join.
+
+**Original 12 independent-EDR satellite tests contained zero strict Kp>5
+acquisitions**: 7 Kp<=3 and 5 with 3<Kp<=5. Thus third-batch real-satellite
+results did *not* demonstrate storm-class robustness. Their Kp-stratified
+random-sector RMSE for conditional DDPM was 1.2839 (7 quiet acquisitions) and
+1.8100 (5 moderate acquisitions); for interpolation 1.3025 and 1.5225,
+respectively. These are observational descriptors, not causal activity effects.
+
+**New 2005-01 Kp-only discovery succeeded.** After excluding 14 previously
+used orbits, the source inventory contained 47 additional F16 EDR files with
+midpoint Kp>5 spanning 9 UTC dates, and 223 quiet files spanning 27 dates.
+The prospectively selected validation cohort contains **6 high (Kp>5)**
+and **6 quiet (Kp<=3)** new orbits, at most one per calendar date, none
+identical to the old EDR orbits. Some selected high dates coincide with
+earlier validation dates, so do not claim independence from all previous
+space-weather events. Do not imply that any of the six high orbits has passed
+the native SSUSI holdout coverage audit yet.
+
+**First-round multi-year synthetic test:** 240 complete OVATION-target
+timestamps in 2001/2005/2009; only 17 had Kp>5 (10/5/2 per year).
+Mean conditional RMSE on synthetic targets was 0.0342 for Kp<=3,
+0.0927 for 3<Kp<=5, and 0.2678 for strict Kp>5.
+This is neither a real satellite storm result nor proof of monotonic causality.
+
+### Next commands: original data preparation, no DDPM inference
+
+\`\`\`bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+# Hash checkpoint and training scripts. No model unpickling or private weight upload.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_checkpoint_provenance.py
+
+# Materialize native, center-aligned 80x96 support masks for preselected
+# 6 strong and 6 quiet previously unused F16 EDRs.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_high_kp_real_ssusi.py --prepare
+
+# Mandatory: ensure ALL selected EDRs have meaningful true observed
+# holdout targets and matching OMNI/OVATION UTC data before model inference.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/kp_stratified_cases \
+  --output paper_modif/Second_revision/R2-4_R2-8_R3-1/kp_preflight_report.json
+\`\`\`
+
+Send:
+- \`checkpoint_provenance_audit.json\` (just a small file hash/manifest; do **not** share the raw model weights)
+- \`kp_stratified_cases/manifest.json\` (it contains private source paths; remove paths if sharing publicly)
+- \`kp_preflight_report.json\` (with \`ready_for_primary_inference\`)
+
+**Only after the preflight passes** should the third-batch
+\`multievent_heldout_benchmark.py\` be rerun on the NEW Kp-stratified manifest,
+using a distinct \`kp_benchmark\` output directory. Use the run commands in
+the "Second stage" section above. If checkpoint provenance remains
+unverified, preserve that caveat regardless of the empirical performance
+outcome; if evidence of incorrect training provenance arises, stop, correct
+it and reassess affected third-batch claims.
+
+The April–May 1996 train/validation split is the last chronological ~10%
+for validation, but neighboring 5-minute maps are serially correlated.
+External 2001/2005/2009 model-input years are calendar-disjoint from 1996,
+yet OVATION-derived target agreement alone is insufficient to close R2-8
+or R3-1 as assertions of real-satellite solar-cycle generalization.
+
+### Interpretation guards
+
+- The prior source \`train.py\` imports \`models.unet_v1\`, which is absent
+  from the tracked GitHub source tree checked at batch initiation. The
+  published checkpoint used by the benchmark may originate from a different
+  local run. The provenance audit records this discrepancy; no assumption
+  about actual weights is justified.
+- R2-4 is not yet resolved by candidate availability or Kp matching.
+- R2-8/R3-1 still require an honest boundary on 1996-only training and
+  independent-year *measured* targets; extensive retraining should be
+  decided after the Kp and provenance audits, not implied by synthetic
+  reconstruction scores.
+- Do NOT issue English reviewer Responses or claim new manuscript results
+  until the real-Kp measurements and full-text consistency checks are complete.

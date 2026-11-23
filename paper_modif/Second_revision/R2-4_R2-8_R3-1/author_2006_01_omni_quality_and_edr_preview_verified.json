@@ -1,0 +1,127 @@
+{
+  "upload_date": "2026-11-23",
+  "sources": [
+    "omni_200601_cdf_audit.json",
+    "user pasted 2006 January CDF log and 12 EDR dry-run catalog"
+  ],
+  "source_domain": "2006-01 OMNI HRO2 5-min original CDF and F16 SSUSI EDR file metadata",
+  "source_cdf_sha256": "9ea150616661ae35106801bce576567d9e465f268ea821b9c80544b1bc178f96",
+  "model_source_fields": {
+    "Bx": "BX_GSE",
+    "By": "BY_GSM",
+    "Bz": "BZ_GSM",
+    "V": "flow_speed",
+    "P": "Pressure"
+  },
+  "utc_grid": {
+    "count": 8928,
+    "first": "2006-01-01T00:00:00",
+    "last": "2006-01-31T23:55:00",
+    "complete_regular_5min": true
+  },
+  "raw_invalid": {
+    "Bx": {
+      "count": 308,
+      "fraction": 0.03449820788530466,
+      "longest_minutes": 825
+    },
+    "By": {
+      "count": 308,
+      "fraction": 0.03449820788530466,
+      "longest_minutes": 825
+    },
+    "Bz": {
+      "count": 308,
+      "fraction": 0.03449820788530466,
+      "longest_minutes": 825
+    },
+    "V": {
+      "count": 402,
+      "fraction": 0.04502688172043011,
+      "longest_minutes": 825
+    },
+    "P": {
+      "count": 402,
+      "fraction": 0.04502688172043011,
+      "longest_minutes": 825
+    }
+  },
+  "full_month_conversion": {
+    "requested": true,
+    "succeeded": false,
+    "refusal_correct": true,
+    "reason": "All channels have maximum contiguous invalid duration 825min, exceeding the predeclared 60-minute gap limit despite <5% invalid fraction."
+  },
+  "edr_catalog_preview": {
+    "year_month": "2006-01",
+    "n_scanned_year_edrs": 4927,
+    "n_eligible_month_edrs": 418,
+    "n_selected": 12,
+    "min_gap_hours": 24,
+    "selection_uses_flux": false,
+    "cases": [
+      {
+        "orbit": "11393",
+        "start": "2006-01-02T05:54:08",
+        "end": "2006-01-02T07:35:59"
+      },
+      {
+        "orbit": "11430",
+        "start": "2006-01-04T20:45:51",
+        "end": "2006-01-04T22:27:42"
+      },
+      {
+        "orbit": "11466",
+        "start": "2006-01-07T09:55:50",
+        "end": "2006-01-07T11:37:41"
+      },
+      {
+        "orbit": "11503",
+        "start": "2006-01-10T00:47:23",
+        "end": "2006-01-10T02:29:14"
+      },
+      {
+        "orbit": "11539",
+        "start": "2006-01-12T13:57:23",
+        "end": "2006-01-12T15:39:14"
+      },
+      {
+        "orbit": "11576",
+        "start": "2006-01-15T04:48:57",
+        "end": "2006-01-15T06:30:48"
+      },
+      {
+        "orbit": "11612",
+        "start": "2006-01-17T17:58:44",
+        "end": "2006-01-17T19:40:35"
+      },
+      {
+        "orbit": "11649",
+        "start": "2006-01-20T08:50:40",
+        "end": "2006-01-20T10:32:31"
+      },
+      {
+        "orbit": "11685",
+        "start": "2006-01-22T22:00:18",
+        "end": "2006-01-22T23:42:09"
+      },
+      {
+        "orbit": "11722",
+        "start": "2006-01-25T12:52:13",
+        "end": "2006-01-25T14:34:04"
+      },
+      {
+        "orbit": "11758",
+        "start": "2006-01-28T02:01:51",
+        "end": "2006-01-28T03:43:42"
+      },
+      {
+        "orbit": "11795",
+        "start": "2006-01-30T16:53:25",
+        "end": "2006-01-30T18:35:16"
+      }
+    ]
+  },
+  "next_action": "Audit each preregistered 2006 January EDR against raw OMNI validity before preparing NPY or running DDPM. If all EDR intervals are fully raw valid, use event-qualified gap-preserving NPY with unresolved long CDF gaps retained as NaN; never interpolate 825 minutes. Otherwise choose revised cohort solely using predeclared time and OMNI quality, not flux/prediction.",
+  "reviewer_status": "R2-8, R3-1 remain open pending independently observed 2006 heldout evaluation and checkpoint training lineage. No English responses yet."
+}

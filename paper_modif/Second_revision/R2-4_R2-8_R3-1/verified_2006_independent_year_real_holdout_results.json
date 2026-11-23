@@ -1,0 +1,153 @@
+{
+  "review_date": "2026-11-23",
+  "evidence": [
+    "Author uploaded benchmark_summary(3).json",
+    "Author uploaded metrics_per_holdout(5).csv (180 full precision method evaluations)",
+    "Author uploaded event_level_summary(2).json",
+    "Author uploaded real_2006_01_solar_conditioning_range_audit.json",
+    "Previously uploaded metrics_per_holdout(2).csv (2005 12-EDR real SSUSI primary random protocol)"
+  ],
+  "verification": {
+    "csv_rows": 180,
+    "unique_EDR_acquisitions": 12,
+    "independent_satellite_observation_year": 2006,
+    "month": "January",
+    "acquisition_dates_in_january": 12,
+    "random_holdout_sectors": 36,
+    "method_rows_each": 36,
+    "widths_mlt_hours": [
+      1,
+      2,
+      4
+    ],
+    "heldout_observed_pixels_by_width": {
+      "1": 1587,
+      "2": 2848,
+      "4": 5890
+    },
+    "same_physical_hidden_truth_and_coordinates_for_all_five_methods": true,
+    "selection_score_zero_and_target_flux_blind": true,
+    "direct_and_observed_fused_OVATION_same_predictions_on_withheld_pixels": true,
+    "method_overviews_and_event_summary_match_raw_csv_exactly": true,
+    "sources_match_year_and_manifest": true,
+    "interpretation": "There are four distinct predictions: conditional DDPM, unconditional DDPM, direct OVATION and interpolation; observed-fused OVATION is an identical withheld-region display baseline."
+  },
+  "event_equal_mean": {
+    "units": "erg cm^-2 s^-1 for RMSE, MAE, and peak absolute error",
+    "conditional_ddpm": {
+      "rmse": 0.6616419750820739,
+      "mae": 0.2863312287248848,
+      "pearson_r": 0.31210476268708903,
+      "peak_absolute_error": 4.749005102655953,
+      "aggregate_peak_ratio": 0.10836652287805962,
+      "aggregate_gradient_ratio": 0.18358040915194831
+    },
+    "unconditional_ddpm": {
+      "rmse": 0.6423009767318403,
+      "mae": 0.25597506549400567,
+      "pearson_r": 0.34022135913217805,
+      "peak_absolute_error": 4.765792964647214,
+      "aggregate_peak_ratio": 0.10245745718753668,
+      "aggregate_gradient_ratio": 0.27568888301569355
+    },
+    "direct_OVATION_Prime": {
+      "rmse": 0.7838989066009487,
+      "mae": 0.4085879863790208,
+      "pearson_r": 0.21795396871717296,
+      "peak_absolute_error": 4.6020319784681005,
+      "aggregate_peak_ratio": 0.16152324231408982,
+      "aggregate_gradient_ratio": 0.18357279684824193
+    },
+    "spatial_interpolation": {
+      "rmse": 0.6354793407201881,
+      "mae": 0.2392508175366289,
+      "pearson_r": 0.32852999035262753,
+      "peak_absolute_error": 3.2973035075184374,
+      "aggregate_peak_ratio": 0.3941464118860298,
+      "aggregate_gradient_ratio": 0.44370293982363346
+    },
+    "caveat": "Pearson r averages over event means with undefined sectors skipped; interpolation has 11 events with defined r, others 12."
+  },
+  "paired_conditional_minus_baseline_rmse": {
+    "unconditional": {
+      "mean": 0.019340998350233566,
+      "ci95_bootstrap_12acq": [
+        0.008546696908089532,
+        0.030063472153953642
+      ],
+      "conditional_better_events": 3,
+      "conditional_worse_events": 9,
+      "conditional_relative_RMSE_change_percent": 3.0112048791587798
+    },
+    "direct_OVATION": {
+      "mean": -0.12225693151887475,
+      "ci95_bootstrap_12acq": [
+        -0.16315564913184363,
+        -0.0822156868095012
+      ],
+      "conditional_better_events": 12,
+      "conditional_worse_events": 0,
+      "conditional_relative_RMSE_change_percent": -15.596007404703638
+    },
+    "interpolation": {
+      "mean": 0.026162634361885734,
+      "ci95_bootstrap_12acq": [
+        -0.022373344776093755,
+        0.07489979504139828
+      ],
+      "conditional_better_events": 4,
+      "conditional_worse_events": 8,
+      "conditional_relative_RMSE_change_percent": 4.116992116885454
+    }
+  },
+  "morphology": {
+    "peak_ratio_warning": "Ratios of aggregate mean predicted and measured physical peaks differ from arithmetic means of unstable sector ratios; table uses the former.",
+    "gradient_ratio_warning": "Ratios of aggregate mean predicted and measured gradients differ from arithmetic means of unstable sector ratios; table uses the former.",
+    "two_zero_flux_reference_sectors": [
+      "2006-01-10 1h MLT withheld window",
+      "2006-01-10 4h MLT withheld window"
+    ],
+    "undefined_pearson_r_csv_counts": {
+      "conditional_ddpm": 2,
+      "unconditional_ddpm": 2,
+      "direct_ovation": 2,
+      "interpolation": 3
+    },
+    "undefined_ratio_csv_counts_per_method": 2,
+    "missing_diagnostics_not_zero_filled": true
+  },
+  "major_case_sensitivity": {
+    "case": "F16_2006017T143452_REV11610",
+    "native_supported_cells": 849,
+    "measured_withheld_sector_support_preflight_passed": true,
+    "conditional_event_RMSE": 3.6192418661635615,
+    "share_of_sum_of_twelve_conditional_event_RMSE": 0.45584092334763193,
+    "primary_conditional_RMSE_all12": 0.6616419750820739,
+    "exploratory_conditional_RMSE_excluding_this_one_case": 0.3927692577110296,
+    "exploratory_paired_conditional_minus_unconditional_without_case": 0.01939398037365788,
+    "exploratory_paired_conditional_minus_interpolation_without_case": 0.0095769469337587,
+    "must_retain_for_primary": true
+  },
+  "sources_and_covariate_shift": {
+    "stored_1996_training_normalization_clipping_in_2006_acquisition_means": 0,
+    "all_five_raw_OMNI_variables_in_each_selected_interval_within_saved_bounds": true,
+    "unresolved_2006_monthly_OMNI_NaN_ticks_outside_EdR_intervals": 281,
+    "mean_true_flux_across_2005_initial_random_sectors": 0.9160926716543408,
+    "mean_true_flux_across_2006_random_sectors": 0.246687169938084,
+    "confounder": "Lower raw 2006 RMSE cannot be interpreted as cross-year performance improvement because true auroral brightness and cohorts differ."
+  },
+  "scientific_limitations": [
+    "12 calendar-separated January 2006 acquisitions do not establish 12 independent geomagnetic storms.",
+    "2006 EDRs were screened on original OMNI quality and native support before inference; this can shift activity distribution.",
+    "Only two real satellite observation years, 2005 and 2006, with one month sampled per year.",
+    "Most extreme storm conditions, including Kp>=7, are not established by the 2006 cohort.",
+    "Original checkpoint historical training run and exact UNet source lineage remain unresolved; hashes and apparent model compatibility are not proof.",
+    "No defensible claim that conditional DDPM beats unconditional DDPM or interpolation on real SSUSI targets.",
+    "No final English reviewer response until complete reviewer issue evidence and manuscript consistency checks."
+  ],
+  "reviewer_comment_status": {
+    "R2_4": "Strict Kp>5 real 2005 measured SSUSI validation available in independent earlier analysis; caveats retained.",
+    "R2_8": "Measured F16/SSUSI independent observation year 2006 now tested with original weights; short and possibly autocorrelated April-May1996 nominal training and broader regimes remain limitations.",
+    "R3_1": "2006 and 2005 measured acquisitions are calendar disjoint from nominal 1996 source and from each other; original trained-checkpoint source/run lineage remains unresolved."
+  }
+}

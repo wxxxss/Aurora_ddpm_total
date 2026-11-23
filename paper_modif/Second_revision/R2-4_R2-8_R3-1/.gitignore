@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+training_alignment_audit.json
+prior_multiyear_strict_kp_audit.json
+existing_real_kp/
+kp_stratified_cases/
+kp_benchmark/
+kp_preflight_report.json
+*.log

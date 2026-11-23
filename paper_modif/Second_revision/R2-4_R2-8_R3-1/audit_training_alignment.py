@@ -52,8 +52,10 @@ def month_inputs(aurora_root,omni_root,year,month):
         raise ValueError(f"{aurora}: expected [time,80,96], got {imgs.shape}")
     if sw.dtype.names is None or "utc" not in sw.dtype.names:
         raise ValueError(f"{omni}: OMNI array has no UTC field, cannot audit training alignment")
-    times=np.asarray(sw["utc"],dtype="datetime64[s]")
-    if len(times)!=len(sw):raise ValueError("OMNI UTC count differs from NPY records")
+    times=np.asarray(sw["utc"],dtype="datetime64[s]").reshape(-1)
+    if len(times)!=len(sw):raise ValueError("OMNI UTC count differs from NPY records (multidimensional UTC field?)")
+    if len(times)>1 and np.any(np.diff(times)<np.timedelta64(0,"s")):
+        raise ValueError("OMNI UTC records are not chronologically sorted; training loader does not sort them")
     if len(times)>1:
         minutes=np.diff(times).astype("timedelta64[s]").astype(np.int64)/60.
         cadence=float(np.median(minutes))

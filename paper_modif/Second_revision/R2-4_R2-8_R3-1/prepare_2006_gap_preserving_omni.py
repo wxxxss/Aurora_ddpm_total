@@ -108,7 +108,9 @@ def main():
     p.add_argument("--write",action="store_true")
     args=p.parse_args()
     audit={"cdf":str(args.cdf),"catalog":str(args.catalog),
-           "output_npy":str(args.output_npy),"requested_write":args.write,
+           "output_npy":str(args.output_npy),
+           "output_report":str(args.output_report),
+           "requested_write":args.write,
            "ready_for_event_qualified_write":False,"saved":False,"error":None}
     try:
         catalog=json.loads(args.catalog.read_text(encoding="utf-8"))

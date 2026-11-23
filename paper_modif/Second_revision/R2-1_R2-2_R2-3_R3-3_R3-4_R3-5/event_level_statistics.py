@@ -30,13 +30,35 @@ def read_rows(path):
     if not rows:raise ValueError(f"No metric results in {path}")
     return rows
 
+# Constant or zero observed targets can make correlation, R2, peaks or
+# gradient ratios mathematically undefined. pandas writes NaN as an empty
+# CSV field. Preserve it as an unavailable diagnostic, never invent zero.
+UNDEFINED_ALLOWED={"pearson_r","r2","peak_ratio","gradient_ratio"}
+
+def numeric(row,field,*,undefined_allowed=False):
+    raw=row.get(field)
+    if raw is None or (isinstance(raw,str) and not raw.strip()):
+        if undefined_allowed:
+            return float("nan")
+        raise ValueError(f"Required metric {field!r} is missing in "
+                         f"case={row.get('case')}, method={row.get('method')}, "
+                         f"width_h={row.get('width_h')}")
+    try:
+        number=float(raw)
+    except (TypeError,ValueError) as exc:
+        raise ValueError(f"Malformed numeric metric {field!r}: {raw!r} "
+                         f"in case={row.get('case')} method={row.get('method')}") from exc
+    if not math.isfinite(number) and not undefined_allowed:
+        raise ValueError(f"Required metric {field!r} must be finite; got {raw!r}")
+    return number
+
 def value(row,field):
     if field=="peak_abs_error":
-        return abs(float(row["pred_peak"])-float(row["truth_peak"]))
+        return abs(numeric(row,"pred_peak")-numeric(row,"truth_peak"))
     if field=="gradient_ratio_abs_error":
-        v=float(row["gradient_ratio"])
+        v=numeric(row,"gradient_ratio",undefined_allowed=True)
         return abs(v-1.)
-    return float(row[field])
+    return numeric(row,field,undefined_allowed=field in UNDEFINED_ALLOWED)
 
 def mean_finite(arr):
     xs=np.asarray(arr,dtype=float)
@@ -62,7 +84,10 @@ def validate_and_aggregate(rows):
         fused=groups[key+("ovation_with_observations",)]
         for metric in METRICS:
             a=value(direct,metric);b=value(fused,metric)
-            if math.isfinite(a) and math.isfinite(b) and abs(a-b)>1e-8:
+            # A missing diagnostic must be missing for BOTH methods; otherwise
+            # the supposedly identical hidden-pixel predictions are inconsistent.
+            if (math.isfinite(a)!=math.isfinite(b) or
+                (math.isfinite(a) and abs(a-b)>1e-8)):
                 raise AssertionError(f"Direct/fused OVATION differ on hidden pixels: {key} {metric} {a} {b}")
     event_rows=[]
     for case in cases:
@@ -72,18 +97,28 @@ def validate_and_aggregate(rows):
                  "n_sectors":len(rs),
                  "n_distinct_widths":len(set(float(r["width_h"]) for r in rs))}
             for metric in METRICS:
-                rec[metric]=mean_finite([value(r,metric) for r in rs])
+                values=np.asarray([value(r,metric) for r in rs],dtype=float)
+                rec[metric]=mean_finite(values)
+                rec["n_valid_"+metric]=int(np.isfinite(values).sum())
             event_rows.append(rec)
     event_lookup={(r["case"],r["method"]):r for r in event_rows}
     paired_rows=[]
     for case in cases:
         for baseline in BASELINES:
-            x=event_lookup[(case,"conditional_ddpm")]
-            y=event_lookup[(case,baseline)]
             z={"case":case,"baseline":baseline}
+            case_windows=[k for k in windows if k[0]==case]
             for m in METRICS:
-                a=x[m];b=y[m]
-                z["conditional_minus_baseline_"+m]=(a-b) if a is not None and b is not None else None
+                # Same true SSUSI holdout sectors for every comparison.
+                # Compare only when this diagnostic is defined for BOTH
+                # predictions in a matched sector; then average per EDR.
+                valid_differences=[]
+                for w in case_windows:
+                    a=value(groups[w+("conditional_ddpm",)],m)
+                    b=value(groups[w+(baseline,)],m)
+                    if math.isfinite(a) and math.isfinite(b):
+                        valid_differences.append(a-b)
+                z["conditional_minus_baseline_"+m]=mean_finite(valid_differences)
+                z["n_valid_paired_"+m]=len(valid_differences)
             paired_rows.append(z)
     return cases,windows,event_rows,paired_rows
 
@@ -131,7 +166,8 @@ def summarize(rows,seed=2026,n_boot=5000):
       "equal_acquisition_weight_method_metrics":event_summary,
       "paired_event_conditional_minus_baseline":diff_summary,
       "interpretation":"Descriptive event-level comparisons; 95% cluster-bootstrap intervals are only emitted for >=8 finite acquisitions. Nonoverlapping EDR acquisitions are not guaranteed independent magnetic storms. Strong, systematic model superiority cannot be inferred from two original examples.",
-      "peak_and_gradient_metrics":"Peak ratio should be close to 1, not maximized without bound. Also evaluate absolute peak error and |gradient_ratio-1|."
+      "peak_and_gradient_metrics":"Peak ratio should be close to 1, not maximized without bound. Also evaluate absolute peak error and |gradient_ratio-1|.",
+      "undefined_metric_handling":"Pearson r, R2, peak ratio, and gradient ratio can be undefined for zero/constant observed targets. CSV blank/NaN values are excluded from metric-specific means, never set to zero. The per-acquisition n_valid_* and n_valid_paired_* columns report effective sector counts; paired estimates compare only jointly valid matched sectors. RMSE, MAE and physical peak magnitudes must be finite."
     }
 
 def main():

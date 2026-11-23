@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -58,7 +59,76 @@ def temporal_separation(a,b,min_gap_h=24.):
     gap=timedelta(hours=min_gap_h)
     return a["start"]>=b["end"]+gap or b["start"]>=a["end"]+gap
 
-def scan_month(edr_root,month):
+EDR_VERSION_RE=re.compile(
+    r"_v([A-Za-z])(\d+(?:\.\d+)*)r(\d+)(?=\.nc$)", re.IGNORECASE
+)
+
+def source_version_key(record):
+    """Explicit processing version for deterministic identical-time duplicates."""
+    m=EDR_VERSION_RE.search(record["path"].name)
+    if m is None:
+        return (-1,(-1,-1,-1,-1),-1)
+    numeric=tuple(int(v) for v in m.group(2).split("."))[:4]
+    return (ord(m.group(1).upper()), numeric+(-1,)*(4-len(numeric)),
+            int(m.group(3)))
+
+def deduplicate_edr_versions(parsed,old_cases=None):
+    """Deduplicate only by filename time/orbit and record every decision.
+
+    Preserve EXACT source file used in initial selection; exclude NEW
+    ambiguous end times. For identical intervals, prefer highest
+    processing version then lexical path. No SSUSI flux is read.
+    """
+    original={r["case_id"]:r for r in (old_cases or [])}
+    groups={}
+    for rec in parsed:
+        groups.setdefault(case_name(rec),[]).append(rec)
+    selected=[]
+    collision_log=[]
+    for name,variants in sorted(groups.items()):
+        if len(variants)==1:
+            selected.append(variants[0])
+            continue
+        intervals={(v["start"],v["end"]) for v in variants}
+        chosen=None
+        if name in original:
+            source=original[name].get("source_file")
+            if not source:
+                raise ValueError(f"Preselected {name} is missing original source_file")
+            matching=[v for v in variants if str(v["path"])==source]
+            if len(matching)!=1:
+                raise ValueError(f"Original EDR source unavailable or repeated: {name}, {source}")
+            chosen=matching[0]
+            reason="preserve_exact_original_catalog_file"
+        elif len(intervals)>1:
+            reason="conflicting_end_times_excluded"
+        else:
+            # Stable descending version / ascending path. Never use
+            # NetCDF flux, observed coverage or reconstruction metrics.
+            chosen=min(variants,key=lambda v:(
+                tuple(-x for x in (source_version_key(v)[0],
+                                    *source_version_key(v)[1],
+                                    source_version_key(v)[2])),
+                str(v["path"])))
+            reason="highest_processing_version_then_lexical_path"
+        collision_log.append({
+            "case_id":name,"n_files":len(variants),
+            "n_distinct_time_intervals":len(intervals),
+            "resolution":reason,
+            "selected_source_file":str(chosen["path"]) if chosen else None,
+            "versions":[{
+                "source_file":str(v["path"]),
+                "start":v["start"].isoformat(),
+                "end":v["end"].isoformat(),
+                "filename_version_key":list(source_version_key(v))
+            } for v in sorted(variants,key=lambda r:str(r["path"]))]
+        })
+        if chosen is not None:
+            selected.append(chosen)
+    selected.sort(key=lambda r:(r["midpoint"],str(r["path"])))
+    return selected,collision_log
+
+def scan_month(edr_root,month,old_cases=None):
     start,end=month_bounds(month)
     paths=sorted(edr_root.rglob("*.nc"))
     parsed=[]
@@ -73,16 +143,19 @@ def scan_month(edr_root,month):
         if start<=record["start"] and record["end"]<end and record["orbit"] not in EXCLUDED_ORBITS:
             parsed.append(record)
     parsed.sort(key=lambda r:(r["midpoint"],str(r["path"])))
-    unique={}
-    for record in parsed:
-        name=case_name(record)
-        if name in unique:
-            raise ValueError(f"Duplicate EDR case identity in source directory: {name}")
-        unique[name]=record
-    return parsed,{"n_edr_files_scanned":len(paths),
-                   "n_calendar_eligible_files":len(parsed),
-                   "n_filename_rejected_any_month":len(rejected),
-                   "filename_rejection_examples":rejected[:15]}
+    selected,collisions=deduplicate_edr_versions(parsed,old_cases)
+    return selected,{
+       "n_edr_files_scanned":len(paths),
+       "n_calendar_eligible_files":len(parsed),
+       "n_unique_usable_acquisitions":len(selected),
+       "n_duplicate_identity_groups":len(collisions),
+       "n_extra_duplicate_files":sum(x["n_files"]-1 for x in collisions),
+       "n_conflicting_end_time_groups_excluded":sum(
+           x["resolution"]=="conflicting_end_times_excluded" for x in collisions),
+       "duplicate_identity_resolution":collisions,
+       "n_filename_rejected_any_month":len(rejected),
+       "filename_rejection_examples":rejected[:15]
+    }
 
 def source_quality_index(records,times,mask):
     quality={}
@@ -125,6 +198,8 @@ def choose_quality_cohort(old_cases,records,quality,min_gap_h=24.,expected=12):
         if (rec["start"].isoformat()!=row["acquisition_start"] or
             rec["end"].isoformat()!=row["acquisition_end"]):
             raise ValueError("Original catalog acquisition times changed unexpectedly")
+        if row.get("source_file") and str(rec["path"])!=row["source_file"]:
+            raise ValueError("Original catalog EDR source path changed unexpectedly")
     retained=[by_id[name] for name in old_ids
               if quality[name]["raw_fully_valid_acquisition"]]
     invalid=[row for row in old_cases if
@@ -221,7 +296,7 @@ def main():
     legacy=load_legacy()
     df,meta=legacy.extract_raw_dataframe(args.cdf,year=2006)
     times,valid=calendar_validity(df,2006,1,legacy.VALID_RANGES)
-    records,scan=scan_month(args.edr_root,"2006-01")
+    records,scan=scan_month(args.edr_root,"2006-01",old_cases=old["cases"])
     quality=source_quality_index(records,times,valid)
     # Compare the author's prior original-quality audit. A changed raw
     # CDF / timestamp interpretation must not silently change eligibility.
@@ -275,7 +350,9 @@ def main():
     preview=args.output_root/"catalog_preview.json"
     if args.dry_run:
         preview.write_text(json.dumps(summary,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
-        print(json.dumps({"n_source_EDRs":scan["n_calendar_eligible_files"],
+        print(json.dumps({"n_source_EDRs":scan["n_unique_usable_acquisitions"],
+          "n_duplicate_identity_groups":scan["n_duplicate_identity_groups"],
+          "n_conflicting_end_time_groups_excluded":scan["n_conflicting_end_time_groups_excluded"],
           "n_raw_valid_source_EDRs":selection["n_available_raw_omni_qualified_candidates"],
           "retained":selection["n_original_valid_preserved"],
           "replaced":len(selection["replacements"]),
@@ -288,8 +365,11 @@ def main():
         raise RuntimeError("Not all original failed EDRs can be replaced under the fixed timing/quality protocol. Report preview; do not relax rules.")
     if preview.exists():
         previously=json.loads(preview.read_text(encoding="utf-8"))
-        if [x["case_id"] for x in previously["cases"]]!=[x["case_id"] for x in ordered]:
-            raise RuntimeError("Selected cases differ from previously displayed preview. Inspect source data changes.")
+        if [(x["case_id"],x["source_file"]) for x in previously["cases"]] != [
+                (x["case_id"],x["source_file"]) for x in ordered]:
+            raise RuntimeError("Selected case IDs or EDR source versions differ from the previous preview.")
+        if previously.get("source_cdf_sha256")!=current_sha:
+            raise RuntimeError("Source 2006 OMNI CDF differs from the previous preview.")
     for rec in selected:
         details=prepare_case(rec,args.output_root)
         case=case_name(rec)

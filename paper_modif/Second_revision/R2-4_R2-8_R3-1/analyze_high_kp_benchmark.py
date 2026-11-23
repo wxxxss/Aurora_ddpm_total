@@ -28,9 +28,23 @@ def analyze(manifest,frame):
     if set(frame.case)!=set(recs):raise ValueError("Benchmark cases differ from Kp-stratified manifest")
     if frame[["case","width_h","rank","method"]].duplicated().any():
         raise ValueError("Duplicate evaluation row")
+    if "selection_score" not in frame or not np.allclose(frame["selection_score"],0,rtol=0,atol=1e-12):
+        raise ValueError("Strict Kp stratified evaluation must be flux-blind; expected zero selection scores")
+    for case,info in recs.items():
+        k=float(info["kp_midpoint"])
+        expected="Kp>5" if k>5 else "Kp<=3" if k<=3 else "other"
+        if expected not in ("Kp>5","Kp<=3") or info["kp_group"]!=expected:
+            raise ValueError(f"Unexpected group for {case}: Kp={k}, label={info['kp_group']}")
     for key,g in frame.groupby(["case","width_h","rank"]):
         if set(g.method)!=set(METHODS) or len(g)!=len(METHODS):
             raise ValueError(f"Missing methods for sector {key}")
+        # All four predictors plus the observed-fused OVATION display must
+        # be scored at the EXACT same measured withheld SSUSI pixels.
+        for field in ("n_pixels","holdout_pixels","center_mlt_h","coverage",
+                      "truth_mean","truth_peak","truth_gradient_mean"):
+            values=g[field].astype(float).to_numpy()
+            if not np.allclose(values,values[0],rtol=0,atol=1e-9,equal_nan=True):
+                raise AssertionError(f"Different withheld targets at {key}: {field}")
         a=g[g.method=="ovation_prime"].iloc[0]
         b=g[g.method=="ovation_with_observations"].iloc[0]
         for stat in ("rmse","mae","pearson_r","peak_ratio","gradient_ratio"):
@@ -44,7 +58,9 @@ def analyze(manifest,frame):
     if not set(frame.kp_group).issubset({"Kp>5","Kp<=3"}):
         raise ValueError("Unexpected mid-range Kp in high/low stratified benchmark")
     events=frame.groupby(["case","method","kp_group"],sort=True)[
-        ["rmse","mae","pearson_r","peak_ratio","gradient_ratio"]].mean().reset_index()
+        ["rmse","mae","pearson_r","peak_ratio","gradient_ratio",
+         "truth_mean","truth_peak","pred_peak",
+         "truth_gradient_mean","pred_gradient_mean"]].mean().reset_index()
     event_wise=[]
     for case in sorted(recs):
         sub=events[events.case==case]
@@ -60,14 +76,37 @@ def analyze(manifest,frame):
     out={"n_acquisition_cases":len(recs),"by_group":{},
          "independence_limitation":"Different EDRs or UTC days can remain embedded in the same geomagnetic disturbance. Case-stratified means are descriptive, not a 12-storm statistical test.",
          "reference_truth":"Artificially withheld, native-supported SSUSI energy flux, NOT generated OVATION maps.",
-         "no_inference_claim":"No bootstrap CI or p value is reported from a handful of Kp>5 dates."}
+         "no_inference_claim":"No bootstrap CI or p value is reported from a handful of Kp>5 dates.",
+         "metric_warning":"Per-sector peak and gradient ratios can be inflated by nearly zero quiet-sector reference values; also report ratios of aggregate predicted and measured magnitudes.",
+         "flux_domain_warning":"Larger absolute RMSE under Kp>5 is confounded by the substantially larger true withheld flux distribution; the group difference is not a causal Kp effect."}
     for label in ("Kp>5","Kp<=3"):
         sub=events[events.kp_group==label]
         cmp=[r for r in event_wise if r["kp_group"]==label]
         if sub.empty:
             out["by_group"][label]={"n_acquisitions":0,"status":"no available events"}
             continue
+        # Aggregate ratios use PHYSICAL magnitudes, not arithmetic means
+        # of potentially unstable individual withheld-sector ratios.
+        scale_stats={}
+        for method in METHODS:
+            rows=sub[sub.method==method]
+            true_peaks=float(rows["truth_peak"].mean())
+            true_grads=float(rows["truth_gradient_mean"].mean())
+            scale_stats[method]={
+                "mean_peak_abs_error":float((rows["pred_peak"]-rows["truth_peak"]).abs().mean()),
+                "ratio_of_mean_predicted_to_mean_true_peaks":(
+                    float(rows["pred_peak"].mean()/true_peaks) if true_peaks>0 else None),
+                "ratio_of_mean_predicted_to_mean_true_gradients":(
+                    float(rows["pred_gradient_mean"].mean()/true_grads) if true_grads>0 else None),
+                "mean_reference_flux":float(rows["truth_mean"].mean()),
+                "mean_reference_peak":true_peaks,
+                "mean_reference_gradient":true_grads,
+            }
+        cond_sectors=frame[(frame.kp_group==label)&(frame.method=="conditional_ddpm")]
         out["by_group"][label]={
+          "n_heldout_sectors":int(len(cond_sectors)),
+          "n_heldout_sectors_true_gradient_lt_0_01":int((cond_sectors.truth_gradient_mean<.01).sum()),
+          "scale_robust_diagnostics":scale_stats,
           "n_acquisitions":sub.case.nunique(),
           "n_distinct_calendar_days":len(set(
               str(recs[c]["acquisition_start"])[:10] for c in sub.case.unique())),

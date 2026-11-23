@@ -10,3 +10,9 @@ kp_preflight_report.json
 crossyear_real_input_survey.json
 historical_training_sources_audit.json
 checkpoint_provenance_audit.json
+crossyear_omni_sources.json
+omni_20????_cdf_audit.json
+omni_2006*_cdf_audit.json
+real_2006_01_inputs/
+real_2006_01_benchmark/
+real_2006_01_preflight.json

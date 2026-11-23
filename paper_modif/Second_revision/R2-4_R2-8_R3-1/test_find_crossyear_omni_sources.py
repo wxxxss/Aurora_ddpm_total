@@ -47,6 +47,17 @@ class TestFindSources(unittest.TestCase):
         self.assertEqual(a["files"][0]["source_type"],"CDF")
         self.assertFalse(a["files"][0]["utc_range_verified"])
 
+    def test_2020_june_not_confused_with_2006(self):
+        wrong=self.root/"hro2_5min"/"2020"/"omni_hro2_5min_20200601_v01.cdf"
+        right=self.root/"hro2_5min"/"2006"/"omni_hro2_5min_20060101_v01.cdf"
+        wrong.parent.mkdir(parents=True)
+        right.parent.mkdir(parents=True)
+        wrong.write_bytes(b"2020 only")
+        right.write_bytes(b"2006 only")
+        survey=find(2006,[self.root/"hro2_5min"])
+        self.assertEqual(len(survey["files"]),1)
+        self.assertIn("/2006/",survey["files"][0]["path"])
+
     def test_empty_npy_does_not_abort_search(self):
         p=self.root/"omni_5min"/"2006"/"omni_20060101_5min.npy"
         p.parent.mkdir(parents=True)

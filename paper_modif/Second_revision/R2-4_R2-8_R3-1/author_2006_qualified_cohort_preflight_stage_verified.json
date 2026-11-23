@@ -1,0 +1,70 @@
+{
+  "receipt_date": "2026-11-23",
+  "evidence": "User-pasted 2006 Jan source-qualified reselection --dry-run, --prepare, original CDF per-orbit coverage audit and gap-preserving OMNI no-write audit outputs.",
+  "protocol": "Preserve 8 original source-clean time-selected Jan 2006 EDRs; deterministically replace 4 originals with nearest-time original-OMNI-fully-valid F16 EDR under >=24h separation, without SSUSI flux or DDPM prediction selection.",
+  "scan": {
+    "n_calendar_unique_usable_edr": 412,
+    "n_duplicate_edr_identity_groups": 3,
+    "n_duplicate_groups_excluded_for_conflicting_acquisition_end": 3,
+    "n_raw_omni_qualified_edr": 329
+  },
+  "reselected": {
+    "n_old_retained": 8,
+    "n_old_replaced": 4,
+    "n_total_selected_and_native_prepared": 12,
+    "ready_for_preparation": true,
+    "replacements": [
+      {
+        "old": "F16_2006004T204551_REV11430",
+        "new": "F16_2006004T190355_REV11429",
+        "midpoint_shift_hours": -1.699
+      },
+      {
+        "old": "F16_2006015T044857_REV11576",
+        "new": "F16_2006014T220112_REV11572",
+        "midpoint_shift_hours": -6.869
+      },
+      {
+        "old": "F16_2006017T175844_REV11612",
+        "new": "F16_2006017T143452_REV11610",
+        "midpoint_shift_hours": -3.398
+      },
+      {
+        "old": "F16_2006030T165325_REV11795",
+        "new": "F16_2006030T151128_REV11794",
+        "midpoint_shift_hours": -1.699
+      }
+    ],
+    "supported_native_grid_cells_by_orbit": {
+      "REV11393": 3286,
+      "REV11429": 3685,
+      "REV11466": 3314,
+      "REV11503": 4257,
+      "REV11539": 4341,
+      "REV11572": 3792,
+      "REV11610": 849,
+      "REV11649": 3134,
+      "REV11685": 3795,
+      "REV11722": 4172,
+      "REV11758": 4214,
+      "REV11794": 4239
+    },
+    "caution": "REV11610 has only 849 of 7680 native cells (11.1%); no flux-blind holdout eligibility has been confirmed for the prescribed 60–80 MLAT, MLT widths 1/2/4 h, 50% coverage and minimum 20 observed pixels."
+  },
+  "raw_source_audit": {
+    "n_edr": 12,
+    "n_fully_original_omni_valid": 12,
+    "every_selected_edr_has_no_invalid_raw_five_minute_inputs": true,
+    "monthly_invalid_any_variable_ticks": 406,
+    "no_usable_EDR_intersects_invalid_omni_ticks": true
+  },
+  "gap_preserving_monthly_omni": {
+    "n_monthly_ticks_remaining_nan_any_variable": 281,
+    "no_write_audit_ready_for_event_qualified_write": true,
+    "no_write_audit_error": null,
+    "saved": false,
+    "next_action": "Run same command with explicit --write and same manifest, then check SHA and report saved=true. No 825-minute interpolation."
+  },
+  "next_gate": "Run native SSUSI+OMNI+OVATION model-free preflight on the new qualified manifest and the separate 2006 gap-preserving NPY. Check REV11610 1/2/4h holdouts; do not relax coverage silently or run DDPM before 12/12 pass.",
+  "reviewer_status": "R2-8 and R3-1 remain unresolved until actual withheld real 2006 model results, manuscript consistency, and checkpoint provenance limitations are documented. No English responses issued."
+}

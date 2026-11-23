@@ -908,3 +908,94 @@ generalization.
 computed, compared transparently with 2005 and the synthetic-only
 2001/2005/2009 tests, and the unresolved exact trained-checkpoint
 provenance is adequately documented. No English reviewer Responses yet.
+
+
+## 2026-11-23 — January 2006 12-EDR independent-year real benchmark DONE; fix event-level NaN parsing
+
+The author uploaded the *full 2006 benchmark console output* as
+`粘贴的文本 (1)(20261123-092331).txt`. All **12 original-checkpoint,
+independent-year F16/SSUSI acquisitions** were evaluated at 1, 2 and
+4 MLT-hour flux-blind random masked sectors: **36 true observed
+hidden SSUSI sectors, 180 method-scoring rows including observed-fused
+OVATION**, no apparent inference failure.
+
+**Important provenance:** these are the ORIGINAL conditional and
+unconditional model checkpoints used for the January 2005 benchmark,
+without retraining, but the full historical 1996 training source/run
+metadata remains unverified. The January 2006 target pixels are actual
+DMSP F16/SSUSI measurements deliberately withheld during inference;
+this does establish a *separate real-observation calendar year* test,
+not a solar-cycle-wide representative test.
+
+Approximate *event-equal* RMSE from console values rounded to four
+decimals (NOT the precise original CSV; see
+`author_2006_real_console_benchmark_preliminary.json`):
+conditional **0.662**, unconditional **0.642**, direct OVATION
+**0.784**, interpolation **0.635**. Mean paired conditional-minus-
+baseline RMSE is approximately **+0.0193 vs unconditional
+(conditional wins 3/12 EDRs)**, **−0.1223 vs direct OVATION
+(12/12 wins)**, **+0.0262 vs interpolation (4/12 wins)**.
+Do not make claims about statistical significance until the exact
+event-clustered summary has run.
+
+**High-leverage real case:** the low-coverage yet valid
+`F16_2006017T143452_REV11610` has three-width mean conditional
+RMSE ~**3.619**, accounting for ~**45.6%** of the total
+12-orbit *sum of EDR mean RMSEs*. It PASSED all target-flux-blind
+native heldout checks. It must stay in the primary analysis; report
+acquisition-level heterogeneity and a clearly labeled leave-one-out
+sensitivity analysis rather than silently excluding difficult events.
+
+**Statistics crash (NO model rerun required):** the original
+`event_level_statistics.py` attempted `float("")` on blank
+fields in `metrics_per_holdout.csv`. The benchmark correctly
+reports undefined Pearson r, R², peak ratios and gradient ratios
+for constant/zero SSUSI targets as NaN; pandas CSV serializes
+these as blank. The event statistics script now:
+- treats such blank/NaN diagnostics as **undefined**, not zero;
+- **rejects** missing/malformed essential RMSE, MAE and peak magnitudes;
+- verifies that direct versus observed-fused OVATION have the same
+  *finite-or-undefined* status and identical finite metrics;
+- reports per-acquisition valid metric counts `n_valid_*`;
+- computes conditional-minus-baseline paired metric differences only
+  from sectors where BOTH metrics are defined, reporting
+  `n_valid_paired_*`.
+
+Regression tests are committed in
+`test_event_level_statistics_missing_values.py`.
+
+### Run ONLY statistics and normalization diagnostic — do not rerun 2006 DDPM
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+# Validate the NaN/blank scientific metric policy and all fourth-batch code
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 -p 'test_*.py'
+
+# Read the PREVIOUSLY GENERATED original 2006 real-SSUSI CSV;
+# writes event_level_summary.json and case/paired CSVs, no inference.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/event_level_statistics.py \
+  --metrics paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark/metrics_per_holdout.csv \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark
+
+# If not done previously, audit solar conditioning against stored
+# 1996 normalization bounds WITHOUT excluding any 2006 EDRs.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_solar_normalization.py
+```
+
+Send the exact generated inputs for next scientific work:
+`real_2006_01_benchmark/metrics_per_holdout.csv`,
+`real_2006_01_benchmark/event_level_summary.json`,
+`real_2006_01_benchmark/benchmark_summary.json`,
+and `real_2006_01_solar_conditioning_range_audit.json`.
+If available, also send `metrics_by_acquisition.csv`.
+This will allow exact orbit-weighted 2005-versus-2006 interpretation
+and robust peak/gradient attenuation measurements, followed by a
+complete cumulative revised Word manuscript.
+
+The author originally requested no new English responses to R2-4,
+R2-8 or R3-1 until each is genuinely resolved, including checkpoint
+lineage and full manuscript source consistency. No new reviewer
+Responses are released here.

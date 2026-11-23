@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import calendar
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -80,6 +81,16 @@ def inspect_cdf(path):
             "utc_range_verified":False,
             "note":"Candidate ONLY: filename/year match is not proof of complete 2006 5-min UTC coverage or required CDF variables. Validate before conversion."}
 
+def year_matches_source_path(path, year):
+    """Use an exact year folder or exact YYYYMMDD token, never '2006' in 20200601."""
+    year=str(year)
+    if year in path.parts:
+        return True
+    name=path.name
+    return bool(re.search(r"(?<![0-9])"+re.escape(year)+
+                          r"(?:_(?![0-9])|(?:(?:0[1-9]|1[0-2])(?:0[1-9]|[12][0-9]|3[01]))(?![0-9])|\b)",name))
+
+
 def find(year,roots,max_files=5000):
     if max_files<1:raise ValueError("max_files must be positive")
     discovered=[]
@@ -97,6 +108,7 @@ def find(year,roots,max_files=5000):
                             f"*{year}*.npy",f"*{year}*.npz"):
                 for path in candidate.rglob(pattern):
                     if not path.is_file():continue
+                    if not year_matches_source_path(path,year):continue
                     k=str(path.resolve())
                     if k in dedup:continue
                     dedup.add(k)

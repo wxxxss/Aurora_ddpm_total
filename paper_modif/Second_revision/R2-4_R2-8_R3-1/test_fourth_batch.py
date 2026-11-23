@@ -15,6 +15,7 @@ from kp_time_matching import activity_group,match_kp
 from audit_training_alignment import infer_image_cadence
 from audit_prior_multiyear import audit as audit_synthetic
 from prepare_high_kp_real_ssusi import evenly_pick_days,select_kp_cohorts
+from analyze_high_kp_benchmark import analyze as analyze_real_kp
 
 class TestKp(unittest.TestCase):
     def setUp(self):
@@ -79,6 +80,58 @@ class TestArchivedSynthetic(unittest.TestCase):
         self.assertEqual(result["activity_groups"]["Kp>5"]["n_distinct_sample_times"],1)
         self.assertEqual(result["activity_groups"]["3<Kp<=5"]["n_distinct_sample_times"],1)
         self.assertEqual(result["activity_groups"]["Kp<=3"]["n_distinct_sample_times"],1)
+
+class TestRealKpAudit(unittest.TestCase):
+    def sample(self):
+        cases=[
+            {"case_id":"F16_2005002T143139_REV06242","kp_midpoint":5.7,
+             "kp_group":"Kp>5","acquisition_start":"2005-01-02T14:31:39"},
+            {"case_id":"F16_2005004T090000_REV06267","kp_midpoint":3.0,
+             "kp_group":"Kp<=3","acquisition_start":"2005-01-04T09:00:00"}
+        ]
+        methods=("conditional_ddpm","unconditional_ddpm","ovation_prime",
+                 "ovation_with_observations","interpolation")
+        rows=[]
+        for case in cases:
+            for width in (1.,2.,4.):
+                for method in methods:
+                    rmse={"conditional_ddpm":1.,"unconditional_ddpm":1.1,
+                          "ovation_prime":1.3,"ovation_with_observations":1.3,
+                          "interpolation":.9}[method]
+                    rows.append({
+                        "case":case["case_id"],"width_h":width,"rank":1,
+                        "method":method,"selection_mode":"random",
+                        "selection_score":0.,
+                        "n_pixels":30,"holdout_pixels":30,
+                        "center_mlt_h":10.,"coverage":.6,
+                        "truth_mean":2.,"truth_peak":5.,
+                        "truth_gradient_mean":.5,
+                        "pred_peak":1.,"pred_gradient_mean":.1,
+                        "rmse":rmse,"mae":.5,"pearson_r":.2,
+                        "peak_ratio":.2,"gradient_ratio":.2,
+                    })
+        return {"cases":cases},pd.DataFrame(rows)
+
+    def test_paired_ground_truth_and_aggregate_ratios(self):
+        manifest,df=self.sample()
+        out,_,_=analyze_real_kp(manifest,df)
+        self.assertEqual(out["n_acquisition_cases"],2)
+        self.assertEqual(out["by_group"]["Kp>5"]["n_heldout_sectors"],3)
+        ratio=out["by_group"]["Kp>5"]["scale_robust_diagnostics"]["conditional_ddpm"]["ratio_of_mean_predicted_to_mean_true_gradients"]
+        self.assertAlmostEqual(ratio,.2)
+
+    def test_detects_heldout_truth_mismatch(self):
+        manifest,df=self.sample()
+        df.loc[0,"truth_peak"]=99.
+        with self.assertRaises(AssertionError):
+            analyze_real_kp(manifest,df)
+
+    def test_strict_kp_threshold_not_rounded(self):
+        manifest,df=self.sample()
+        manifest["cases"][0]["kp_midpoint"]=5.0
+        with self.assertRaises(ValueError):
+            analyze_real_kp(manifest,df)
+
 
 if __name__=="__main__":
     unittest.main()

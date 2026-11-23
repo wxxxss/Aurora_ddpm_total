@@ -299,3 +299,66 @@ Return the small JSON files
 \`historical_training_sources_audit.json\`, or the summary sections of their
 printed output. Do not upload checkpoint weights or raw EDR files.
 **R2-8 and R3-1 remain open; no final English Response is released yet.**
+
+
+## 2026-11-23: independent-year inventory and historical UNet-v1 audit received
+
+Author-uploaded \`crossyear_real_input_survey.json\` and
+\`historical_training_sources_audit.json\` have been examined; key results
+are archived in \`crossyear_2006_and_unet_sources_verified.json\`.
+
+**Cross-year actual inventory.** The survey checked 60 months in
+2004/2006/2007/2008/2009. It counted 4,927 original F16/SSUSI EDRs
+in 2006, and 11 full, valid, one-minute 80×96 OVATION monthly arrays:
+**January, February and April–December 2006**. March 2006's purported
+OVATION monthly NPY is an empty **zero-byte** file. These files make
+2006 a sensible first independent-year real-observation cohort.
+
+However **no 2006 OMNI NPYs were found in the specific expected folder**
+\`omni_real_data/omni_5min/2006/\`. The overall candidate count remains
+zero, but this does **not** establish that all 2006 OMNI data are absent:
+the author may have raw CDFs at a different location. Do not regenerate
+all 11 months of OVATION or claim cross-year skill without checking raw
+OMNI coverage and source fields.
+
+**Historical UNet lineage.** Two local \`unet_v1.py\` copies were found,
+one 454-line version in \`Aurora_DDPM_final\` (SHA-256
+\`dc376e090fbab2e3...\`), another 536-line version in \`Aurora_DDPM\`
+(\`75cfcd5b79ab069a...\`). They are different source versions.
+The published inference checkpoint's original training command, source
+version and data lineage remain unverified. Historical
+\`inspect_historical_training_sources.py\` now compares the actual
+\`UNet\` class AST signatures, constructor arguments and methods
+without executing code or loading weights. An AST difference is not
+proof of which architecture produced checkpoint weights.
+
+### Run this precise next-stage inventory, no inference or retraining
+
+\`\`\`bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 \
+  -p 'test_*.py'
+
+# Find the potentially reusable 2006 5-minute solar-wind source CDF/NPY
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/find_crossyear_omni_sources.py
+
+# Compare both historical UNet-v1 definitions using AST structural signatures
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/inspect_historical_training_sources.py
+\`\`\`
+
+Return \`crossyear_omni_sources.json\` and the regenerated
+\`historical_training_sources_audit.json\`. They are small summary reports,
+NOT raw satellite data or 410MB model weights.
+
+If a 2006 CDF/NPY candidate is found, the next stage must verify that it
+matches 2006 **UTC**, exact [Bx,By,Bz,V,P] conditioning schema, five-minute
+cadence and reasonable gap handling before preparing a 2006 real-SSUSI
+held-out cohort. January 2006 already has 418 EDRs and a full OVATION
+monthly NPY, so it is a practical first target. Do not use 2005
+OMNI as a stand-in for 2006.
+
+**Open reviewer comments:** R2-8 and R3-1 remain open; no reviewer
+Response is generated from this file inventory.

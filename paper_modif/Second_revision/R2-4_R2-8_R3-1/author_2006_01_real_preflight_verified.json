@@ -1,0 +1,92 @@
+{
+  "received_date": "2026-11-23",
+  "materials": [
+    "author terminal output from prepare_2006_gap_preserving_omni.py --write",
+    "author-uploaded real_2006_01_preflight.json, independently checked all case entries and window counts"
+  ],
+  "gap_preserving_2006_omni": {
+    "source_qualified_orbit_count": 12,
+    "unfilled_any_field_monthly_5min_ticks": 281,
+    "ready_for_event_qualified_write": true,
+    "saved": true,
+    "write_error": null,
+    "sha256": "6a7996b5a48cd74677c8499f6e01a7f5fce2b57104e5aee97f9a870058265335",
+    "absolute_path": "/home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy",
+    "interpretation": "Intentional NaN on unresolved long source intervals; all selected real SSUSI acquisition intervals were separately verified raw-valid in prior CDF audit. Do not call monthly product complete or gap-free."
+  },
+  "no_model_inference_preflight": {
+    "month": "2006-01",
+    "n_catalog_cases": 12,
+    "n_fully_evaluable_acquisitions": 12,
+    "ready_for_primary_inference": true,
+    "errors": [],
+    "selection_rule": {
+      "mode": "random flux-blind",
+      "mlat_band": [
+        60,
+        80
+      ],
+      "mlt_hour_widths": [
+        1,
+        2,
+        4
+      ],
+      "sector_min_coverage": 0.5,
+      "min_observed_target_pixels": 20,
+      "sector_step_hours": 0.5,
+      "seed": 2026
+    },
+    "holdout_sectors_by_width": {
+      "1h": 12,
+      "2h": 12,
+      "4h": 12
+    },
+    "total_holdout_sectors": 36,
+    "withheld_observed_ssusi_cells_by_width": {
+      "1h": {
+        "total": 1587,
+        "min_per_orbit": 83,
+        "max_per_orbit": 160
+      },
+      "2h": {
+        "total": 2848,
+        "min_per_orbit": 168,
+        "max_per_orbit": 320
+      },
+      "4h": {
+        "total": 5890,
+        "min_per_orbit": 368,
+        "max_per_orbit": 640
+      }
+    },
+    "lowest_native_supported_orbit": {
+      "case": "F16_2006017T143452_REV11610",
+      "supported_cells": 849,
+      "supported_fraction": 0.110546875,
+      "widths_passed_all": true,
+      "withheld_cells": {
+        "1h": 130,
+        "2h": 249,
+        "4h": 422
+      }
+    },
+    "all_12_acquisitions_have_finite_omni_interval_means": true,
+    "all_12_acquisitions_have_full_ovation_1min_frames": true,
+    "omni_path": "/home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy",
+    "ovation_path": "/home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy"
+  },
+  "authorized_next": "Run independent January 2006 original-weight DDPM benchmark with selected 12 qualified EDRs and explicit 2006 OMNI/OVATION paths. Keep same random 1/2/4h mask protocol, checkpoint and normalization as 2005; no model changes.",
+  "expected_results": {
+    "n_original_holdout_sector_records": 36,
+    "n_methods": 5,
+    "n_method_scoring_rows": 180,
+    "evaluation_source": "genuinely measured SSUSI withheld native-supported cells"
+  },
+  "scientific_limitations": [
+    "2006 calendar-year transfer is distinct from 1996 training and 2005 prior real-satellite benchmark, but this is one month and one satellite platform, not the whole solar cycle.",
+    "Original 1996 training checkpoint exact lineage is still not fully verified.",
+    "Qualification by 2006 raw-OMNI completeness can shift the set of sampled geomagnetic activities; do not claim random solar-wind activity sampling.",
+    "Storm-day correlations remain; 12 calendar-separated acquisitions are not necessarily 12 statistically independent storms.",
+    "The benchmark has not run and no quantitative reconstruction skill is claimed yet."
+  ]
+}

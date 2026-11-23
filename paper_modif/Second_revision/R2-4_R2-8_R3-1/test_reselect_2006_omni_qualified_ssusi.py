@@ -4,12 +4,13 @@
 Neither satellite flux, model predictions, CDF readers, nor torch is loaded.
 """
 from __future__ import annotations
+import tempfile
 import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from reselect_2006_omni_qualified_ssusi import (
-    choose_quality_cohort, temporal_separation
+    choose_quality_cohort, temporal_separation, scan_month, source_version_key
 )
 from prepare_multievent_ssusi import case_name
 
@@ -67,6 +68,71 @@ class TestReselect(unittest.TestCase):
         self.assertFalse(temporal_separation(a,b,24))
         c=edr(3,2,3)
         self.assertTrue(temporal_separation(a,c,24))
+
+    def test_identical_orbit_and_interval_uses_latest_processing_revision(self):
+        # Same physical EDR acquisition, two reprocessed files.
+        # Must count as ONE orbit, not an independent second event.
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            stem=("dmspf16_ssusi_edr-aurora_2006012T222703-"
+                  "2006013T000454-REV11544_")
+            earlier=root/(stem+"vA8.2.0r000.nc")
+            later=root/(stem+"vA8.2.0r001.nc")
+            earlier.write_bytes(b"old placeholder; no SSUSI flux parsed")
+            later.write_bytes(b"new placeholder; no SSUSI flux parsed")
+            out,scan=scan_month(root,"2006-01")
+            self.assertEqual(len(out),1)
+            self.assertEqual(str(out[0]["path"]),str(later))
+            self.assertEqual(scan["n_duplicate_identity_groups"],1)
+            self.assertEqual(scan["n_extra_duplicate_files"],1)
+            self.assertEqual(
+                scan["duplicate_identity_resolution"][0]["resolution"],
+                "highest_processing_version_then_lexical_path")
+
+    def test_original_catalog_version_stays_pinned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            stem=("dmspf16_ssusi_edr-aurora_2006012T222703-"
+                  "2006013T000454-REV11544_")
+            earlier=root/(stem+"vA8.2.0r000.nc")
+            later=root/(stem+"vA8.2.0r001.nc")
+            earlier.write_bytes(b"original")
+            later.write_bytes(b"later")
+            without_pin,_=scan_month(root,"2006-01")
+            prior=[{**record(without_pin[0]),"source_file":str(earlier)}]
+            with_pin,scan=scan_month(root,"2006-01",old_cases=prior)
+            self.assertEqual(str(with_pin[0]["path"]),str(earlier))
+            self.assertEqual(
+                scan["duplicate_identity_resolution"][0]["resolution"],
+                "preserve_exact_original_catalog_file")
+
+    def test_new_conflicting_end_times_excluded_and_logged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            first=root/("dmspf16_ssusi_edr-aurora_2006012T222703-"
+                        "2006013T000454-REV11544_vA8.2.0r000.nc")
+            other=root/("dmspf16_ssusi_edr-aurora_2006012T222703-"
+                        "2006013T001454-REV11544_vA8.2.0r001.nc")
+            first.write_bytes(b"a")
+            other.write_bytes(b"b")
+            selected,scan=scan_month(root,"2006-01")
+            self.assertEqual(selected,[])
+            self.assertEqual(scan["n_conflicting_end_time_groups_excluded"],1)
+            self.assertIsNone(
+                scan["duplicate_identity_resolution"][0]["selected_source_file"])
+
+    def test_nonexistent_original_source_cannot_be_silently_substituted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            stem=("dmspf16_ssusi_edr-aurora_2006012T222703-"
+                  "2006013T000454-REV11544_")
+            for rev in ("r000","r001"):
+                (root/(stem+"vA8.2.0"+rev+".nc")).write_bytes(b"a")
+            records,_=scan_month(root,"2006-01")
+            prior=[{**record(records[0]),
+                    "source_file":str(root/"file_that_does_not_exist.nc")}]
+            with self.assertRaises(ValueError):
+                scan_month(root,"2006-01",old_cases=prior)
 
     def test_requires_original_catalog_unchanged(self):
         old,records,quality,orig,_=self.fixture()

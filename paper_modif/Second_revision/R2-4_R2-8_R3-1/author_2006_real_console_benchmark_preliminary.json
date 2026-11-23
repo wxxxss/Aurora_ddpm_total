@@ -1,0 +1,62 @@
+{
+  "audit_date": "2026-11-23",
+  "source": "User-pasted text file 粘贴的文本 (1)(20261123-092331).txt; console output (4 decimal RMSE), not original metrics_per_holdout.csv",
+  "scientific_status": "First complete independent-year 2006 real F16/SSUSI heldout inference run finished. Downstream equal-acquisition statistic script crashed when reading CSV blank strings for undefined correlation/ratio metrics; fixed separately. No manuscript result should quote console-derived numbers as full precision.",
+  "protocol": {
+    "month": "2006-01",
+    "n_acquisitions": 12,
+    "heldout_sectors": 36,
+    "widths_h": [
+      1,
+      2,
+      4
+    ],
+    "methods": [
+      "conditional_ddpm",
+      "unconditional_ddpm",
+      "ovation_prime",
+      "ovation_with_observations",
+      "interpolation"
+    ],
+    "n_all_method_evaluations": 180,
+    "comparison_level": "acquisition equal weight; 3 random target-flux-blind sector widths per acquisition",
+    "checkpoints": "original 2005-used conditional and unconditional weights, no retraining"
+  },
+  "approximately_from_rounded_console": {
+    "event_equal_mean_rmse_erg_cm2_s": {
+      "conditional_ddpm": 0.661639,
+      "unconditional_ddpm": 0.642297,
+      "ovation_prime": 0.7839,
+      "interpolation": 0.635478
+    },
+    "paired_12_event_rmse_deltas_conditional_minus_baseline": {
+      "unconditional_ddpm": {
+        "delta": 0.019342,
+        "conditional_event_wins": 3
+      },
+      "ovation_prime": {
+        "delta": -0.122261,
+        "conditional_event_wins": 12
+      },
+      "interpolation": {
+        "delta": 0.026161,
+        "conditional_event_wins": 4
+      }
+    },
+    "extreme_case": {
+      "case": "F16_2006017T143452_REV11610",
+      "native_supported_cells": 849,
+      "event_equal_conditional_rmse": 3.619267,
+      "fraction_of_full_cohort_sum_of_event_conditional_RMSE": 0.455846,
+      "conditional_mean_rmse_excluding_this_case_for_sensitivity_only": 0.392764,
+      "warning": "The sparse high-error event is VALID under prospectively set holdout thresholds. Excluding it is not permitted for primary performance; any leave-one-out is labeled sensitivity only."
+    }
+  },
+  "undefined_diagnostics": {
+    "examples": "January 10 1h and 4h hidden sectors have zero observed auroral flux, so Pearson r and peak/gradient ratios are undefined (NaN). CSV serializes them as blank, not 0.",
+    "event_statistics_error": "ValueError: could not convert string to float: ''",
+    "status": "A localized patch to third-batch event_level_statistics.py now accepts blank/NaN only for scientifically undefined ratios/correlations, rejects missing required RMSE/MAE, and computes matched-sectors-only paired metrics.",
+    "no_inference_rerun_needed": true
+  },
+  "outstanding": "Request original 2006 metrics_per_holdout.csv plus repaired event_level_summary.json and solar normalization range audit; verify precision and missingness before updating cumulative manuscript. Training checkpoint lineage still unresolved. R2-8/R3-1 responses withheld."
+}

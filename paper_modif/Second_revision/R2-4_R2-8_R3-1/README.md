@@ -1180,3 +1180,60 @@ observed-target testing is complete within the documented year/activity
 sampling limits. Revise final manuscript language according to the
 actual provenance audit outcome, then proceed to the complete
 reviewer-by-reviewer response (not before).
+
+
+## 2026-11-23 — FINAL HISTORICAL ARCHIVE IDENTITY DISCOVERY (supersedes prior 2-file negative result)
+
+The author completed the full, **untruncated** checkpoint inventory
+with `audit_historical_checkpoint_matches.py` and uploaded the original
+`historical_checkpoint_match_audit.json`. The scan counted **1,054
+archive checkpoint files** in the two history trees, including **61
+best-named snapshots**, and SHA-hashed two files matching the evaluated
+weight-file sizes. **Both evaluated model files have exact full SHA-256
+matches**:
+
+| Evaluated real-SSUSI checkpoint | Original archived snapshot whose bytes match exactly | SHA-256 |
+| --- | --- | --- |
+| `Aurora_DDPM_total/ckpt/cond/aurora_diff_best.pth` | `Aurora_DDPM_final/ckpt/cond/ckptv2_unetv3/aurora_diff_best.pth` | `875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12` |
+| `Aurora_DDPM_total/ckpt/uncond/aurora_diff_best.pth` | `Aurora_DDPM/ckpt/diffusion_ckpt_simplenet/ckpt_v8/aurora_diff_best.pth` | `8061c33f406e47ff2e793e96473c9d5eec1649bb70e02a1bc570bbcaace4bac3` |
+
+**This materially changes the previous provenance conclusion**:
+no matching byte identity was found in the *two initially checked*
+historical `ckptv4_unetv1` and `ckptv1_unetv1` snapshots, but a full
+inventory DOES find the evaluated conditional snapshot under the
+different `ckptv2_unetv3` directory. Similarly, the baseline
+unconditional snapshot matches `diffusion_ckpt_simplenet/ckpt_v8`.
+These are the exact archived model files used for the fixed-weight
+January 2005 and January 2006 tests. Both previous model performance
+tables remain valid for the tested weights; no NPU inference rerun is
+required merely to establish file identity.
+
+**Important scientific evidence boundary:** A byte-identical archived
+checkpoint is **NOT proof of its complete historical training run,
+original source import, or input dataset composition**. The present
+`train.py` references `models.unet_v1` and best save directory
+`ckptv4_unetv1`, whereas the evaluated conditional checkpoint matches
+`ckptv2_unetv3`. The archive path's `unetv3` label is informative
+provenance, but it does not authenticate the actual historical source
+class. The originally described April–May 1996 OVATION + OMNI training
+workflow and Figure 3 100-epoch loss trace cannot be **directly
+attributed** to these specific archived bytes without contemporaneous
+logs, archived training source and dataset fingerprints. File mtimes
+are not reliable training start/finish timestamps.
+
+Full findings are in
+`verified_historical_checkpoint_identity_20261123.json`.
+
+**Full cumulative manuscript updated again:** the 12-table manuscript
+retains all validated 2005 and 2006 SSUSI comparisons, explicitly
+identifies both evaluated archive snapshots and complete SHA-256
+in Section 3.3, presents Section 3.2 as the *inference-side*
+architecture, and qualifies the 1996 training scenario, Table 6
+training settings and Figure 3 development loss curve rather than
+falsely certifying their linkage to the evaluated checkpoints.
+Limitations and Conclusions distinguish confirmed archive file
+identity from still-unverified run/source/data provenance.
+
+The user-requested next phase is a full consistency check followed by
+an appropriately bounded reviewer response; DO NOT declare exact
+training-lineage closure solely on directory names or SHA identity.

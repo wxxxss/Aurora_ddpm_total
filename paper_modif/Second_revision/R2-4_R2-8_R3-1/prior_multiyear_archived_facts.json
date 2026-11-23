@@ -1,0 +1,89 @@
+{
+  "source": "Archived First_revision/R1-2 synthetic OVATION target benchmark (2001/2005/2009), 240 unique timepoints × three methods; computed directly from tracked per-sample CSV",
+  "target_domain": "OVATION Prime synthetic maps (not directly observed satellite energy flux)",
+  "unique_times": 240,
+  "by_year": {
+    "2001": {
+      "n_unique": 80,
+      "n_strict_kp_gt5": 10,
+      "n_kp_ge4": 22
+    },
+    "2005": {
+      "n_unique": 80,
+      "n_strict_kp_gt5": 5,
+      "n_kp_ge4": 22
+    },
+    "2009": {
+      "n_unique": 80,
+      "n_strict_kp_gt5": 2,
+      "n_kp_ge4": 16
+    }
+  },
+  "groups": {
+    "Kp<=3": {
+      "n_unique_timepoints": 174,
+      "by_method": {
+        "conditional": {
+          "n": 174,
+          "mean_rmse": 0.034232251406276344,
+          "mean_mae": 0.024050796130612465
+        },
+        "unconditional": {
+          "n": 174,
+          "mean_rmse": 0.3223215324535627,
+          "mean_mae": 0.21717483056319398
+        },
+        "interpolation": {
+          "n": 174,
+          "mean_rmse": 0.49335280071369525,
+          "mean_mae": 0.31198146138948907
+        }
+      }
+    },
+    "3<Kp<=5": {
+      "n_unique_timepoints": 49,
+      "by_method": {
+        "conditional": {
+          "n": 49,
+          "mean_rmse": 0.09271073011273115,
+          "mean_mae": 0.06360207246057901
+        },
+        "unconditional": {
+          "n": 49,
+          "mean_rmse": 0.5101398234938376,
+          "mean_mae": 0.3574092206802384
+        },
+        "interpolation": {
+          "n": 49,
+          "mean_rmse": 0.8930277769648052,
+          "mean_mae": 0.6041818622875322
+        }
+      }
+    },
+    "Kp>5": {
+      "n_unique_timepoints": 17,
+      "by_method": {
+        "conditional": {
+          "n": 17,
+          "mean_rmse": 0.26777152637396673,
+          "mean_mae": 0.18185335247001724
+        },
+        "unconditional": {
+          "n": 17,
+          "mean_rmse": 0.7637342140324754,
+          "mean_mae": 0.5393618666894122
+        },
+        "interpolation": {
+          "n": 17,
+          "mean_rmse": 1.2184596991041194,
+          "mean_mae": 0.8625377466682513
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Kp>5 sample count is small and not independent of 3h Kp interval or same storm; this descriptive domain does not validate recovery of measured aurora.",
+    "Original grouping Kp>=4 is not the reviewer-requested Kp>5.",
+    "Training source train.py years=[1996], months=range(4,6), with 90/10 chronological in-loader split. This is not proof of temporal generalization."
+  ]
+}

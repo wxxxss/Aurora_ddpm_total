@@ -747,3 +747,69 @@ the preview; do not relax source quality or timing thresholds.
 
 No model inference has been performed by this fix; R2-8 and R3-1
 remain open.
+
+
+## 2026-11-23: qualified 2006 cohort READY for source write and mask preflight
+
+The author provided complete dry-run, native swath preparation, raw HRO2
+source-CDF quality and gap-preserving-OMNI **no-write** logs. An exact
+fact summary is committed in
+`author_2006_qualified_cohort_preflight_stage_verified.json`.
+
+The original catalog's eight fully clean EDRs were preserved, four
+source-unqualified EDRs replaced, and the resulting 12-case independent
+**January 2006** cohort is prepared. Raw original five-field OMNI
+measurements are valid for **all 12 acquisition windows**. The source
+inventory reports 412 unique usable EDR cases, 3 ambiguous duplicate
+identity groups excluded and 329 OMNI-qualified EDR candidates. The
+dedicated gap-preserving monthly input will retain **281 NaN timepoints**
+across the month; no source-invalid OMNI values appear within the selected
+EDRs. **This is not a fully complete monthly dataset.**
+
+**Critical native-coverage gate:** 11 of 12 prepared orbit grids have
+3,134–4,341 observed native-supported cells, but replacement
+`F16_2006017T143452_REV11610` has **only 849/7680 native-supported
+cells (11.05%)**. It might lack one or more flux-blind observed target
+windows. The *preflight* enforces the unchanged 1/2/4 h MLT sectors,
+60–80 MLAT, 50% target coverage, and >=20 measured target pixels.
+Do **not** assume that the high-level EDR source audit certifies
+eligible holdout masks or loosen those thresholds simply to keep 12 EDRs.
+
+### Authorized next two commands — no DDPM inference
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+# Now write the validated source-qualified array using the NEW manifest,
+# never the original 12-case file in real_2006_01_inputs/.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/prepare_2006_gap_preserving_omni.py \
+  --catalog paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs/manifest.json \
+  --write
+
+# Native SSUSI geometry / flux-blind targets / exact UTC source preflight.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/preflight_multievent_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy \
+  --output paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_preflight.json
+```
+
+The first command must report `saved=true`, `error=null` and
+a real `output_npy_sha256`. It refuses to overwrite an existing NPY.
+The second command must report
+`ready_for_primary_inference=true`, `n_catalog_cases=12`,
+`n_fully_evaluable_acquisitions=12`, `errors=[]`.
+**If it fails (especially on REV11610), stop and inspect each missing
+width in the JSON instead of launching DDPM.** A second source-blind
+candidate-selection stage could prioritize native *coverage only*, not
+heldout flux or observed prediction error, but that would require
+explicitly recording selection bias and rerunning source and preflight
+checks on a new distinct cohort.
+
+The original 2006 HRO2 long 825-minute source outage was never filled.
+The ordinary full-month `audit_and_prepare_2006_omni.py --convert`
+still correctly refuses conversion.
+
+R2-8 and R3-1 remain OPEN. No result yet establishes 2006 real
+withheld-target reconstruction accuracy or exact checkpoint lineage.

@@ -7,3 +7,6 @@ kp_stratified_cases/
 kp_benchmark/
 kp_preflight_report.json
 *.log
+crossyear_real_input_survey.json
+historical_training_sources_audit.json
+checkpoint_provenance_audit.json

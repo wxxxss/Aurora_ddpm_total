@@ -813,3 +813,98 @@ still correctly refuses conversion.
 
 R2-8 and R3-1 remain OPEN. No result yet establishes 2006 real
 withheld-target reconstruction accuracy or exact checkpoint lineage.
+
+
+## 2026-11-23: all 12 January 2006 real SSUSI masked-target preflights PASSED
+
+The author completed the `--write` stage for the January 2006
+*gap-preserving* HRO2 solar-wind NPY with `saved=true`, no error,
+SHA-256 `6a7996b5a48cd74677c8499f6e01a7f5fce2b57104e5aee97f9a870058265335`,
+and 281 unresolved five-minute samples containing at least one NaN
+across the FULL MONTH. The selected EDR intervals remain independently
+verified to contain **only raw-valid OMNI** data.
+
+Then the author submitted `real_2006_01_preflight.json`, whose every
+acquisition and withheld mask was checked against the original
+science/coverage criteria. Main summary:
+
+- `n_catalog_cases=12`
+- `n_fully_evaluable_acquisitions=12`
+- `ready_for_primary_inference=true`, `errors=[]`
+- All 12 acquisitions have a finite, date-matched 2006 OMNI interval
+  mean and full date-matched 1-minute 2006 OVATION image coverage.
+- 1/2/4-hour MLT random sectors: **12 each = 36 heldout sectors**.
+  Their corresponding real observed SSUSI hidden-cell counts total
+  **1,587 / 2,848 / 5,890**, respectively.
+- The sparsely observed `F16_2006017T143452_REV11610` (849/7680
+  native observed cells) nevertheless meets the SAME flux-blind,
+  60–80 MLAT, 50%-coverage and >=20-pixel criteria for all three
+  prescribed sector widths: 130, 249 and 422 native observed hidden
+  cells for 1/2/4 h. Do NOT discard it on global support fraction alone.
+
+An exact report summarizing the author's output, without any invented
+model performance numbers, is committed as
+`author_2006_01_real_preflight_verified.json`.
+
+### INFERENCE UNBLOCKED — use exact 2006 sources, no model changes
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+# Low-cost diagnostic, no model inference: 2006 input means vs stored
+# 1996 training normalizer. This does not change cohort or model.
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/audit_2006_solar_normalization.py
+
+# Run REAL January 2006 independent-calendar-year satellite holdout
+# reconstruction on the *qualified* 12-acquisition manifest.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/multievent_heldout_benchmark.py \
+  --prepared-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_omni_qualified_inputs \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark \
+  --selection-mode random \
+  --windows-per-width 1 \
+  --min-events 12 \
+  --seed 2026 \
+  --omni /home/docker/data/private/AuroraData/omni_real_data/omni_5min/2006/omni_20060101_5min_gap_preserving.npy \
+  --ovation /home/docker/data/private/AuroraData/generated_aurora_data/2006_omni_aurora/aurora_img_20060101.npy
+
+# Acquisition-equal comparison, paired across the same real SSUSI pixels.
+# Do this only after the benchmark created metrics_per_holdout.csv.
+python paper_modif/Second_revision/R2-1_R2-2_R2-3_R3-3_R3-4_R3-5/event_level_statistics.py \
+  --metrics paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark/metrics_per_holdout.csv \
+  --output-root paper_modif/Second_revision/R2-4_R2-8_R3-1/real_2006_01_benchmark
+```
+
+Expected completed benchmark *if all inference executions succeed*:
+36 heldout sectors, **180 method-scoring records** (conditional DDPM,
+unconditional DDPM, direct OVATION Prime, observed-fused OVATION and
+spatial interpolation). All five methods must be scored only on the
+SAME genuinely observed, deliberately hidden SSUSI native pixels.
+**These expected numbers are not measured 2006 scores.**
+
+The `audit_2006_solar_normalization.py` diagnostic records each
+original OMNI interval mean compared to the actual stored model
+normalization [min, min+range], including per-parameter input
+saturation at the [0,1] clipping bounds. This is relevant to R2-8:
+1996 training may not cover all 2006 solar-wind states.
+Never omit or select acquisitions according to clipping, never
+renormalize to make 2006 test scores better, and do not substitute
+it for original checkpoint training provenance.
+
+Submit four small result files:
+- `real_2006_01_solar_conditioning_range_audit.json`
+- `real_2006_01_benchmark/benchmark_summary.json`
+- `real_2006_01_benchmark/metrics_per_holdout.csv`
+- `real_2006_01_benchmark/event_level_summary.json`
+
+Keep the original trained conditional/unconditional checkpoints,
+the identical 2005 holdout protocol and all model baselines unchanged.
+The 12-acquisition cohort is selected by **source OMNI completeness
+and UTC spacing**, not at random from all 2006 conditions. 24-hour
+separation does not prove 12 independent storms or solar-cycle
+generalization.
+
+**R2-8/R3-1 remain OPEN** until the 2006 observed-target results are
+computed, compared transparently with 2005 and the synthetic-only
+2001/2005/2009 tests, and the unresolved exact trained-checkpoint
+provenance is adequately documented. No English reviewer Responses yet.

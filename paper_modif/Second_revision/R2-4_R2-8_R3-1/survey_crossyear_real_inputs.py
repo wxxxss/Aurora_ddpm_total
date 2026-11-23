@@ -26,7 +26,6 @@ DEFAULT_YEARS=(2004,2006,2007,2008,2009)
 DEFAULT_OUT=HERE/"crossyear_real_input_survey.json"
 
 def audit_month(year,month,root):
-    ssusi=root/"real_aurora_data_ssusi/f16"/str(year)/f"{month:03d}"
     # F16 originals use Julian day directories, not YYYY/MM.
     yearroot=root/"real_aurora_data_ssusi/f16"/str(year)
     days=calendar.monthrange(year,month)[1]
@@ -48,7 +47,9 @@ def audit_month(year,month,root):
         "not_january_2005":(year,month)!=(2005,1),
     }
     if omni.is_file():
-        arr=np.load(omni,mmap_mode="r",allow_pickle=False)
+        # Hourly/five-minute OMNI may store structured object timestamps;
+        # these small local, author-controlled arrays can be read directly.
+        arr=np.load(omni,allow_pickle=True)
         report["omni_shape"]=list(arr.shape)
         report["omni_utc_field_present"]=bool(arr.dtype.names and "utc" in arr.dtype.names)
     if ovation.is_file():

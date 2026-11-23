@@ -1,0 +1,84 @@
+{
+  "sources": [
+    "Author-uploaded training_alignment_audit.json",
+    "Author-uploaded prior_multiyear_strict_kp_audit.json",
+    "Author-uploaded existing_real_kp_summary.json",
+    "Author-uploaded kp_catalog_preview.json"
+  ],
+  "training_1996": {
+    "months": [
+      "1996-04",
+      "1996-05"
+    ],
+    "paired_5minute_frames": 17568,
+    "aurora_frames_by_month": [
+      8640,
+      8928
+    ],
+    "omni_records_by_month": [
+      8640,
+      8928
+    ],
+    "inferred_calendar_time_matching_within_2minutes": 17568,
+    "inferred_max_abs_utc_offset_minutes": 0,
+    "readout": "No evidence for the hypothesized minute-vs-five-minute mismatch in the original 1996 arrays. Image time coordinates inferred from whole-month frame counts, not supplied as explicit per-frame timestamps.",
+    "unresolved": "The published inference checkpoint's exact training scripts, run logs and data provenance have not been independently proven. Public train.py imports models.unet_v1, not present in tracked model tree at the time of audit."
+  },
+  "prior_2001_2005_2009_synthetic": {
+    "synthetic_OVATION_target_times": 240,
+    "by_year_total": {
+      "2001": 80,
+      "2005": 80,
+      "2009": 80
+    },
+    "by_year_strict_kp_gt5": {
+      "2001": 10,
+      "2005": 5,
+      "2009": 2
+    },
+    "total_strict_kp_gt5": 17,
+    "conditional_ddpm_mean_rmse_by_group": {
+      "Kp<=3": 0.03423225140627632,
+      "3<Kp<=5": 0.09271073011273112,
+      "Kp>5": 0.2677715263739667
+    },
+    "boundary": "Synthetic OVATION targets are not independent SSUSI measurements. Group RMSE changes can reflect signal amplitude, mask composition, and target distribution; they are not causal storm effects."
+  },
+  "existing_2005_01_real_ssusi": {
+    "acquisition_count": 12,
+    "strict_kp_gt5": 0,
+    "kp_le3": 7,
+    "kp_between3and5": 5,
+    "original_random_conditional_rmse_by_group": {
+      "Kp<=3": 1.2839106607173114,
+      "3<Kp<=5": 1.8100335067179831
+    },
+    "original_random_interpolation_rmse_by_group": {
+      "Kp<=3": 1.3024746167634313,
+      "3<Kp<=5": 1.522540702780034
+    },
+    "note": "Original 12-acquisition real-satellite benchmark has NO strict Kp>5 evaluation. Differences between these nonrandom weather strata should be treated descriptively."
+  },
+  "unused_real_ssusi_candidate_catalog": {
+    "month": "2005-01",
+    "edrs_with_strict_kp_gt5": 47,
+    "distinct_dates_with_strict_kp_gt5": 9,
+    "quiet_edrs_kp_le3": 223,
+    "distinct_quiet_dates": 27,
+    "preselected_high": 6,
+    "preselected_quiet": 6,
+    "selected_orbits_overlap_existing_or_development_orbits": false,
+    "high_kp_selected_acquisition_dates": [
+      "2005-01-02",
+      "2005-01-08",
+      "2005-01-12",
+      "2005-01-18",
+      "2005-01-19",
+      "2005-01-22"
+    ],
+    "some_dates_overlap_previous_12_orbits": true,
+    "essential_limit": "At most one EDR per selected date; distinct dates do not establish distinct storm intervals or statistical independence, and no SSUSI native support or high-Kp reconstruction accuracy has yet been computed."
+  },
+  "workflow_decision": "No retraining solely based on cadence audit. Proceed with (1) source/checkpoint provenance fingerprint (2) preparation of 6+6 new Kp-stratified EDRs (3) native support & UTC preflight (4) only then real withheld SSUSI inference and case-level evaluation.",
+  "reviewer_status": "R2-4, R2-8 and R3-1 remain OPEN until new high-Kp observation metrics, provenance review and manuscript update. No English reviewer Responses yet."
+}

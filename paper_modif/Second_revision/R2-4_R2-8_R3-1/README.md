@@ -1334,3 +1334,77 @@ Availability; then produce revised clean + marked Word,
 standalone figures and final comprehensive reviewer response.
 No more 2006 data re-selection, model retraining or
 2007–2009 input-generation is currently warranted.
+
+
+## 2026-11-25 — REVIEWER R3-8 FIVE-SEED STOCHASTIC UNCERTAINTY: VERIFIED
+
+Author completed `audit_2006_stochastic_reconstruction.py` after
+all 36 January 2006 real F16/SSUSI native-supported flux-blind
+heldout sectors were verified against original 2006 benchmark CSV.
+The model, original train checkpoint SHA, conditioning, mask geometry,
+widths, native observed truth and original reverse-sampling parameters
+(`n_sample=1` internal jumps, 300 inference steps) were held fixed.
+Five independent diffusion RNG streams per target region generated
+**180 conditional reconstructed maps** across **12 orbital clusters**.
+The first seed reproduced each original 2006 benchmark RMSE to a
+max absolute difference of **2.22 × 10^-16**, verifying that the
+mask/seed replay did not shift the primary experimental protocol.
+
+The author's complete `stochastic_uncertainty_summary.json` was
+independently parsed and *all four reported 12-acquisition equal
+means were recomputed exactly from its per-acquisition entries*:
+
+| Fixed-mask stochastic measure | 12-EDR equal-weight mean |
+| --- | ---: |
+| Mean per-draw hidden-target RMSE | 0.6622203492 |
+| Across-five-draw RMSE standard deviation, mean over masks/EDRs | 0.0019772814 |
+| Across-five-draw per-pixel flux standard deviation, mean over hidden pixels, masks and EDRs | 0.0196996626 |
+| Fraction of actual heldout SSUSI flux values within five-draw empirical 10th–90th-percentile envelope | 0.1134590638 (11.35%) |
+
+Flux/RMSE/SD quantities are in erg cm^-2 s^-1. The mean
+within-mask RMSE spread is only **0.30%** of the mean RMSE,
+whereas low observed-pixel inclusion demonstrates that this
+empirical five-draw uncertainty envelope is much narrower
+than the observed error about the available point estimates.
+The high-error original REV11610 remains a valid and
+included event: five-draw mean RMSE 3.622756; draw-RMSE SD
+0.004371; observed-pixel envelope inclusion 0.023818.
+
+**Statistical interpretation:** This measures intrinsic sampling
+stochasticity conditional on fixed 2006 observations, solar
+wind forcing and fixed trained weights. The independently resampled
+2006 *acquisition-cluster bootstrap* CI measures a DIFFERENT
+quantity, variation in the ensemble of acquisition cases.
+Five draws cannot provide a robust or calibrated posterior
+predictive distribution; the 10th–90th five-sample quantiles
+are **descriptive empirical bounds, NOT a validated 80%
+prediction interval**. In particular, do not claim the
+11.35% figure is a formal 80%-coverage miscalibration test
+or compare it against nominal 80% as if sample quantiles were
+population quantiles. The low realized inclusion and small
+sampling spread, however, reinforce the observed mismatch
+between the generated spatial structures and hidden real
+SSUSI peaks/gradients.
+
+**Do not revise the original fixed-one-draw 2006 Table 12:**
+conditional RMSE 0.661641975 and its paired baselines remain
+the registered primary experiment. The five-seed RMSE
+0.662220349 is a supplemental conditional random-draw mean,
+not the updated benchmark and not a best-of-five selection.
+The original evaluated checkpoint is SHA
+`875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12`.
+
+Detailed verified fact record:
+`verified_2006_stochastic_uncertainty_20261125.json`.
+The event-level source report is local and not committed
+because all private SSUSI case outputs are gitignored.
+
+**Reviewer status:** R3-8 is now **empirically addressed**
+but only for finite-draw stochastic sampling spread, NOT
+for predictive interval calibration. Remaining high-priority
+request: R2-6 explicitly label IMF Bz, V and dynamic
+pressure directly on original Figures 4–7; then
+R3-9 Table 2/3 explanation, R2 minor terminology,
+R3-6 OVATION feature caveat, editorial data/software
+availability and complete point-by-point English response
+plus marked/clean manuscript package.

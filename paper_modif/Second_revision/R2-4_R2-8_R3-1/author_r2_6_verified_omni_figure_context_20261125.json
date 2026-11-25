@@ -1,0 +1,65 @@
+{
+  "audit_date": "2026-11-25",
+  "source_primary": "paper_modif/First_revision/R2-2_R2-4/event_context_results/event_context.csv",
+  "source_independent_ssusi": "paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/timecorrected_figures_and_psd_verified.json",
+  "figures": {
+    "Figure4": {
+      "instrument": "Polar/UVI",
+      "utc": "1996-04-03 02:15 UTC",
+      "OMNI_time_basis": "exact timestamp-matched single 5-minute 1996 OMNI row",
+      "Bz_nT": -1.5700000524520874,
+      "solar_speed_km_s": 325.3999938964844,
+      "Pdyn_nPa": 2.9100000858306885,
+      "condition_match_offset_seconds": 0,
+      "historical_original_png": "paper_modif/First_revision/R2-2_R2-4/polar_redraw_results/Figure4_Polar_UVI_manuscript.png",
+      "new_figure_annotation_stage": "Not yet regenerated from historical GitHub PNG in current container. R2-6 request requires source PNG labeling on user NPU checkout."
+    },
+    "Figure5": {
+      "instrument": "Polar/UVI",
+      "utc": "1996-04-01 08:40 UTC",
+      "OMNI_time_basis": "exact timestamp-matched single 5-minute 1996 OMNI row",
+      "Bz_nT": -3.799999952316284,
+      "solar_speed_km_s": 364.8999938964844,
+      "Pdyn_nPa": 2.690000057220459,
+      "condition_match_offset_seconds": 0,
+      "historical_original_png": "paper_modif/First_revision/R2-2_R2-4/polar_redraw_results/Figure5_Polar_UVI_manuscript.png",
+      "new_figure_annotation_stage": "Not yet regenerated from historical GitHub PNG in current container. R2-6 request requires source PNG labeling on user NPU checkout."
+    },
+    "Figure6": {
+      "instrument": "DMSP F16/SSUSI",
+      "orbit": "06228",
+      "UTC_EDR": "2005-01-01T14:44:34 to 2005-01-01T16:26:25 UTC",
+      "OMNI_time_basis": "mean of all time-matched 5-minute OMNI values during EDR",
+      "Bz_nT": 1.6933332681655884,
+      "solar_speed_km_s": 459.076171875,
+      "Pdyn_nPa": 3.1847617626190186,
+      "source_original": "user-uploaded timecorrected Figure6_comparison_vmax5(2).png, byte-identical to cumulative Word image1.png",
+      "annotation_test": "Pixel-for-pixel unchanged source scientific image; appended black OMNI basis banner",
+      "staged_local_deliverable": "/mnt/data/fourth_batch/r2_6_annotated/Figure6_solar_wind_labeled.png",
+      "included_in_current_working_word": true
+    },
+    "Figure7": {
+      "instrument": "DMSP F16/SSUSI",
+      "orbit": "06263",
+      "UTC_EDR": "2005-01-04T02:12:15 to 2005-01-04T03:54:07 UTC",
+      "OMNI_time_basis": "mean of all time-matched 5-minute OMNI values during EDR",
+      "Bz_nT": -2.128000020980835,
+      "solar_speed_km_s": 656.0899658203125,
+      "Pdyn_nPa": 2.8934998512268066,
+      "source_original": "user-uploaded timecorrected Figure7_comparison_vmax5(2).png, byte-identical to cumulative Word image2.png",
+      "annotation_test": "Pixel-for-pixel unchanged source scientific image; appended black OMNI basis banner",
+      "staged_local_deliverable": "/mnt/data/fourth_batch/r2_6_annotated/Figure7_solar_wind_labeled.png",
+      "included_in_current_working_word": true
+    }
+  },
+  "word": {
+    "new_file": "Solar-Wind-Conditioned Diffusion Model - R2-6 OMNI-Annotated SSUSI Cumulative Working Manuscript.docx",
+    "status": "37-page intermediate working draft, scientific image pixels preserved, Figure4/5 captions enriched but original polar plots not yet embedded",
+    "mathematical_formula_objects_retained": 20,
+    "tables_retained": 12,
+    "embedded_images": 4,
+    "figure_6_and_7_source_panel_pixels_unchanged": true
+  },
+  "remaining": "Run annotate_figures_4_7_solar_wind.py on author's repo checkout where tracked Figure4/5 PNGs and local corrected Figure6/7 source PNGs are accessible. Validate ready_for_R2_6:true and inspect all four PNGs, then embed original Polar figures into final marked/clean submission artwork. Do not declare R2-6 closed beforehand.",
+  "no_new_model_inference": true
+}

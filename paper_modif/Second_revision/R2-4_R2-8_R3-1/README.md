@@ -1408,3 +1408,5 @@ R3-9 Table 2/3 explanation, R2 minor terminology,
 R3-6 OVATION feature caveat, editorial data/software
 availability and complete point-by-point English response
 plus marked/clean manuscript package.
+
+**Working manuscript after R3-8:** The locally rendered and structurally checked cumulative 36-page Word draft is `Solar-Wind-Conditioned Diffusion Model - R3-8 Stochastic Uncertainty Cumulative Working Manuscript.docx` (delivered to the author separately, not committed because it contains the full journal manuscript). New subsection **4.8**, new Section 2.5 evaluation-protocol paragraph, and an explicit Discussion limitation retain all 12 prior tables, 20 equation objects and 4 embedded images. This remains a WORKING manuscript; Figures 4–7 source solar-wind annotations, Table 2-vs-3 discrepancy, data/software release and marked-plus-clean manuscript packages are NOT DONE.

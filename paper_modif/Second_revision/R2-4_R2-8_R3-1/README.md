@@ -1410,3 +1410,94 @@ availability and complete point-by-point English response
 plus marked/clean manuscript package.
 
 **Working manuscript after R3-8:** The locally rendered and structurally checked cumulative 36-page Word draft is `Solar-Wind-Conditioned Diffusion Model - R3-8 Stochastic Uncertainty Cumulative Working Manuscript.docx` (delivered to the author separately, not committed because it contains the full journal manuscript). New subsection **4.8**, new Section 2.5 evaluation-protocol paragraph, and an explicit Discussion limitation retain all 12 prior tables, 20 equation objects and 4 embedded images. This remains a WORKING manuscript; Figures 4–7 source solar-wind annotations, Table 2-vs-3 discrepancy, data/software release and marked-plus-clean manuscript packages are NOT DONE.
+
+
+## 2026-11-25 — R2-6: Figure 4–7 original-OMNI labels; 6/7 already in working Word
+
+Following the reviewer-completion gate, we independently matched
+Fig. 4–7 conditions against the historical first-revision
+`First_revision/R2-2_R2-4/event_context_results/event_context.csv`,
+and for Fig. 6/7 independently cross-checked the audited
+`Second_revision/R2-7_R3-10_R3-12_R3-13/timecorrected_figures_and_psd_verified.json`.
+The four correct *physical-input* labels are:
+
+| Figure | Absolute UTC meaning | Bz (nT) | Vsw (km/s) | Pdyn (nPa) |
+| --- | --- | ---: | ---: | ---: |
+| 4 (Polar/UVI) | 1996-04-03 02:15, exact-time 5-min OMNI record | -1.57 | 325 | 2.91 |
+| 5 (Polar/UVI) | 1996-04-01 08:40, exact-time 5-min OMNI record | -3.80 | 365 | 2.69 |
+| 6 (F16/SSUSI) | 2005-01-01 14:44:34–16:26:25, EDR interval MEAN | +1.69 | 459 | 3.18 |
+| 7 (F16/SSUSI) | 2005-01-04 02:12:15–03:54:07, EDR interval MEAN | -2.13 | 656 | 2.89 |
+
+**Do not label the 2005 SSUSI interval means as nearest-midpoint
+5-min measurements.** That was a documented mismatch in an earlier
+Figure 6/7 generation script; the corrected figures use
+acquisition-mean OMNI and acquisition-mean 1-minute OVATION.
+
+An immutable, original-data-validated annotation program
+`annotate_figures_4_7_solar_wind.py` is committed, with
+`test_annotate_figures_4_7_solar_wind.py`. It reads the original
+historical CSV, crosschecks corrected SSUSI means and acquisition UTC,
+and deterministically appends a black, white-on-black annotation
+band with driver values and the correct time basis. It verifies that
+**every original scientific-panel image pixel is byte-identical** to
+the unchanged image region of the generated PNG. No inference,
+training, OVATION rerun, or SSUSI preprocessing is performed.
+
+**Already completed locally:** The author-provided
+time-corrected 2005 Figure 6 and Figure 7 PNGs were
+annotated, visually checked, and embedded in the latest
+37-page cumulative WORKING Word draft. Figure 4/5 original
+Polar/UVI PNGs were not supplied in the Word/available local
+container, so **their plots themselves have NOT yet been
+annotated**. Their captions were updated using the checked
+1996 OMNI measurements. All 12 original tables, 20 equations,
+4 image objects are retained; the working DOCX is delivered
+to the author separately. The fine-grained audit is
+`author_r2_6_verified_omni_figure_context_20261125.json`.
+
+### Finish R2-6 without any NPU computation
+
+Run from the author's repo checkout:
+
+```bash
+cd /home/docker/code/Aurora_DDPM_total
+git pull --ff-only origin main
+
+python -m unittest discover \
+  -s paper_modif/Second_revision/R2-4_R2-8_R3-1 \
+  -p 'test_*.py'
+
+python paper_modif/Second_revision/R2-4_R2-8_R3-1/annotate_figures_4_7_solar_wind.py
+```
+
+Expected output in:
+`paper_modif/Second_revision/R2-4_R2-8_R3-1/figure4_7_solar_wind_labeled/`
+
+- `Figure4_solar_wind_labeled.png`
+- `Figure5_solar_wind_labeled.png`
+- `Figure6_solar_wind_labeled.png`
+- `Figure7_solar_wind_labeled.png`
+- `figure4_7_omni_label_audit.json`
+
+The JSON must report `ready_for_R2_6=true` and
+`n_annotated_figures=4`, and all four source PNG pixels
+must be preserved. The script does NOT silently substitute
+obsolete `First_revision/R2-1_R2-3/swath_reconstruction_diagnostics/`
+2005 figures if the time-corrected source is unavailable:
+it fails instead. If one of the corrected SSUSI source
+PNGs does not exist on the server, pass its original
+time-corrected path with `--figure6` or `--figure7`
+rather than selecting an old reconstruction.
+
+Return the **two newly labeled Polar files (Figure 4/5)**
+and the small audit JSON. Then the cumulative Word manuscript
+can embed and visually verify all four final annotated
+science figure panels (currently only Figure 6/7 embedded).
+**R2-6 remains PARTIAL until those Figure 4/5 PNGs are
+confirmed and inserted into the final figure package.**
+
+After R2-6, next open issue is R3-9's Table 2 versus
+Table 3 RMSE protocol discrepancy, followed by explicit
+R3-6 OVATION feature dependence and minor nomenclature,
+then data/software release, clean+marked manuscript,
+and the complete point-by-point English R2/R3 response.

@@ -1,0 +1,49 @@
+{
+  "audit_date": "2026-11-25",
+  "evidence": "Author uploaded stochastic_uncertainty_summary.json after completing fixed-mask five-seed run in audit_2006_stochastic_reconstruction.py",
+  "identity": {
+    "original_12_EDRs": true,
+    "preexisting_fixed_random_MLT_holdouts": 36,
+    "draws_per_mask": 5,
+    "total_conditional_runs": 180,
+    "main_2006_holdout_csv_sha256": "3bbfcb81c9dc721cd022266d1ecb2b8726cc5eb57a312d865de5862e45d1e45b",
+    "evaluated_conditional_checkpoint_sha256": "875b88edf91ca2a56d7a3041d55f956ca1ff3243bd137a44ef3e534fbce7ed12",
+    "max_absolute_first_draw_RMSE_difference_from_original": 2.220446049250313e-16,
+    "original_model_and_data_selection_unchanged": true
+  },
+  "checked_metrics": {
+    "n_acquisition_clusters": 12,
+    "n_observed_hidden_sectors": 36,
+    "event_equal_mean_per_draw_rmse": 0.6622203492240643,
+    "event_equal_mean_sectorwise_ddpm_draw_rmse_standard_deviation": 0.001977281429921655,
+    "event_equal_mean_heldout_pixel_draw_standard_deviation": 0.019699662608048,
+    "event_equal_mean_fraction_true_observed_values_within_five_draw_empirical_q10_q90": 0.11345906377967901,
+    "ratio_avg_sectorwise_RMSE_standard_deviation_to_avg_RMSE_percent": 0.2985836107631655,
+    "ratio_avg_pixel_draw_standard_deviation_to_avg_RMSE_percent": 2.9747896800710607,
+    "recomputed_all_4_acquisition_equal_aggregates_exactly": true,
+    "largest_RMSE_case": {
+      "case_id": "F16_2006017T143452_REV11610",
+      "event_equal_mean_per_draw_rmse": 3.622755661575074,
+      "event_mean_per_draw_rmse_std": 0.004370647465981555,
+      "empirical_truth_inclusion_fraction": 0.02381776467883931
+    },
+    "empirical_truth_q10q90_inclusion_fraction_across_12_acquisitions_range": [
+      0.022835959699583557,
+      0.2236286427890395
+    ]
+  },
+  "inference": [
+    "Fixed-mask diffusion randomness yields low within-sector RMSE variability relative to reconstruction error. Dominant disagreement with SSUSI is not explained by sampling seed variation.",
+    "The observed hidden flux values fall within the 5-draw empirical 10%–90% envelope only 11.35% on average across 12 equally weighted acquisitions, showing limited observed-target inclusion.",
+    "The finite-five-draw order statistic envelope is not a calibrated 80% predictive interval, so do not apply an 80%-nominal significance claim or equate this inclusion to predictive uncertainty calibration.",
+    "Single-draw January 2006 primary RMSE 0.661641975 and all paired DDPM/OVATION/interpolation baseline results remain the main publication inference; 0.662220 is a supplemental average across five seeds, not a replacement primary benchmark.",
+    "The 12 January 2006 acquisition clusters may share geomagnetic disturbances; sector/pixel-level samples cannot be treated as 36 or thousands of independent storms.",
+    "Five random seeds and single month are limited; stochastic sampling spread is only one source of predictive uncertainty (not observations, training distribution shift, or model-structure uncertainty).",
+    "The real extreme hard case REV11610 is preserved in the main uncertainty and primary error analyses."
+  ],
+  "reviewer": {
+    "R3-8": "Measured/partly addressed: requested repeated stochastic sampling evidence obtained with 5 independent draws for each of 36 fixed true SSUSI holdout sectors; manuscript and response must describe poor empirical inclusion and avoid posterior-calibration claims.",
+    "R2-6": "Next priority: annotate Figures 4–7 with directly visible IMF Bz, V, dynamic pressure values while checking scientific source alignment.",
+    "editorial": "Clean/marked revised manuscript, complete point-by-point response and data/software availability checks remain OPEN."
+  }
+}

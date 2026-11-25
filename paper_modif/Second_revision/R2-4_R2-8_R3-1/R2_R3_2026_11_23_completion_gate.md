@@ -22,7 +22,7 @@ an explicitly requested item/artifact not delivered or not verified.
 | R2-major-3 | Direct OVATION baseline on independent satellite targets | Addressed | Tables 8–12, paired event statistics, duplicate observed-fused OVATION clearly identified |
 | R2-major-4 | Kp >5 disturbed events | Addressed within limited Kp range | Six strict Kp>5 real acquisitions (Kp 5.3–6.0); no extrapolation to Kp>=7 |
 | R2-major-5 | Is model only prior generation and post hoc replacement? Prior-dependent mask? | Partial | Actual models/ddpm.py repeatedly forward-noises and reinjects valid observed pixels into reverse sampling. Trained on complete OVATION rather than masked examples; document exactly and avoid claiming learned mask-aware network or proven improvement over simple OVATION fusion |
-| R2-major-6 | IMF Bz, speed, dynamic pressure directly IN Figures 4–7 | **PARTIAL — Figures 6/7 completed, Figures 4/5 source PNG outputs pending** | All original OMNI values and time bases verified for four cases. Corrected 2005 Figures 6/7 have driver banners directly in PNG panels and are embedded in the 37-page cumulative working Word draft; four captions updated. Original 1996 Figure 4/5 source PNGs reside in first-revision historical GitHub; run committed `annotate_figures_4_7_solar_wind.py` on author checkout to generate four audited images and deliver the two labeled Polar PNGs before marking closed. |
+| R2-major-6 | IMF Bz, speed, dynamic pressure directly IN Figures 4–7 | **Figure evidence completed; final artwork/Word consistency pending** | All original OMNI values and time bases verified for four cases. Corrected 2005 Figures 6/7 have driver banners directly in PNG panels and are embedded in the 37-page cumulative working Word draft; four captions updated. Author now uploaded four verified, OMNI-annotated Figure 4–7 PNGs and `figure4_7_omni_label_audit.json` (`ready_for_R2_6=true`, `n_annotated_figures=4`; all scientific source pixels preserved). The initial tiny label typography was subsequently enlarged in local candidates. Update final figure upload set and manuscript figure references/captions; current 37-page Word still embeds only 6/7, not 4/5. No model rerun. |
 | R2-major-7 | Why Polar/UVI appears better than SSUSI | Addressed | Section 4.2 contrasts intensity-threshold constraints, swath support, acquisition geometry, and measurement quality |
 | R2-major-8 | Is Apr–May 1996 sufficient across geomagnetic storms? | Partial | Independent January 2006 observed-year transfer, selected strict Kp>5 2005. Still only two months nominal training and no extreme storms; exact historical training dataset-to-weights linkage unverified |
 | R2-minor-1 | Spell out Polar/UVI, IMAGE/FUV, DMSP/SSUSI at first mention | Open | Intro paragraph still uses abbreviated instrument/mission names without full expansion |
@@ -62,10 +62,7 @@ an explicitly requested item/artifact not delivered or not verified.
 
 ## Next bounded actions, in order
 
-1. **One narrow new measurement**, not more model training: fixed-case,
-   fixed-mask, multiple DDPM random draws (prefer complete 12-acquisition
-   2006 cohort, at least five seeds); separately quantify within-case
-   stochastic variability and prediction uncertainty, no checkpoint tuning.
+1. **COMPLETED:** R3-8 fixed-mask five-seed stochastic uncertainty (180 draws) is already in Word Section 4.8. Figure 4–7 solar-wind source annotation audit now reports four figures complete. Final publication artwork typography and placement remain to be approved; NO new model inference needed.
 2. Correct explicit Text/Table 2 vs Table 3 protocol discrepancy,
    OVATION generating-feature explanation, acronyms, jth/ΩM and broken
    Open Research citation, and Figure 4–7 annotations.
@@ -78,3 +75,45 @@ an explicitly requested item/artifact not delivered or not verified.
 
 This is a **documented readiness audit**, not a new performance result
 or evidence that reviewer concerns are all met.
+
+
+## Final status crosscheck 2026-11-25 (after R2-6 figures and R3-8)
+
+Original author response document `Response_Letter(1).docx` contains
+**25** `[To be completed after revisions.]` placeholders: Reviewer #2
+8 major + 2 minor, Reviewer #3 1 general critique + 14 numbered points.
+Thus the experimental evidence is more advanced than the **formal
+response letter (still not drafted)**.
+
+Among the 24 numbered comments, 12 have sufficient substantive
+evidence, 11 require partially addressed manuscript/analysis changes,
+and 1 (R2 minor initialism expansion) remains unwritten. This is an
+evidence-level snapshot, NOT an acceptance or submission readiness score.
+Reviewer #3 general inpainting-method criticism is a separate high-risk
+partial item: the actual `models/ddpm.py` sampler reinjects noised
+observed pixels during reverse diffusion, but the network is not
+trained with masked inputs, and the model is not known to reconstruct
+missing event-specific fine structures.
+
+**Manuscript check:** current 37-page R2-6 working DOCX has all 12 tables,
+12 figure captions, but only four embedded images: Figures 6, 7, 8 and
+11. Standalone figures rather than inline images may be the eventual
+journal submission convention; what is needed is a consistent chosen
+layout and a complete, approved figure upload set (not necessarily
+inserting all 12 figures into the DOCX). R2-6 has four uploaded labeled
+source-preserving files and corresponding OMNI audit, but Figure4/5
+have not yet been integrated into Word.
+
+**Prioritized next tasks:** First reconcile Table 2 RMSE .233 versus
+Table 3 .055 (R3-9) directly from actual different mask/cohort protocols.
+Then explain OVATION input feature limitations (R3-6), inpainting
+sampler versus mask-aware denoiser (R2-5/R3-2/R3 general), selective
+attention limitation (R3-7), prior-dependent Polar masking and 40
+erg/cm2/s threshold (R3-11/R3-12). Fix first-use acronym expansion,
+ILBHL, jth, ΩM, and double-ampersand citation. Correct the Open Research
+claim of fully public software while validation code repository remains
+private. Finally select clean/marked final manuscript conventions,
+assemble final numbered figure files and create/verify 25 point-by-point
+responses, including exact section/table/figure references. Original
+training code/run/dataset provenance is still unverified even though
+both checkpoint files were proven byte-identical to named archived files.

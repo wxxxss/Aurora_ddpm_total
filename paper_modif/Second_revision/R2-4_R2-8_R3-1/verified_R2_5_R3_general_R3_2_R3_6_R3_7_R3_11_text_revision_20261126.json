@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-26",
+  "task": "Text-first, code-grounded Step 2 integrated Methods/Discussion correction for Reviewer #2 Comment 5 and Reviewer #3 general, Comments 2, 6, 7 and 11",
+  "scope": "No model inference, training, checkpoint changes, data re-selection, metric modifications or invented model-baseline comparisons.",
+  "manuscript": {
+    "source": "R3-9_protocol_reconciliation_working_manuscript.docx (verified cumulative 38-page manuscript)",
+    "revised": "R2-5_R3-2_R3-6_R3-7_R3-11_Text_First_Cumulative_Working_Manuscript.docx (delivered separately)",
+    "output_docx_sha256": "1a6e06feb0f3690c14f19a9b5dc1f6e42fed243bf099bf3153e9e2b8d899c8c9",
+    "render_pages": 39,
+    "render_checked": true,
+    "unchanged_tables": 12,
+    "unchanged_OMML_math_objects": 20,
+    "unchanged_embedded_scientific_image_payloads": 4,
+    "modified_existing_paragraphs": 13,
+    "added_discussion_paragraphs": 1,
+    "amended_sections": [
+      "2.1 OVATION generator inputs",
+      "2.2 Polar high-flux selection and calendar overlap",
+      "2.4 physical variable roles",
+      "3.2 single-key attention",
+      "3.3 training provenance and observation-constrained sampler",
+      "4.6 synthetic variable ablation",
+      "5 Summary and Discussion"
+    ]
+  },
+  "audited_source_facts": {
+    "actual_reverse_sampler": {
+      "code": "models/ddpm.py:step() and sample()",
+      "sampler_mask_convention": "mask=1 retained observation, mask=0 hidden/reconstructed",
+      "previously_unobserved_input_values_cleared": true,
+      "forward_noised_known_values_inserted_before_noise_prediction_at_reverse_steps": true,
+      "retained_measurements_reinjected_at_following_diffusion_level": true,
+      "terminal_exact_retained_pixel_copy": true,
+      "unet_receives_binary_mask_as_explicit_input": false,
+      "original_training_mask_aware_loss_verified": false,
+      "qualification": "No controlled ablation proves this sampler architecture or jumping schedule is superior to post-hoc fusion; exact kept-pixel identity does not prove missing-region truth."
+    },
+    "attention": {
+      "code": "models/unet.py:CrossAttention forward() and UNet",
+      "query": "(B,H*W,32)",
+      "key_value": "ONE global token EACH with tensor shape (B,1,32), divided into eight attention heads",
+      "single_token_softmax_attention_weight": 1,
+      "consequence": "No image-position-dependent competition among different condition tokens; projected condition is a broadcast global residual before subsequent spatial processing.",
+      "retrained_FiLM_or_global_broadcast_comparator_performed": false,
+      "qualification": "Do not claim empirically proven selective spatial attention or advantage over a simpler retrained conditioning module."
+    },
+    "synthetic_target_dependency": {
+      "ovation_generator": "paper_modif/First_revision/R1-2/generate_multiyear_ovation.py, newell coupling from By/Bz/V",
+      "independent_direct_generator_inputs": [
+        "By",
+        "Bz",
+        "Vsw"
+      ],
+      "other_DDPM_input_variables": [
+        "Bx",
+        "Pdyn"
+      ],
+      "ablation": "paper_modif/First_revision/R1-3/condition_ablation.py",
+      "qualification": "Weak Bx/Pdyn permutation contributions in OVATION-target tests are not evidence of physical irrelevance or causal insignificance for real aurora."
+    },
+    "polar_mask": {
+      "original_legacy_source": "repaired_polar.py, threshold at 1 erg cm^-2 s^-1",
+      "differential_saved_output_evidence": "paper_modif/Second_revision/R2-5_R3-2_R3-11/polar_mask_case_discriminating_findings.json",
+      "source_case_4": "172/172 low-flux OVATION-nonpositive cells changed above 1e-4",
+      "source_case_5": "175/175 low-flux OVATION-nonpositive cells changed above 1e-4",
+      "conclusion": "Saved figure behavior contradicts strict positive-OVATION gate; flux threshold is a different concept from physical instrument support. Exact historical figure-run mask not independently certified solely from saved arrays.",
+      "calibration": "40 erg/cm2/s upper Polar QC cutoff is unverified physical threshold and has no authentic uncensored sensitivity evidence."
+    },
+    "ssusi_mask": {
+      "source": "paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13 center-aligned native-bin pipeline",
+      "native_support": "finite positive UT_N plus finite energy flux and MLAT/MLT",
+      "uses_target_flux_threshold_for_mask": false,
+      "actual_observed_holdout": "2005 and 2006 genuine SSUSI measured target cells withheld from denoiser and all baseline inputs"
+    },
+    "historical_training_provenance": {
+      "archived_checkpoint_binary_identity_verified": true,
+      "historical_1996_original_training_run_and_dataset_fingerprint_verified": false,
+      "action": "Distinguish existing development workflow text from authenticated actual checkpoint generation in Section 3.3; no provenance claims beyond source evidence."
+    }
+  },
+  "reviewer_item_status": {
+    "R2-5": "Source-grounded manuscript methods explanation drafted and integrated, no new experimental success assertion.",
+    "R3-general": "Source-grounded observation-constrained sampler vs mask-trained model distinction drafted; no claimed missing-region superiority to simple baselines.",
+    "R3-2": "Explicit per-step noisy known-pixel reinjection, absent direct mask input, exact-copy semantics clarified.",
+    "R3-6": "Synthetic OVATION generator dependencies By/Bz/V made explicit; Bx/P effects noncausal.",
+    "R3-7": "Single-key attention mathematically non-selective among keys; no FiLM/broadcast retrained control, so remain bounded.",
+    "R3-11": "Polar threshold versus true sensor support and saved-output contradiction of OVATION gating now explicitly distinguished; native SSUSI support separately defined."
+  },
+  "remaining": "This completes a TEXT patch but not a final reviewer-response letter or editorial publication package. Original source/run lineage, Polar uncensored threshold, exact masks for historic Figure4/5, public code availability and full figure set remain limited/open. No change to verified 2005/2006 metrics."
+}

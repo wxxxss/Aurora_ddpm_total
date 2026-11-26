@@ -1,0 +1,97 @@
+{
+  "audited_on": "2026-11-26",
+  "reviewer": "R3-9",
+  "query": "Table 2 conditional RMSE 0.233 versus Table 3 2005 declining-phase RMSE 0.055",
+  "evidence": {
+    "original_and_latest_docx": "original manuscript and 37-page R2-6 cumulative Word main draft; numeric Table 2 and Table 3 values unchanged",
+    "candidate_table2_implementation": "test_ddpm_indice.py (present repository source file; exact original run version not authenticated)",
+    "candidate_table2_normalizer": "utils/normlize.py and data/dataset_diff.py",
+    "table3_implementation": "paper_modif/First_revision/R1-2/run_multiyear_benchmark.py",
+    "table3_generator": "paper_modif/First_revision/R1-2/generate_multiyear_ovation.py",
+    "table3_metrics": "paper_modif/First_revision/R1-2/r1_2_results/metrics_per_sample.csv",
+    "table3_manifest": "paper_modif/First_revision/R1-2/r1_2_prepared/manifest.csv",
+    "table3_summary": "paper_modif/First_revision/R1-2/r1_2_results/solar_phase_summary.csv"
+  },
+  "table2": {
+    "conditional_rmse_as_reported_in_manuscript": 0.233,
+    "independently_recomputed_from_original_per_sample_outputs": false,
+    "limitation": "The legacy benchmark script only plots curves and prints summary; its complete case-level metric outputs and precise historical source-run identity are not committed, so Table 2 numerical provenance is not fully authenticated.",
+    "historical_candidate_protocol": {
+      "year_month": "2005-01",
+      "target": "existing originally generated one-minute OVATION January cube (aurora_img_20050101.npy)",
+      "original_condition": "January 2005 structured 1-minute OMNI file",
+      "sampling": "every 360 one-minute frames (6 hours), at most 240 frames; complete-month n cannot be confirmed from existing archived raw cube",
+      "synthetic_mask": "60–80 MLAT, 18–06 MLT, 1920 of 7680 pixels (25%)",
+      "hidden_only_rmse": "sqrt(mean((prediction-reference)**2)) on mask==0",
+      "flux_normalization": "log1p min/max fitted to entire January 2005 test cube (utils/normlize.py); not confirmed as training-only normalizer",
+      "solar_normalization": "OmniDataset min/max fitted from January 2005 OMNI array",
+      "candidate_solar_order": [
+        "Bx",
+        "By",
+        "Bz",
+        "Vx",
+        "Vy",
+        "Vz",
+        "P"
+      ],
+      "observed_network_encoding": "models/unet.py SolarWindEncoder actually reads only first five indices as [Bx,By,Bz,Vsw,Pdyn]; 7-vector candidate therefore places Vx and Vy where Vsw and Pdyn were expected if run with this model implementation",
+      "critical_caveat": "The current historical candidate script does not prove the exact original executed source version. The 7-field/5-field mismatch and transductive test-set normalization are substantive protocol issues; no quantitative attribution of the 0.233 discrepancy is justified."
+    }
+  },
+  "table3": {
+    "year": 2005,
+    "phase": "declining_phase",
+    "reported_conditional_rmse_rounded": 0.055,
+    "independently_recomputed_conditional_rmse_from_48_csv_rows": 0.055028124338264206,
+    "archived_summary_rmse": 0.055028124338264185,
+    "sample_count": 48,
+    "selection": "48 nearly evenly spaced, OMNI-eligible hours over 2005 calendar year",
+    "first_case_utc": "2005-01-04T19:00:00",
+    "last_case_utc": "2005-12-28T04:00:00",
+    "reference_generation": "fresh OVATION maps computed from hourly OMNI, with Newell coupling mode calibrated/selected per recorded generator logic",
+    "original_source": "r1_2_prepared/multiyear_testset.npz",
+    "solar_fields": [
+      "Bx",
+      "By",
+      "Bz",
+      "V",
+      "P"
+    ],
+    "scaling": "frozen saved conditional aurora and OMNI training normalization (ckpt/cond/norm_params.pkl)",
+    "mask": "60–80 MLAT, 18–06 MLT, 1920/7680 pixels (25%)",
+    "masked_pixels_each_csv_row": 1920,
+    "definition": "mean of 48 per-sample sqrt(mean((prediction-reference)**2 on withheld pixels))"
+  },
+  "comparisons": {
+    "overlapping_calendar_year": true,
+    "same_canonical_mask_geometry": true,
+    "same_pixel_rmse_formula": true,
+    "same_evaluation_utc_sample_set": false,
+    "same_source_reference_maps": false,
+    "same_normalization_procedure": false,
+    "strict_reproduction_of_table2_per_sample_scores_available": false,
+    "difference_0_233_minus_0_0550281243": 0.1779718756617358,
+    "cannot_attribute_difference_to_a_single_factor": true,
+    "previously_claimed_70_percent_mask_for_quantitative_benchmark": "Incorrect; 70% belongs to a separate aurora-dependent mask generator, whereas the two code-backed fixed-sector benchmark masks cover 25% of grid."
+  },
+  "action_taken": {
+    "word_title": "Solar-Wind-Conditioned Diffusion Model - R3-9 Table 2-3 Protocol Reconciliation Cumulative Working Manuscript.docx",
+    "sections": [
+      "2.4 saved-vs-legacy-normalizer distinction",
+      "2.5 synthetic benchmark population distinction",
+      "4.3 correct 70% to 25% for the fixed benchmark",
+      "4.4 January 2005 legacy sample provenance",
+      "4.5 explicit direct source-aware Table2/Table3 reconciliation",
+      "Table 2 and Table 3 captions"
+    ],
+    "unchanged_original_table_numbers": true,
+    "model_inference_or_retraining_performed": false,
+    "word_structure_preserved": {
+      "tables": 12,
+      "equation_objects": 20,
+      "embedded_images": 4
+    },
+    "status": "Text reconciliation completed with transparent substantive historical-protocol caveats; Table2 full numeric reproducibility remains UNVERIFIED and must not be treated as a harmonized cross-test result."
+  },
+  "next_step": "Proceed to combined R2-5/R3-general/R3-2/R3-6/R3-7/R3-11 method text revisions. No new DDPM experiment required for R3-9 unless the author insists on a direct matched-protocol numeric comparison, in which case source data/normalizer must be corrected and a limited controlled rerun explicitly labeled new."
+}

@@ -1565,3 +1565,74 @@ R3-9 textual explanation is ready with historical run-provenance
 qualification, but the original unarchived Table2 per-sample output
 cannot be independently certified. **No final reviewer Response
 is released before the complete 25-response submission package.**
+
+
+## 2026-11-26 — Text-first Step 2 COMPLETED: R2-5 / R3 general + 2,6,7,11
+
+Following the author's explicit **"use text where reliable, experiments
+only when unavoidable"** direction, the current cumulative Word
+manuscript has been revised using actual first- and second-round
+source/mask audits. The revised 39-page working artifact
+`R2-5_R3-2_R3-6_R3-7_R3-11_Text_First_Cumulative_Working_Manuscript.docx`
+is delivered separately to the author. The technical provenance is
+saved as
+`verified_R2_5_R3_general_R3_2_R3_6_R3_7_R3_11_text_revision_20261126.json`.
+
+Changes (no new NPU, retraining, or adjusted scores):
+
+1. **R2-5 and R3-general/R3-2:** `models/ddpm.py`
+   `step()` actually injects newly noised measured values BEFORE
+   the denoiser call, reinjects observed values at the following
+   diffusion step, and preserves them exactly at the terminal output.
+   This is **not** a mere post-hoc-only paste, but the U-Net itself
+   receives no separate binary mask input and was not established to
+   have been trained on masked real satellite maps. A missing-region
+   claim must be supported by heldout measured SSUSI truth, not
+   preservation of already known cells.
+2. **R3-7:** the condition attention block uses
+   `Q=(B,HW,32)` and ONE `K=(B,1,32)` and ONE
+   `V=(B,1,32)`, split over eight heads. A softmax over one key
+   has weight one; hence no data-dependent selection among condition
+   tokens occurs. The global solar-wind signal is broadcast and
+   spatial context is processed via other image-dependent stages.
+   A separately trained FiLM/broadcast baseline was not tested, so
+   attention-specific superiority is explicitly withdrawn.
+3. **R3-6:** the OVATION generating procedure directly uses
+   `By/Bz/Vsw` via its coupling prescription; separate `Bx/Pdyn`
+   DDPM channels are not independent direct generator drivers.
+   The smaller Bx and dynamic pressure permutation effects on
+   OVATION-generated targets do NOT imply negligible physical roles
+   for real aurora.
+4. **R3-11:** archived Polar reconstruction modifies low-flux
+   cells where the OVATION reference is nonpositive, contradicting
+   strict OVATION-positive gating for its observed mask. The
+   `>=1 erg cm^-2 s^-1` Polar measurement threshold is
+   intensity selection, **not** true instrument coverage, and
+   can remove weak but valid measured precipitation. Native SSUSI
+   `UT_N` support is flux-independent and must be explained
+   separately. Exact figure-producing historical mask provenance
+   remains only partially verifiable.
+5. **R3-1 context:** the Polar examples overlap the nominal
+   1996 OVATION training calendar. The direct Polar pixels were
+   not documented as training targets, but the unverified
+   historical checkpoint training run cannot be retroactively
+   asserted to have a fully authenticated 1996 source separation.
+
+Document QA: **39 rendered pages, all 12 original tables,
+20 embedded OMML mathematical equation objects, and four
+scientific image media payloads byte-for-byte unchanged**.
+Figures 1–12 are still a submission-artwork packing task:
+the working DOCX has only 4 embedded figures, and a separate
+complete figure upload set is mandatory for final submission.
+This artifact is **NOT** a final clean or marked revision and no
+English response letter has yet been certified.
+
+**Next under the agreed text-first plan:** Investigate the *source
+availability only* for R3-12's pre-40-threshold uncensored
+Polar/UVI calibration product. If the genuinely pre-QC source is
+not available, state the empirically chosen 40 cutoff and its
+unmeasured selection sensitivity in Results/Discussion, with no
+fictitious post-QC threshold experiment. Then fix R2 minor acronym
+expansions, subscript formatting, reference typos and Open Research
+availability before final figure packaging, clean+marked Word and
+25 point-by-point reviewer Responses.

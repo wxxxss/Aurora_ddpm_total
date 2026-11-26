@@ -1501,3 +1501,67 @@ Table 3 RMSE protocol discrepancy, followed by explicit
 R3-6 OVATION feature dependence and minor nomenclature,
 then data/software release, clean+marked manuscript,
 and the complete point-by-point English R2/R3 response.
+
+
+## 2026-11-26 — Reviewer R3-9: Table 2 RMSE 0.233 versus Table 3 2005 RMSE 0.055 reconciled in text
+
+**No new model runs or additional SSUSI cases.** The reviewer flagged
+a seemingly inconsistent synthetic-OVATION conditional DDPM RMSE for
+2005. We inspected the original 37-page cumulative Word draft,
+`test_ddpm_indice.py`, `utils/normlize.py`,
+`data/dataset_diff.py`, the R1-2 multiyear generator/benchmark,
+the complete source-matched `r1_2_results/metrics_per_sample.csv`,
+the 240-case manifest and the official phase summary.
+Findings are in
+`verified_R3_9_table2_vs_table3_protocol_20261126.json`.
+
+- **Table 2 (0.233):** original January-2005 OVATION 1-min cube,
+  candidate legacy script taking every 360 frames (6 h). Only
+  manuscript-reported aggregate metrics are preserved; original
+  per-frame metric output and exact historical executed source version
+  were NOT found, so 0.233 cannot be independently recomputed.
+- **Table 3 (0.055):** freshly generated OVATION maps from hourly OMNI,
+  48 evenly distributed 2005 phase samples with UTC range
+  2005-01-04 19:00 to 2005-12-28 04:00. Independent recomputation
+  of 48 conditional records in the tracked R1-2 CSV gives
+  **0.055028124338264206** (archived phase summary agrees).
+- **Not a different mask:** both inspected test implementations use
+  60°–80° MLAT and 18–06 MLT = **1,920/7,680 = 25%** of the
+  80×96 map, with ordinary masked-target RMSE = sqrt(mean(error²)).
+  The earlier manuscript description **"70% masked" was incorrect**
+  for this benchmark. A separate aurora-dependent mask generator
+  in `data/dataset_diff.py` aims for at least 70% but is not
+  the fixed Table2 or Table3 evaluation mask.
+- **Not an identical input-normalization/data pipeline:** the legacy
+  January script calls `normalize(mn_datas)` and
+  `OmniDataset(solar_data)` on **January 2005 TEST arrays**, and
+  creates the seven-variable sequence `Bx,By,Bz,Vx,Vy,Vz,P`;
+  the checked `SolarWindEncoder` actually treats the FIRST FIVE
+  positions as `Bx,By,Bz,Vsw,Pdyn`. The R1-2 multiyear code instead
+  correctly uses **five** fields and saved **training**
+  normalizers. The exact executed original January source cannot
+  be authenticated from its present-day file; a current-source field
+  mismatch is a material concern and is *not* proof of the precise
+  run responsible for 0.233. Inference-time normalization learned
+  from test targets also limits the legacy statistic's independent
+  test validity.
+- **Correct conclusion:** the January-only Table2 0.233 and
+  yearwide 2005 Table3 0.055 are **not commensurate**. Differences
+  in sample population, source map generation, solar forcing
+  and normalization are established, but their relative causal
+  numerical contributions CANNOT be apportioned from available
+  evidence. The 0.233 is retained as a clearly labeled legacy
+  descriptive value, not compared directly to the authenticated
+  0.0550 or to independent real SSUSI benchmarks.
+
+**Manuscript action:** Section 2.4/2.5, Section 4.3–4.5 and Table2/3
+captions have been amended accordingly. The cumulative working
+Word `Solar-Wind-Conditioned Diffusion Model - R3-9 Table 2-3
+Protocol Reconciliation Cumulative Working Manuscript.docx`
+is delivered separately, rendered and checked: **38 pages,
+12 tables, 20 equations, 4 embedded pictures**. Existing numerical
+tables and 2005/2006 real SSUSI scores remain unmodified.
+R3-9 textual explanation is ready with historical run-provenance
+qualification, but the original unarchived Table2 per-sample output
+cannot be independently certified. **No final reviewer Response
+is released before the complete 25-response submission package.**

@@ -1709,3 +1709,79 @@ without inaccurately claiming a private code repository
 is public; approve all twelve independent final figures;
 prepare marked and clean revisions plus all 25 formal
 reviewer responses. These are editorial/text tasks.
+
+
+## 2026-11-27 — Text-first Step 4: R2 minor requests, bibliographic integrity and AGU availability
+
+A complete cumulative Word WORKING manuscript
+`R2_Minors_References_Open_Research_Text_First_Cumulative_Working_Manuscript.docx`
+has been edited from the prior R3-12 39-page draft and delivered
+separately to the author. Direct file hash:
+`e09a19cb9204f6b5297b4410ae9c762326e73b79c560af0de955193394a6137e`.
+
+**R2 minor 1 now addressed in the text**: Polar's Ultraviolet
+Imager (Polar/UVI), the FUV instrument aboard IMAGE
+(Imager for Magnetopause-to-Aurora Global Exploration; IMAGE/FUV),
+and the Special Sensor Ultraviolet Spectrographic Imager aboard
+Defense Meteorological Satellite Program spacecraft (DMSP/SSUSI)
+are expanded on first main-text use. The self-contained abstract
+and plain-language summary also introduce the SSUSI/DMSP names.
+
+**R2 minor 2 specifically corrected**: true Word
+`I_LBHL`, `F_e` and `Ω_M` subscripts in the prose;
+`jth` is now `indexed by j`; a problematic
+Unicode-math italic `F` that rendered as an absent glyph is
+now an ordinary genuinely italic Word character.
+OMNI bibliography's `Papitashvili & & King` typo is fixed.
+The distinct OMNI 5-min and hourly datasets share the same
+authors/year and are now consistently disambiguated as
+`Papitashvili & King 2020a/2020b`.
+The SSIM `Zhou Wang` entry and in-text reference were corrected
+to `Wang, Z. et al.` according to
+`https://doi.org/10.1109/TIP.2003.819861`.
+
+The third original Key Point exceeded the AGU
+**140-character per point** limit and used several
+abbreviations. All three now have 107/112/131
+characters and contain no abbreviations. The revised
+abstract has 244 whitespace-delimited words.
+
+**Open Research claim is corrected, but access is not solved.**
+The prior manuscript incorrectly stated all data AND software
+were already public. NASA/OMNI/Polar/DMSP source data and
+OvationPyme third-party resources have public links, while
+the author's custom DDPM code, pretrained checkpoint
+files, validation/reconstruction scripts and derived
+benchmarks are still in a private repository without an
+independently verified versioned public release and
+persistent identifier. The working manuscript now says
+this accurately rather than inventing Zenodo/DOI
+availability. **Before revision submission**, authors
+must authorize a citable preserved release and/or
+document authentic access restrictions with peer-review
+copies according to the AGU policy:
+`https://www.agu.org/publications/authors/journals/data-software-for-authors`.
+This is a real **SUBMISSION BLOCKER**, not a missing
+one-line edit.
+
+Manuscript QA: complete `render_docx.py` 39-page
+render completed, all page contact sheets inspected,
+and pages 1/5/6/27 inspected at full resolution.
+All 12 numbered table and Figure captions remain
+present and in order. None of the original
+12 tables, 20 OMML equations or 4 embedded
+image-file SHA-256 values changed. The science
+metrics/figures/model inference remain untouched.
+Tracked numerical evidence is unchanged.
+
+The full audit is
+`verified_2026_11_27_R2_minors_open_research_text_qa.json`.
+
+**Next action:** Agree on the author-approved code/checkpoint/
+derived-data archival/access plan (without uploading private
+weights without permission), verify/approve complete
+Figure1–12 standalone production art and consistent caption
+and in-text linkages, then prepare a clean manuscript,
+marked changes for this revision, and the
+**25** complete, factual R2/R3 Responses.
+Do not call this draft a submission-final clean version yet.

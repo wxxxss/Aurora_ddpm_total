@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-27",
+  "reviewer_item": "R3-12",
+  "status": "Scientific methods text revised with accurate documented bounds. Instrument calibration, original pixel QC and threshold sensitivity remain unverified; no new experiment claimed.",
+  "source_evidence": [
+    "User-supplied grid_calibration_audit.json from past server run; locally reopened and checked",
+    "Second-revision batch-2 audit_grid_calibration.py and audit_uncensored_polar_threshold.py",
+    "Original inference source repaired_polar.py and test_ddpm_polar.py, showing only already-processed resampled_5min_1996_0405.npy",
+    "GitHub main recursive source tree, searched for polar/UVI/LBHL/threshold/calibration paths",
+    "39-page 2026-11-26 cumulative source Word manuscript, including Sections 2.2 and 5"
+  ],
+  "audited_map_cases": {
+    "Figure4": {
+      "utc": "1996-04-03T02:15:00",
+      "postprocessed_max_flux_erg_cm2_s": 4.043886297529739,
+      "postprocessed_above40": 0,
+      "retained_flux_ge1_cells": 448,
+      "grid_cells": 7680
+    },
+    "Figure5": {
+      "utc": "1996-04-01T08:40:00",
+      "postprocessed_max_flux_erg_cm2_s": 32.332662872235524,
+      "postprocessed_above40": 0,
+      "retained_flux_ge1_cells": 1317,
+      "grid_cells": 7680
+    }
+  },
+  "derived_conversion": {
+    "assumed_conversion": "F_e [erg cm^-2 s^-1] approximately equals corrected LBHL brightness [R] / 110",
+    "approximate_40_flux_brightness_equivalence_R": 4400,
+    "instrument_saturation_limit_proved": false,
+    "physical_optimality_of_40_cutoff_proved": false,
+    "quantitative_calibration_uncertainty_evaluated": false
+  },
+  "threshold_distinctions": {
+    "qc_upper40": "Historically reported flux screening of unusually high derived values; pre-screening raw calibrated LBHL/flux and native quality flags not authenticated in accessible repository/case products.",
+    "inpainting_known_pixel_lower1": "Selects gridded observed-looking bright precipitation as constraints. All lower-value pixels become reconstruction candidates; these may include valid low-precipitation measurements, so this does not mean native sensor lacked coverage.",
+    "no_methodological_proof_from_postqc_maxima": "Zero above 40 in already screened cases does not establish that zero were excluded upstream.",
+    "naive_20_40_60_postqc_sensitivity_invalid": true
+  },
+  "repository_access": {
+    "tracked_uncensored_preQC_LBHL_product_confirmed": false,
+    "only_visible_source_array": "/home/docker/data/private/AuroraData/real_aurora_data_polar/1996/resampled_5min_1996_0405.npy (previously processed and gridded)",
+    "private_server_all_filesystem_scanned": false,
+    "cannot_claim_no_uncensored_files_exist_on_authors_server": true,
+    "optional_existing_script": "paper_modif/Second_revision/R2-7_R3-10_R3-12_R3-13/audit_uncensored_polar_threshold.py",
+    "optional_experiment_condition": "Author independently identifies genuinely calibrated, pre-40-cutoff flux plus quality flags; rerun only if source fidelity established and quantitatively valuable. Otherwise disclose unverified threshold."
+  },
+  "cumulative_docx": {
+    "input": "R2-5_R3-2_R3-6_R3-7_R3-11_Text_First_Cumulative_Working_Manuscript.docx",
+    "output": "R3-12_Polar_UVI_Calibration_Threshold_Text_First_Cumulative_Working_Manuscript.docx",
+    "new_docx_sha256": "a2b1dd502e20daeb15c0178d4673cdfd412de320eadb9f0fff3aec2e23f35c39",
+    "changes": [
+      "Section 2.2 conversion wording now explicitly approximate rather than a verified per-case model-independent calibration",
+      "Upper 40 erg cm^-2 s^-1 screen numerically equivalent to 4400 R under assumed conversion, not an independently justified instrument threshold",
+      "Postprocessed map maxima and their inability to reveal upstream rejected observations explicitly documented",
+      "Separate lower 1 erg cm^-2 s^-1 constraint-selection rule and actual 448/1317 supported-intensity pixels stated",
+      "Section 4.2 visual difference now cautions against inferring upper-cutoff effects",
+      "Section 5 limitations explicitly restrict Polar missing-region accuracy and calibration certainty"
+    ],
+    "rendered_pages": 39,
+    "tables": 12,
+    "equation_objects": 20,
+    "embedded_image_payloads_unchanged": 4,
+    "pdf_render_and_page6_and_page16_QA": true
+  },
+  "experiments_performed": 0,
+  "reviewer_recommendation": "Reply in text with explicit calibration assumption and QC heuristic; transparently state the missing raw pre-QC provenance and absence of physical justification. Do not claim that 20/40/60 sensitivity or independent instrument calibration was completed.",
+  "next_step": "Paper-wide terminology/notational typo pass (R2 minors) and Open Research availability clarification, then full independent figure bundle and point-by-point responses."
+}

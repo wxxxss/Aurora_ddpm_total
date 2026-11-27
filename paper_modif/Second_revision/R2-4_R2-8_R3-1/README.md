@@ -1636,3 +1636,76 @@ fictitious post-QC threshold experiment. Then fix R2 minor acronym
 expansions, subscript formatting, reference typos and Open Research
 availability before final figure packaging, clean+marked Word and
 25 point-by-point reviewer Responses.
+
+
+## 2026-11-27 — R3-12 text-first Polar LBHL calibration / cutoff audit COMPLETE within evidence limits
+
+The author's original `grid_calibration_audit.json` was reopened and
+crosschecked with the historical Polar sources `repaired_polar.py`,
+`test_ddpm_polar.py`, the current second-revision
+`audit_grid_calibration.py` and
+`audit_uncensored_polar_threshold.py`. Result:
+- The reported approximate conversion is **110 R per
+  1 erg cm^-2 s^-1**, with substantial unresolved physical
+  calibration/background/atmospheric-yield uncertainty.
+- The reported **40 erg cm^-2 s^-1 upper pre-screening**
+  is numerically **4400 R** *under that assumed factor*, NOT
+  a validated Polar saturation threshold or physically
+  universal upper energy-flux limit.
+- The only verified accessible Polar 80x96 products are
+  **POST-processed** and, for Figure 4 (1996-04-03 02:15)
+  and Figure 5 (1996-04-01 08:40), have maxima
+  **4.043886** and **32.332663 erg cm^-2 s^-1** and
+  **zero surviving values >40**. This does **not**
+  show that zero pre-QC samples exceeded the cutoff or
+  establish whether rejected samples were artifacts.
+- The independent **1 erg cm^-2 s^-1 LOWER inpainting
+  retained-observation rule** keeps respectively
+  **448/7680** and **1317/7680** pixels. It is not
+  instrument coverage: weak genuinely observed aurora
+  may be wrongly treated as missing.
+- No authenticated PRE-40 calibrated LBHL flux and
+  original native quality flag product is tracked in the
+  available code/archived case outputs. This does
+  **not** prove such source files are absent from the
+  author's private compute-server filesystem.
+- Running 20/40/60 threshold statistics on the ALREADY
+  screened cases is **invalid** as a test of the original
+  40 threshold. The existing
+  `audit_uncensored_polar_threshold.py` is reserved
+  for genuine pre-cutoff calibrated input, with original
+  provenance documented. No threshold experiment was
+  performed or claimed.
+
+**The manuscript has been updated IN TEXT**:
+`R3-12_Polar_UVI_Calibration_Threshold_Text_First_Cumulative_Working_Manuscript.docx`
+is the new 39-page working draft. Methods Section 2.2
+now explicitly distinguishes the 110-R approximation,
+the historically stated QC upper 40, and the independent
+constraint lower 1. Results Section 4.2 and Discussion
+Section 5 now state that the postprocessed examples
+cannot independently establish original instrument
+support, physically calibrate 40 or validate missing
+faint/strong emission. The original 12 numeric tables,
+20 equation objects and four embedded scientific image
+media payloads were preserved, and the new Word was
+rendered and visually checked.
+
+Source-grounded audit, including exact working-Word
+SHA-256 and author supplied maxima:
+`verified_R3_12_polar_LBHL_upper_threshold_source_audit_20261127.json`.
+
+**Reviewer status: R3-12 text response scientifically ready
+WITH EXPLICIT UNVERIFIED CALIBRATION/CUTOFF LIMITATION**.
+If the author later identifies genuine pre-QC Polar
+radiances and quality flags, a minimal screening
+sensitivity could be considered separately; no
+new diffusion inference or model retraining is needed.
+
+**Next** under author's text-first instructions:
+R2 minor initialism expansion + math notation/
+reference typo checks; verify Open Research disclosure
+without inaccurately claiming a private code repository
+is public; approve all twelve independent final figures;
+prepare marked and clean revisions plus all 25 formal
+reviewer responses. These are editorial/text tasks.

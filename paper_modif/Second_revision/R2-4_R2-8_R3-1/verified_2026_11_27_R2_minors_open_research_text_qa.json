@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-27",
+  "phase": "Text-first Step 4: Reviewer #2 two minor comments, bibliographic integrity, first-use initialisms, mathematical typography, full text/figure crossreference, Open Research truthfulness",
+  "source_manuscript": "R3-12_Polar_UVI_Calibration_Threshold_Text_First_Cumulative_Working_Manuscript.docx",
+  "revised_manuscript": "R2_Minors_References_Open_Research_Text_First_Cumulative_Working_Manuscript.docx",
+  "revised_docx_sha256": "e09a19cb9204f6b5297b4410ae9c762326e73b79c560af0de955193394a6137e",
+  "document_changes_count": 18,
+  "reviewer_R2_minor1": {
+    "status": "Completed in 39-page WORKING Word",
+    "main_intro_first_occurrence": [
+      "Polar Ultraviolet Imager (Polar/UVI)",
+      "Imager for Magnetopause-to-Aurora Global Exploration / Far Ultraviolet instrument (IMAGE/FUV)",
+      "Defense Meteorological Satellite Program / Special Sensor Ultraviolet Spectrographic Imager (DMSP/SSUSI)"
+    ],
+    "self_contained_abstract_and_plain_language_summary_abbreviation_introductions_updated": true
+  },
+  "reviewer_R2_minor2": {
+    "status": "Specific examples corrected in working Word; overall publication copyedit remains a final requirement",
+    "corrected_prose_math": [
+      "I_{LBHL} true Word subscript (LBHL)",
+      "F_e true Word subscript (e)",
+      "Omega_M true Word subscript (M)",
+      "jth replaced by 'conditioning variable indexed by j'",
+      "math italic F rendered instead of unsupported Unicode glyph"
+    ],
+    "reference_repairs": [
+      "Papitashvili & & King repeated ampersand removed",
+      "Distinct OMNI 5-min and hourly same-author-year datasets disambiguated as Papitashvili & King (2020a, 2020b)",
+      "Wang et al. (2004) cited under surname, and official SSIM authors/reference corrected and DOI kept"
+    ],
+    "SSIM_bibliographic_evidence": "https://doi.org/10.1109/TIP.2003.819861"
+  },
+  "journal_style": {
+    "AGU_key_points": [
+      "107 chars",
+      "112 chars",
+      "131 chars"
+    ],
+    "max_chars_per_key_point": 140,
+    "no_abbreviations_in_key_points": true,
+    "abstract_word_count_by_whitespace": 244,
+    "official_AGU_requirements": [
+      "https://www.agu.org/publications/authors/journals/text-graphics-requirements",
+      "https://www.agu.org/publications/authors/journals/submission-checklists",
+      "https://www.agu.org/publications/authors/journals/data-software-for-authors"
+    ]
+  },
+  "Open_Research": {
+    "previous_unsafe_claim": "The data and software used in this study are publicly available.",
+    "updated_statement": "Explicitly distinguishes public external source data and third-party software from private study-specific model weights, scripts, derived holdouts and outputs.",
+    "evaluated_custom_repository_public_archive_verified": false,
+    "public_persistent_identifier_for_custom_artifacts_verified": false,
+    "status": "Text now accurate; author-approved source and code/checkpoint deposit (or supported access restrictions and peer-review copy) remains a hard SUBMISSION BLOCKER.",
+    "do_not_invent_doi_or_promise_unapproved_publication": true
+  },
+  "QA": {
+    "rendered_page_count": 39,
+    "all_rendered_pages_visually_checked_as_contact_sheets": true,
+    "targeted_full_resolution_page_QA": [
+      1,
+      5,
+      6,
+      27
+    ],
+    "original_tables_unchanged": 12,
+    "original_OMML_math_objects_unchanged": 20,
+    "original_embedded_image_payloads_sha256_identical": true,
+    "embedded_image_count": 4,
+    "numbered_figure_captions": 12,
+    "numbered_table_captions": 12,
+    "text_figure_table_number_reference_subset_valid": true,
+    "all_real_2005_2006_observation_scores_unchanged": true,
+    "scientific_model_or_dataset_reruns": 0
+  },
+  "figure_package": {
+    "status": "OPEN",
+    "detail": "Current cumulative Word includes 12 numbered Figure captions but embeds only Figures6/7/8/11. Four audited readable OMNI-labeled Figure4–7 PNGs exist separately, but final Figure1–12 standalone production-artwork set has not been author-approved/fully verified.",
+    "note": "AGU revision requires production-ready separate figure files; do not misrepresent mere nonembedding as absence of the actual science figure."
+  },
+  "formal_responses": {
+    "status": "OPEN",
+    "reviewer2_items": 10,
+    "reviewer3_items_including_general": 15,
+    "total_final_unfilled_or_unapproved_response_positions": 25,
+    "marked_changes_current_revision": "NOT CREATED"
+  },
+  "next": "Finalize independent figure file inventory and public/peer-review software/data release decision, then clean + marked Word and complete point-by-point 25 responses tied to final sections, pages and actual changes. No new DDPM inference warranted.",
+  "manuscript_classification": "CUMULATIVE WORKING DRAFT, NOT FINAL SUBMISSION VERSION"
+}
